@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DB\DbColumn.cs" />
+    <Compile Include="DB\DbConnectionString.cs" />
     <Compile Include="DB\DbTable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
