@@ -42,5 +42,9 @@ namespace Infrastructure.DB
         /// 日期时间
         /// </summary>
         DATE,
+        /// <summary>
+        /// 时间戳
+        /// </summary>
+        TIMESTAMP,
     }
 }

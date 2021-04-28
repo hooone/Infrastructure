@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EnvDTE;
 using EnvDTE80;
+using Infrastructure.Code;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Oracle.ManagedDataAccess.Client;
@@ -121,8 +122,8 @@ namespace HoooneVSIX
             {
                 VsShellUtilities.ShowMessageBox(
                     this.package,
-                    "生成失败",
                     "未找到选中项目",
+                    "生成失败",
                     OLEMSGICON.OLEMSGICON_INFO,
                     OLEMSGBUTTON.OLEMSGBUTTON_OK,
                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
@@ -160,8 +161,8 @@ namespace HoooneVSIX
                 {
                     VsShellUtilities.ShowMessageBox(
                         this.package,
-                        "生成失败",
                         "未找到项目路径",
+                        "生成失败",
                         OLEMSGICON.OLEMSGICON_INFO,
                         OLEMSGBUTTON.OLEMSGBUTTON_OK,
                         OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
@@ -169,7 +170,20 @@ namespace HoooneVSIX
                 }
             }
 
-            // 获得文件
+            // 获得项目信息
+            AssemblyInfo assembly = new AssemblyInfo(projPath);
+            string loadRst = assembly.Load();
+            if (!string.IsNullOrWhiteSpace(loadRst))
+            {
+                VsShellUtilities.ShowMessageBox(
+                     this.package,
+                     loadRst,
+                     "生成失败",
+                     OLEMSGICON.OLEMSGICON_INFO,
+                     OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                return;
+            }
             List<string> csFiles = new List<string>();
             List<string> iniFiles = new List<string>();
             {
@@ -195,8 +209,8 @@ namespace HoooneVSIX
             {
                 VsShellUtilities.ShowMessageBox(
                     this.package,
-                    "生成失败",
                     "未找到CS文件",
+                    "生成失败",
                     OLEMSGICON.OLEMSGICON_INFO,
                     OLEMSGBUTTON.OLEMSGBUTTON_OK,
                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
@@ -248,8 +262,8 @@ namespace HoooneVSIX
             {
                 VsShellUtilities.ShowMessageBox(
                     this.package,
-                    "生成失败",
                     "未找到数据库连接方式",
+                    "生成失败",
                     OLEMSGICON.OLEMSGICON_INFO,
                     OLEMSGBUTTON.OLEMSGBUTTON_OK,
                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
@@ -268,8 +282,8 @@ namespace HoooneVSIX
             {
                 VsShellUtilities.ShowMessageBox(
                  this.package,
-                 "生成失败-连接数据库失败",
                  strConn,
+                 "生成失败-连接数据库失败",
                  OLEMSGICON.OLEMSGICON_INFO,
                  OLEMSGBUTTON.OLEMSGBUTTON_OK,
                  OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
@@ -433,8 +447,8 @@ namespace HoooneVSIX
             }
             VsShellUtilities.ShowMessageBox(
                 this.package,
-                "代码生成成功",
                 "共生成" + count.ToString() + "个文件!",
+                "代码生成成功",
                 OLEMSGICON.OLEMSGICON_INFO,
                 OLEMSGBUTTON.OLEMSGBUTTON_OK,
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
