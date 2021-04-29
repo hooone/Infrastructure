@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HoooneVSIX", "HoooneVSIX\Ho
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfrastructureTests", "InfrastructureTests\InfrastructureTests.csproj", "{D86B9C4E-D8E3-40D5-A89F-86E0098B01E9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDecoder", "AssemblyDecoder\AssemblyDecoder.csproj", "{54B11B2F-6F2F-49C2-8EF7-760E8EC1EBF7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{D86B9C4E-D8E3-40D5-A89F-86E0098B01E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D86B9C4E-D8E3-40D5-A89F-86E0098B01E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D86B9C4E-D8E3-40D5-A89F-86E0098B01E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54B11B2F-6F2F-49C2-8EF7-760E8EC1EBF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54B11B2F-6F2F-49C2-8EF7-760E8EC1EBF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54B11B2F-6F2F-49C2-8EF7-760E8EC1EBF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54B11B2F-6F2F-49C2-8EF7-760E8EC1EBF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

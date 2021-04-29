@@ -112,7 +112,6 @@ namespace HoooneVSIX
             {
                 return;
             }
-
             // 获得dte
             var dteT = Instance.ServiceProvider.GetServiceAsync(typeof(DTE));
             var dte = (DTE2)dteT.Result;
@@ -132,13 +131,6 @@ namespace HoooneVSIX
             }
             string projectName = selectedItems[0].Name;
 
-            VsShellUtilities.ShowMessageBox(
-             this.package,
-             "step1",
-             "step",
-             OLEMSGICON.OLEMSGICON_INFO,
-             OLEMSGBUTTON.OLEMSGBUTTON_OK,
-             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             // 获得项目路径
             string projPath = "";
             {
@@ -178,28 +170,25 @@ namespace HoooneVSIX
                 }
             }
 
-            VsShellUtilities.ShowMessageBox(
-             this.package,
-             "step2",
-             "step",
-             OLEMSGICON.OLEMSGICON_INFO,
-             OLEMSGBUTTON.OLEMSGBUTTON_OK,
-             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             // 获得项目信息
-            AssemblyInfo assembly = new AssemblyInfo(projPath);
-            VsShellUtilities.ShowMessageBox(
-             this.package,
-             "step3",
-             "step",
-             OLEMSGICON.OLEMSGICON_INFO,
-             OLEMSGBUTTON.OLEMSGBUTTON_OK,
-             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-            string loadRst = assembly.Load();
-            if (!string.IsNullOrWhiteSpace(loadRst))
+            System.Diagnostics.Process myProcess = new System.Diagnostics.Process();
+            FileInfo cur = new FileInfo(this.GetType().Assembly.Location);
+            myProcess.StartInfo.FileName = Path.Combine(cur.Directory.FullName, "AssemblyDecoder.exe");
+            myProcess.StartInfo.UseShellExecute = false;
+            myProcess.StartInfo.RedirectStandardInput = true;
+            myProcess.StartInfo.RedirectStandardOutput = true;
+            myProcess.StartInfo.RedirectStandardError = true;
+            myProcess.StartInfo.CreateNoWindow = true;
+            myProcess.StartInfo.Arguments = projPath;
+            myProcess.Start();
+            var str = myProcess.StandardOutput.ReadToEnd();
+            myProcess.WaitForExit();
+            var assembly = Newtonsoft.Json.JsonConvert.DeserializeObject<AssemblyInfo>(str);
+            if (!string.IsNullOrWhiteSpace(assembly.Message))
             {
                 VsShellUtilities.ShowMessageBox(
                      this.package,
-                     loadRst,
+                     assembly.Message,
                      "生成失败",
                      OLEMSGICON.OLEMSGICON_INFO,
                      OLEMSGBUTTON.OLEMSGBUTTON_OK,
@@ -207,20 +196,12 @@ namespace HoooneVSIX
                 return;
             }
             VsShellUtilities.ShowMessageBox(
-             this.package,
-             "step4",
-             "step",
-             OLEMSGICON.OLEMSGICON_INFO,
-             OLEMSGBUTTON.OLEMSGBUTTON_OK,
-             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-
-            VsShellUtilities.ShowMessageBox(
-             this.package,
-             "step5",
-             "step",
-             OLEMSGICON.OLEMSGICON_INFO,
-             OLEMSGBUTTON.OLEMSGBUTTON_OK,
-             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+              this.package,
+              "step2",
+              "step",
+              OLEMSGICON.OLEMSGICON_INFO,
+              OLEMSGBUTTON.OLEMSGBUTTON_OK,
+              OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
 
             // 获得项目文件并检查时间
             List<string> csFiles = new List<string>();
@@ -241,7 +222,9 @@ namespace HoooneVSIX
                         {
                             VsShellUtilities.ShowMessageBox(
                              this.package,
-                             "代码与编译后的文件不匹配，请重新生成项目。",
+                             "代码与编译后的文件不匹配，请重新生成项目。" + Environment.NewLine +
+                             csInfo.FullName + Environment.NewLine +
+                             csInfo.LastWriteTime,
                              "生成失败",
                              OLEMSGICON.OLEMSGICON_INFO,
                              OLEMSGBUTTON.OLEMSGBUTTON_OK,
@@ -259,7 +242,9 @@ namespace HoooneVSIX
                         {
                             VsShellUtilities.ShowMessageBox(
                              this.package,
-                             "代码与编译后的文件不匹配，请重新生成项目。",
+                             "代码与编译后的文件不匹配，请重新生成项目。" + Environment.NewLine +
+                             csInfo.FullName + Environment.NewLine +
+                             csInfo.LastWriteTime,
                              "生成失败",
                              OLEMSGICON.OLEMSGICON_INFO,
                              OLEMSGBUTTON.OLEMSGBUTTON_OK,
@@ -281,14 +266,14 @@ namespace HoooneVSIX
                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
                 return;
             }
-
             VsShellUtilities.ShowMessageBox(
-             this.package,
-             "step6",
-             "step",
-             OLEMSGICON.OLEMSGICON_INFO,
-             OLEMSGBUTTON.OLEMSGBUTTON_OK,
-             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+              this.package,
+              "step3",
+              "step",
+              OLEMSGICON.OLEMSGICON_INFO,
+              OLEMSGBUTTON.OLEMSGBUTTON_OK,
+              OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+
             // 搜索数据库连接字符串
             string connectionDB = "";
             string connectionUser = "";
@@ -322,14 +307,14 @@ namespace HoooneVSIX
                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
                 return;
             }
-
             VsShellUtilities.ShowMessageBox(
-             this.package,
-             "step7",
-             "step",
-             OLEMSGICON.OLEMSGICON_INFO,
-             OLEMSGBUTTON.OLEMSGBUTTON_OK,
-             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+              this.package,
+              "step4",
+              "step",
+              OLEMSGICON.OLEMSGICON_INFO,
+              OLEMSGBUTTON.OLEMSGBUTTON_OK,
+              OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+
             // 连接数据库
             string strConn = "Data Source = " + connectionDB + "; User ID = " + connectionUser + "; Password = " + connectionPass + ";Connection Lifetime=3;Connection Timeout=3;";
             var oracleConnection = new OracleConnection(strConn);
@@ -349,6 +334,13 @@ namespace HoooneVSIX
                  OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
                 return;
             }
+            VsShellUtilities.ShowMessageBox(
+              this.package,
+              "step5",
+              "step",
+              OLEMSGICON.OLEMSGICON_INFO,
+              OLEMSGBUTTON.OLEMSGBUTTON_OK,
+              OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
 
             // 生成dbmodel代码
             int count = 0;
