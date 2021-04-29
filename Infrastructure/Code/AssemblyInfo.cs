@@ -1,4 +1,5 @@
 ﻿using SharpPdb.Windows;
+using SharpPdb.Windows.DebugSubsections;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +12,7 @@ namespace Infrastructure.Code
 {
     public class AssemblyInfo
     {
+        public DateTime LastModifyTime { get; set; }
         public List<ClassInfo> ClassList { get; set; }
         private string AssemblyPath { get; }
         private string PdbPath { get; }
@@ -60,50 +62,136 @@ namespace Infrastructure.Code
         }
         public string Load()
         {
-            if (string.IsNullOrWhiteSpace(AssemblyPath))
+            try
             {
-                return "操作失败，未能找到编译后的文件，请重新生成。";
-            }
-            FileInfo assemFile = new FileInfo(AssemblyPath);
-            if (!assemFile.Exists)
-            {
-                return "操作失败，未能找到编译后的文件，请重新生成。";
-            }
-            FileInfo pdbFile = new FileInfo(PdbPath);
-            if (!assemFile.Exists)
-            {
-                return "操作失败，未能找到.pdb文件，打开debug-full模式。";
-            }
-            Assembly asm = Assembly.LoadFile(AssemblyPath);
-            PdbFile Pdb = new PdbFile(PdbPath);
-            foreach (var typ in asm.DefinedTypes)
-            {
-                var cls = new ClassInfo();
-                cls.Name = typ.Name;
-                cls.FullName = typ.FullName;
-                cls.NameSpace = typ.Namespace;
-                foreach (var item in typ.CustomAttributes)
+
+                if (string.IsNullOrWhiteSpace(AssemblyPath))
                 {
-                    var attr = new AttributeInfo();
-                    attr.Description = item.ToString();
-                    attr.TypeName = item.AttributeType.Name;
-                    attr.TypeFullName = item.AttributeType.FullName;
-                    foreach (var arg in item.ConstructorArguments)
-                    {
-                        attr.ArgumentList.Add(arg.Value.ToString());
-                    }
-                    cls.AttributeList.Add(attr);
+                    return "操作失败，未能找到编译后的文件，请重新生成。";
                 }
-                foreach (var module in Pdb.DbiStream.Modules)
+                FileInfo assemFile = new FileInfo(AssemblyPath);
+                if (!assemFile.Exists)
                 {
-                    if (module.ModuleName.String == cls.FullName)
-                    {
-                        cls.FilePath = module.Files.ToList();
-                    }
+                    return "操作失败，未能找到编译后的文件，请重新生成。";
                 }
-                ClassList.Add(cls);
+                LastModifyTime = assemFile.LastWriteTime;
+                FileInfo pdbFile = new FileInfo(PdbPath);
+                if (!assemFile.Exists)
+                {
+                    return "操作失败，未能找到.pdb文件，打开debug-full模式。";
+                }
+
+                // 临时使用，会导致程序集的内存副本无法释放
+                byte[] fileData = File.ReadAllBytes(AssemblyPath);
+                Assembly asm = Assembly.Load(fileData);
+                PdbFile Pdb = new PdbFile(PdbPath);
+                foreach (var typ in asm.DefinedTypes)
+                {
+                    var cls = new ClassInfo();
+                    cls.Name = typ.Name;
+                    cls.FullName = typ.FullName;
+                    cls.NameSpace = typ.Namespace;
+                    foreach (var item in typ.CustomAttributes)
+                    {
+                        var attr = new AttributeInfo();
+                        attr.Description = item.ToString();
+                        attr.TypeName = item.AttributeType.Name;
+                        attr.TypeFullName = item.AttributeType.FullName;
+                        foreach (var arg in item.ConstructorArguments)
+                        {
+                            attr.ArgumentList.Add(arg.Value.ToString());
+                        }
+                        cls.AttributeList.Add(attr);
+                    }
+                    try
+                    {
+                        foreach (var prop in typ.DeclaredProperties)
+                        {
+                            var property = new PropertyInfo();
+                            property.Name = prop.Name;
+                            property.Type = prop.PropertyType;
+                            try
+                            {
+
+                                foreach (var item in prop.CustomAttributes)
+                                {
+                                    try
+                                    {
+
+                                        var attr = new AttributeInfo();
+                                        attr.Description = item.ToString();
+                                        attr.TypeName = item.AttributeType.Name;
+                                        attr.TypeFullName = item.AttributeType.FullName;
+                                        foreach (var arg in item.ConstructorArguments)
+                                        {
+                                            attr.ArgumentList.Add(arg.Value.ToString());
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        return "777";
+                                    }
+                                    //property.AttributeList.Add(attr);
+                                }
+                                //cls.PropertyList.Add(property);
+                            }
+                            catch
+                            {
+                                return "73";
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        return "7";
+                    }
+
+                    try
+                    {
+
+                        // 从pdb文件中取出代码路径和位置
+                        foreach (var module in Pdb.DbiStream.Modules)
+                        {
+                            if (module.ModuleName.String == cls.FullName)
+                            {
+                                cls.FilePath = module.Files.ToList();
+                                if (cls.FilePath.Count > 1)
+                                {
+                                    continue;
+                                }
+                                var lines = module.DebugSubsectionStream[DebugSubsectionKind.Lines].OfType<LinesSubsection>().ToArray();
+                                uint min = 999999;
+                                uint max = 0;
+                                foreach (var lin in lines)
+                                {
+                                    var elins = lin.Files[0].Lines;
+                                    foreach (var elin in elins)
+                                    {
+                                        min = Math.Min(min, elin.LineStart);
+                                        max = Math.Max(max, elin.LineEnd);
+                                    }
+                                }
+                                if (min < max)
+                                {
+                                    cls.MinLine = min;
+                                    cls.MaxLine = max;
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        return "8";
+                    }
+                    ClassList.Add(cls);
+                }
+                return "999";
+
             }
-            return "";
+            catch (Exception e)
+            {
+                return e.StackTrace;
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using EnvDTE;
 using EnvDTE80;
 using Infrastructure.Code;
+using Infrastructure.DB;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Oracle.ManagedDataAccess.Client;
@@ -131,6 +132,13 @@ namespace HoooneVSIX
             }
             string projectName = selectedItems[0].Name;
 
+            VsShellUtilities.ShowMessageBox(
+             this.package,
+             "step1",
+             "step",
+             OLEMSGICON.OLEMSGICON_INFO,
+             OLEMSGBUTTON.OLEMSGBUTTON_OK,
+             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             // 获得项目路径
             string projPath = "";
             {
@@ -170,8 +178,22 @@ namespace HoooneVSIX
                 }
             }
 
+            VsShellUtilities.ShowMessageBox(
+             this.package,
+             "step2",
+             "step",
+             OLEMSGICON.OLEMSGICON_INFO,
+             OLEMSGBUTTON.OLEMSGBUTTON_OK,
+             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             // 获得项目信息
             AssemblyInfo assembly = new AssemblyInfo(projPath);
+            VsShellUtilities.ShowMessageBox(
+             this.package,
+             "step3",
+             "step",
+             OLEMSGICON.OLEMSGICON_INFO,
+             OLEMSGBUTTON.OLEMSGBUTTON_OK,
+             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             string loadRst = assembly.Load();
             if (!string.IsNullOrWhiteSpace(loadRst))
             {
@@ -184,6 +206,23 @@ namespace HoooneVSIX
                      OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
                 return;
             }
+            VsShellUtilities.ShowMessageBox(
+             this.package,
+             "step4",
+             "step",
+             OLEMSGICON.OLEMSGICON_INFO,
+             OLEMSGBUTTON.OLEMSGBUTTON_OK,
+             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+
+            VsShellUtilities.ShowMessageBox(
+             this.package,
+             "step5",
+             "step",
+             OLEMSGICON.OLEMSGICON_INFO,
+             OLEMSGBUTTON.OLEMSGBUTTON_OK,
+             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+
+            // 获得项目文件并检查时间
             List<string> csFiles = new List<string>();
             List<string> iniFiles = new List<string>();
             {
@@ -196,12 +235,38 @@ namespace HoooneVSIX
                     if (item.ToString().EndsWith(".CS\""))
                     {
                         var file = Regex.Match(item.ToString(), "\"" + @"[\S\s]*?" + "\"").ToString().Replace("\"", "");
-                        csFiles.Add(Path.Combine(dir, file));
+                        var filePath = Path.Combine(dir, file);
+                        FileInfo csInfo = new FileInfo(filePath);
+                        if (csInfo.LastWriteTime > assembly.LastModifyTime)
+                        {
+                            VsShellUtilities.ShowMessageBox(
+                             this.package,
+                             "代码与编译后的文件不匹配，请重新生成项目。",
+                             "生成失败",
+                             OLEMSGICON.OLEMSGICON_INFO,
+                             OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                            return;
+                        }
+                        csFiles.Add(filePath);
                     }
                     else if (item.ToString().EndsWith(".INI\""))
                     {
                         var file = Regex.Match(item.ToString(), "\"" + @"[\S\s]*?" + "\"").ToString().Replace("\"", "");
-                        iniFiles.Add(Path.Combine(dir, file));
+                        var filePath = Path.Combine(dir, file);
+                        FileInfo csInfo = new FileInfo(filePath);
+                        if (csInfo.LastWriteTime > assembly.LastModifyTime)
+                        {
+                            VsShellUtilities.ShowMessageBox(
+                             this.package,
+                             "代码与编译后的文件不匹配，请重新生成项目。",
+                             "生成失败",
+                             OLEMSGICON.OLEMSGICON_INFO,
+                             OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                            return;
+                        }
+                        iniFiles.Add(filePath);
                     }
                 }
             }
@@ -217,44 +282,32 @@ namespace HoooneVSIX
                 return;
             }
 
+            VsShellUtilities.ShowMessageBox(
+             this.package,
+             "step6",
+             "step",
+             OLEMSGICON.OLEMSGICON_INFO,
+             OLEMSGBUTTON.OLEMSGBUTTON_OK,
+             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             // 搜索数据库连接字符串
             string connectionDB = "";
             string connectionUser = "";
             string connectionPass = "";
             {
-                foreach (var file in csFiles)
+                foreach (var cls in assembly.ClassList)
                 {
-                    var cs = File.ReadAllText(file).Replace(" ", "").Replace("\r", "").Replace("\n", "");
-                    bool usingDB = Regex.Match(cs, @"using" + @"[\S\s]*?" + "Infrastructure" + @"[\S\s]*?" + "." + @"[\S\s]*?" + "DB" + @"[\S\s]*?" + "; ").Success;
-                    string attr = "";
-                    if (usingDB)
+
+                    foreach (var prop in cls.PropertyList)
                     {
-                        var r = Regex.Match(cs, @"\[DbConnectionString\(" + @"[\S\s]*?" + @"\)\]");
-                        if (r.Success)
+                        foreach (var attr in prop.AttributeList)
                         {
-                            attr = r.ToString();
-                            var ps = Regex.Matches(attr, "\"" + @"[\S\s]*?" + "\"");
-                            if (ps.Count == 3)
+                            if (attr.TypeFullName == typeof(DbConnectionString).FullName && attr.ArgumentList.Count == 3)
                             {
-                                connectionDB = ps[0].ToString();
-                                connectionUser = ps[1].ToString();
-                                connectionPass = ps[2].ToString();
+                                connectionDB = attr.ArgumentList[0];
+                                connectionUser = attr.ArgumentList[1];
+                                connectionPass = attr.ArgumentList[2];
                             }
-                            break;
                         }
-                    }
-                    var r2 = Regex.Match(cs, @"\[Infrastructure.DB.DbConnectionString\(" + @"[\S\s]*?" + @"\)\]");
-                    if (r2.Success)
-                    {
-                        attr = r2.ToString();
-                        var ps = Regex.Matches(attr, "\"" + @"[\S\s]*?" + "\"");
-                        if (ps.Count == 3)
-                        {
-                            connectionDB = ps[0].ToString();
-                            connectionUser = ps[1].ToString();
-                            connectionPass = ps[2].ToString();
-                        }
-                        break;
                     }
                 }
             }
@@ -270,6 +323,13 @@ namespace HoooneVSIX
                 return;
             }
 
+            VsShellUtilities.ShowMessageBox(
+             this.package,
+             "step7",
+             "step",
+             OLEMSGICON.OLEMSGICON_INFO,
+             OLEMSGBUTTON.OLEMSGBUTTON_OK,
+             OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             // 连接数据库
             string strConn = "Data Source = " + connectionDB + "; User ID = " + connectionUser + "; Password = " + connectionPass + ";Connection Lifetime=3;Connection Timeout=3;";
             var oracleConnection = new OracleConnection(strConn);
@@ -290,164 +350,114 @@ namespace HoooneVSIX
                 return;
             }
 
-            // 搜索model文件
+            // 生成dbmodel代码
             int count = 0;
+            int fail = 0;
             {
-                foreach (var file in csFiles)
+                foreach (var cls in assembly.ClassList)
                 {
-                    var cs = File.ReadAllText(file).Replace("\r", "").Replace("\n", "");
-                    bool usingDB = Regex.Match(cs, @"using" + @"[\s]*?" + "Infrastructure" + @"[\s]*?" + "." + @"[\s]*?" + "DB" + @"[\s]*?" + ";").Success;
-                    List<Match> matches = new List<Match>();
-                    if (usingDB)
-                    {
-                        string par1 = @"\[" + @"[\s]*?" + @"DbTable" + @"[\s]*?" + @"\(" + @"[\S\s]*?" + @"\)" + @"[\s]*?" + @"\]";
-                        var matches1 = Regex.Matches(cs, par1);
-                        for (int i = 0; i < matches1.Count; i++)
-                        {
-                            matches.Add(matches1[i]);
-                        }
-                    }
-                    string par2 = @"\[" + @"[\s]*?" + "Infrastructure" + @"[\s]*?" + "." + @"[\s]*?" + "DB" + @"[\s]*?" + "." + @"[\s]*?" + @"DbTable" + @"[\s]*?" + @"\(" + @"[\S\s]*?" + @"\)" + @"[\s]*?" + @"\]";
-                    var matches2 = Regex.Matches(cs, par2);
-                    for (int i = 0; i < matches2.Count; i++)
-                    {
-                        matches.Add(matches2[i]);
-                    }
-                    if (matches.Count == 0)
+                    if (!cls.AttributeList.Exists(f => f.TypeFullName == typeof(DbTable).FullName))
                     {
                         continue;
                     }
-                    matches = matches.OrderBy(f => f.Index).ToList();
                     count++;
+                    if (cls.FilePath.Count > 1)
+                    {
+                        fail++;
+                        continue;
+                    }
 
                     StringBuilder newFile = new StringBuilder();
-                    string oldFile = File.ReadAllText(file).Replace("\r", "").Replace("\n", "");
+                    string oldFile = File.ReadAllText(cls.FilePath[0]);
+                    var className = Regex.Match(oldFile, @"class[\s\n]*?" + cls.Name);
+                    if (!className.Success)
+                    {
+                        fail++;
+                        continue;
+                    }
+                    int begin = className.Index + className.Length;
                     bool keep = true;
-                    bool modelClass = false;
-                    int leftCount = 0;
-                    string tbName = "";
-                    int idx = 0;
+                    int signLevel = 0;
                     // 扫描文件
                     for (int i = 0; i < oldFile.Length; i++)
                     {
-                        // 重写[DbTable]
-                        if (i == matches[idx].Index)
+                        if (i == begin)
                         {
                             keep = false;
-                            leftCount = 0;
-
-                            tbName = Regex.Match(matches[idx].ToString(), "\"" + @"[\S\s]*?" + "\"").ToString().Replace("\"", "");
-                            // 调试
-                            VsShellUtilities.ShowMessageBox(
-                                this.package,
-                                tbName,
-                                "table",
-                                OLEMSGICON.OLEMSGICON_INFO,
-                                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-                            if (usingDB)
-                            {
-                                newFile.AppendLine(string.Format("[DbTable(\"{0}\")]", tbName));
-                            }
-                            else
-                            {
-                                newFile.AppendLine(string.Format("[Infrastructure.DB.DbTable(\"{0}\")]", tbName));
-                            }
+                            signLevel = 0;
+                            // 重写class
+                            newFile.AppendLine();
+                            newFile.AppendLine("    {");
+                            //// 填入字段
+                            //string sql = "select t.table_name,t.column_name,t.data_type,t.data_length,t.nullable,c.comments " +
+                            //    "from user_tab_columns t,user_col_comments c " +
+                            //    "where t.column_name = c.column_name " +
+                            //    "and t.table_name = c.table_name " +
+                            //    "and t.Table_Name ='" + tbName + "' " +
+                            //    " order by t.Table_Name,t.column_id";
+                            //// 调试
+                            //VsShellUtilities.ShowMessageBox(
+                            //    this.package,
+                            //    sql,
+                            //    tbName,
+                            //    OLEMSGICON.OLEMSGICON_INFO,
+                            //    OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                            //    OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                            //DataSet dSet = new DataSet();
+                            //OracleDataAdapter oda = new OracleDataAdapter(sql, oracleConnection);
+                            //oda.Fill(dSet);
+                            //DataTable dTable = dSet.Tables[0];
+                            //foreach (DataRow row in dTable.Rows)
+                            //{
+                            //    if (!string.IsNullOrWhiteSpace(row["COMMENTS"].ToString()))
+                            //    {
+                            //        newFile.AppendLine("        /// <summary>");
+                            //        newFile.AppendLine("        /// " + row["COMMENTS"].ToString());
+                            //        newFile.AppendLine("        /// </summary>");
+                            //    }
+                            //    newFile.AppendLine("        [DbColumn(DataType." + row["DATA_TYPE"].ToString().Replace("(", "_").Replace(")", "") + ")]");
+                            //    if (row["DATA_TYPE"].ToString() == "NUMBER")
+                            //    {
+                            //        newFile.AppendLine("        public int " + row["COLUMN_NAME"] + " { get; set; }");
+                            //    }
+                            //    else
+                            //    {
+                            //        newFile.AppendLine("        public string " + row["COLUMN_NAME"] + " { get; set; }");
+                            //    }
+                            //    newFile.AppendLine("");
+                            //}
+                            newFile.AppendLine("    }");
                         }
-                        if (i == matches[idx].Index + matches[idx].Length)
-                        {
-                            keep = true;
-                            modelClass = true;
-                            if (idx < matches.Count - 1)
-                                idx++;
-                        }
 
-                        // 重写class
-                        if (modelClass)
+                        // 删除原有class的所有内容
+                        if (!keep)
                         {
                             if (oldFile[i] == '{')
                             {
-                                if (keep)
-                                {
-                                    // 填入字段
-                                    newFile.AppendLine();
-                                    newFile.AppendLine("    {");
-                                    string sql = "select t.table_name,t.column_name,t.data_type,t.data_length,t.nullable,c.comments " +
-                                        "from user_tab_columns t,user_col_comments c " +
-                                        "where t.column_name = c.column_name " +
-                                        "and t.table_name = c.table_name " +
-                                        "and t.Table_Name ='" + tbName + "' " +
-                                        " order by t.Table_Name,t.column_id";
-                                    // 调试
-                                    VsShellUtilities.ShowMessageBox(
-                                        this.package,
-                                        sql,
-                                        tbName,
-                                        OLEMSGICON.OLEMSGICON_INFO,
-                                        OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                                        OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-                                    DataSet dSet = new DataSet();
-                                    OracleDataAdapter oda = new OracleDataAdapter(sql, oracleConnection);
-                                    oda.Fill(dSet);
-                                    DataTable dTable = dSet.Tables[0];
-                                    foreach (DataRow row in dTable.Rows)
-                                    {
-                                        if (!string.IsNullOrWhiteSpace(row["COMMENTS"].ToString()))
-                                        {
-                                            newFile.AppendLine("        /// <summary>");
-                                            newFile.AppendLine("        /// " + row["COMMENTS"].ToString());
-                                            newFile.AppendLine("        /// </summary>");
-                                        }
-                                        newFile.AppendLine("        [DbColumn(DataType." + row["DATA_TYPE"].ToString().Replace("(", "_").Replace(")", "") + ")]");
-                                        if (row["DATA_TYPE"].ToString() == "NUMBER")
-                                        {
-                                            newFile.AppendLine("        public int " + row["COLUMN_NAME"] + " { get; set; }");
-                                        }
-                                        else
-                                        {
-                                            newFile.AppendLine("        public string " + row["COLUMN_NAME"] + " { get; set; }");
-                                        }
-                                        newFile.AppendLine("");
-                                    }
-                                    newFile.AppendLine("    }");
-                                }
-                                keep = false;
-                                leftCount++;
+                                signLevel++;
                             }
                             if (oldFile[i] == '}')
                             {
-                                leftCount--;
-                            }
-                            // class结束
-                            if (!keep && (leftCount == 0))
-                            {
-                                modelClass = false;
-                                keep = true;
-                                continue;
+                                signLevel--;
+                                // class结束
+                                if (signLevel <= 0)
+                                {
+                                    keep = true;
+                                }
                             }
                         }
 
                         if (keep)
                         {
-                            if (oldFile[i] == '{' || oldFile[i] == '}')
-                            {
-                                newFile.Append('\r');
-                                newFile.Append('\n');
-                            }
                             newFile.Append(oldFile[i]);
-                            if (oldFile[i] == '{' || oldFile[i] == '}' || oldFile[i] == ';')
-                            {
-                                newFile.Append('\r');
-                                newFile.Append('\n');
-                            }
                         }
                     }
-                    File.WriteAllText(file, newFile.ToString());
+                    File.WriteAllText(cls.FilePath[0], newFile.ToString());
                 }
             }
             VsShellUtilities.ShowMessageBox(
                 this.package,
-                "共生成" + count.ToString() + "个文件!",
+                "共找到" + count.ToString() + "个文件" + (fail == 0 ? "" : (",失败" + fail + "个文件")) + "!",
                 "代码生成成功",
                 OLEMSGICON.OLEMSGICON_INFO,
                 OLEMSGBUTTON.OLEMSGBUTTON_OK,

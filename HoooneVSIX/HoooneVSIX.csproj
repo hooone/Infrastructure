@@ -35,6 +35,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -83,7 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj">
-      <Project>{2340905A-0A3D-46C4-B1D6-54BE1008C2EC}</Project>
+      <Project>{2340905a-0a3d-46c4-b1d6-54be1008c2ec}</Project>
       <Name>Infrastructure</Name>
     </ProjectReference>
   </ItemGroup>
