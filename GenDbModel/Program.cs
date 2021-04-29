@@ -3,6 +3,7 @@ using Infrastructure.DB;
 using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,8 +16,8 @@ namespace GenDbModel
     {
         static void Main(string[] args)
         {
-            //string projPath = args[0];
-            string projPath = @"C:\Users\techsun\Desktop\Infrastructure\Demo\Demo.csproj";
+            string projPath = args[0];
+            //string projPath = @"C:\Users\techsun\Desktop\Infrastructure\Demo\Demo.csproj";
 
             // 获得项目信息
             var assembly = new AssemblyInfo(projPath);
@@ -121,12 +122,41 @@ namespace GenDbModel
             {
                 foreach (var cls in assembly.ClassList)
                 {
-                    if (!cls.AttributeList.Exists(f => f.TypeFullName == typeof(DbTable).FullName))
+                    // 处理DbTable特性
+                    var attr = cls.AttributeList.FirstOrDefault(f => f.TypeFullName == typeof(DbTable).FullName);
+                    if (attr == null || attr.ArgumentList.Count == 0)
                     {
                         continue;
                     }
                     count++;
+                    string tbName = attr.ArgumentList[0];
+                    if (string.IsNullOrWhiteSpace(tbName))
+                    {
+                        fail++;
+                        continue;
+                    }
+
+                    // 查找文件
                     if (cls.FilePath.Count > 1)
+                    {
+                        fail++;
+                        continue;
+                    }
+                    // pdb中不记录空类信息
+                    if (cls.FilePath.Count == 0)
+                    {
+                        foreach (var csfile in csFiles)
+                        {
+                            var txt = File.ReadAllText(csfile);
+                            var mth = Regex.Match(txt, @"class[\s\n]*?" + cls.Name);
+                            if (mth.Success)
+                            {
+                                cls.FilePath.Add(csfile);
+                                break;
+                            }
+                        }
+                    }
+                    if (cls.FilePath.Count == 0)
                     {
                         fail++;
                         continue;
@@ -153,44 +183,39 @@ namespace GenDbModel
                             // 重写class
                             newFile.AppendLine();
                             newFile.AppendLine("    {");
-                            //// 填入字段
-                            //string sql = "select t.table_name,t.column_name,t.data_type,t.data_length,t.nullable,c.comments " +
-                            //    "from user_tab_columns t,user_col_comments c " +
-                            //    "where t.column_name = c.column_name " +
-                            //    "and t.table_name = c.table_name " +
-                            //    "and t.Table_Name ='" + tbName + "' " +
-                            //    " order by t.Table_Name,t.column_id";
-                            //// 调试
-                            //VsShellUtilities.ShowMessageBox(
-                            //    this.package,
-                            //    sql,
-                            //    tbName,
-                            //    OLEMSGICON.OLEMSGICON_INFO,
-                            //    OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                            //    OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-                            //DataSet dSet = new DataSet();
-                            //OracleDataAdapter oda = new OracleDataAdapter(sql, oracleConnection);
-                            //oda.Fill(dSet);
-                            //DataTable dTable = dSet.Tables[0];
-                            //foreach (DataRow row in dTable.Rows)
-                            //{
-                            //    if (!string.IsNullOrWhiteSpace(row["COMMENTS"].ToString()))
-                            //    {
-                            //        newFile.AppendLine("        /// <summary>");
-                            //        newFile.AppendLine("        /// " + row["COMMENTS"].ToString());
-                            //        newFile.AppendLine("        /// </summary>");
-                            //    }
-                            //    newFile.AppendLine("        [DbColumn(DataType." + row["DATA_TYPE"].ToString().Replace("(", "_").Replace(")", "") + ")]");
-                            //    if (row["DATA_TYPE"].ToString() == "NUMBER")
-                            //    {
-                            //        newFile.AppendLine("        public int " + row["COLUMN_NAME"] + " { get; set; }");
-                            //    }
-                            //    else
-                            //    {
-                            //        newFile.AppendLine("        public string " + row["COLUMN_NAME"] + " { get; set; }");
-                            //    }
-                            //    newFile.AppendLine("");
-                            //}
+                            newFile.AppendLine("        /// 该类型代码由插件自动生成，请勿修改。");
+                            newFile.AppendLine();
+                            // 填入字段
+                            string sql = "select t.table_name,t.column_name,t.data_type,t.data_length,t.nullable,c.comments " +
+                                "from user_tab_columns t,user_col_comments c " +
+                                "where t.column_name = c.column_name " +
+                                "and t.table_name = c.table_name " +
+                                "and t.Table_Name ='" + tbName + "' " +
+                                " order by t.Table_Name,t.column_id";
+
+                            DataSet dSet = new DataSet();
+                            OracleDataAdapter oda = new OracleDataAdapter(sql, oracleConnection);
+                            oda.Fill(dSet);
+                            DataTable dTable = dSet.Tables[0];
+                            foreach (DataRow row in dTable.Rows)
+                            {
+                                if (!string.IsNullOrWhiteSpace(row["COMMENTS"].ToString()))
+                                {
+                                    newFile.AppendLine("        /// <summary>");
+                                    newFile.AppendLine("        /// " + row["COMMENTS"].ToString());
+                                    newFile.AppendLine("        /// </summary>");
+                                }
+                                newFile.AppendLine("        [DbColumn(DataType." + row["DATA_TYPE"].ToString().Replace("(", "_").Replace(")", "") + ")]");
+                                if (row["DATA_TYPE"].ToString() == "NUMBER")
+                                {
+                                    newFile.AppendLine("        public int " + row["COLUMN_NAME"] + " { get; set; }");
+                                }
+                                else
+                                {
+                                    newFile.AppendLine("        public string " + row["COLUMN_NAME"] + " { get; set; }");
+                                }
+                                newFile.AppendLine("");
+                            }
                             newFile.AppendLine("    }");
                         }
 
@@ -208,6 +233,7 @@ namespace GenDbModel
                                 if (signLevel <= 0)
                                 {
                                     keep = true;
+                                    continue;
                                 }
                             }
                         }

@@ -45,6 +45,6 @@ namespace Infrastructure.DB
         /// <summary>
         /// 时间戳
         /// </summary>
-        TIMESTAMP,
+        TIMESTAMP_6,
     }
 }
