@@ -1,12 +1,12 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Infrastructure.DB;
+using System.Threading.Tasks;
+
 namespace Demo
 {
-    [DbTable("aa")]
-    public partial class CJJ
+    public class DDJ
     {
     }
-} 
+}

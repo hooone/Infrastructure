@@ -83,9 +83,9 @@
     <Content Include="Resources\GenDbModel.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AssemblyDecoder\AssemblyDecoder.csproj">
-      <Project>{54b11b2f-6f2f-49c2-8ef7-760e8ec1ebf7}</Project>
-      <Name>AssemblyDecoder</Name>
+    <ProjectReference Include="..\GenDbModel\GenDbModel.csproj">
+      <Project>{c60ff2e3-1a32-44cd-8434-760dc1684cca}</Project>
+      <Name>GenDbModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj">
       <Project>{2340905a-0a3d-46c4-b1d6-54be1008c2ec}</Project>

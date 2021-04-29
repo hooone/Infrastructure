@@ -14,7 +14,6 @@ namespace Infrastructure.Code
     public class AssemblyInfo
     {
         public string AssemblyName { get; set; }
-        public string Message { get; set; }
         public DateTime LastModifyTime { get; set; }
         public List<ClassInfo> ClassList { get; set; }
         private string AssemblyPath { get; }
@@ -74,21 +73,18 @@ namespace Infrastructure.Code
         {
             if (string.IsNullOrWhiteSpace(AssemblyPath))
             {
-                this.Message = "操作失败，未能找到编译后的文件，请重新生成。";
-                return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+                return "操作失败，未能找到编译后的文件，请重新生成。";
             }
             FileInfo assemFile = new FileInfo(AssemblyPath);
             if (!assemFile.Exists)
             {
-                this.Message = "操作失败，未能找到编译后的文件，请重新生成。";
-                return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+                return "操作失败，未能找到编译后的文件，请重新生成。";
             }
             LastModifyTime = assemFile.LastWriteTime;
             FileInfo pdbFile = new FileInfo(PdbPath);
             if (!assemFile.Exists)
             {
-                this.Message = "操作失败，未能找到.pdb文件，打开debug-full模式。";
-                return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+                return "操作失败，未能找到.pdb文件，打开debug-full模式。";
             }
 
             // 加载pdb
@@ -166,12 +162,11 @@ namespace Infrastructure.Code
                     }
                     ClassList.Add(cls);
                 }
-                return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+                return "";
             }
             catch (Exception e)
             {
-                this.Message = e.Message + Environment.NewLine + e.StackTrace;
-                return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+                return e.Message + Environment.NewLine + e.StackTrace;
             }
             finally
             {
