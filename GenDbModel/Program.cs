@@ -207,19 +207,167 @@ namespace GenDbModel
                         newFile.Add("            /// 该方法的代码由插件自动生成，请勿修改。");
                         newFile.Add("            string sql = @\"" + sql.ToString() + "\";");
                         newFile.Add("            return helper.ExecuteNonQuery(sql, " + string.Join(", ", columns.Select(f => "obj." + f.Name)) + ");");
-                        WriteMethod(cls.FilePath[0], (int)method.MinLine, (int)method.MaxLine, newFile.ToArray());
+                        WriteMethod(cls.FilePath[0], cls.MethodList, method.MinLine, method.MaxLine, newFile.ToArray());
+                    }
+                    // update
+                    if (method.AttributeList.Exists(f => f.TypeFullName == typeof(DbUpdate).FullName))
+                    {
+                        string tableName = attr.ArgumentList[0];
+                        List<PropertyInfo> keys = new List<PropertyInfo>();
+                        List<PropertyInfo> values = new List<PropertyInfo>();
+                        foreach (var item in method.AttributeList)
+                        {
+                            if (item.TypeFullName == typeof(SqlKey).FullName)
+                            {
+                                var t = dbmodel.PropertyList.FirstOrDefault(f => f.Name == item.ArgumentList[0]);
+                                if (t != null)
+                                {
+                                    keys.Add(t);
+                                }
+                            }
+                            if (item.TypeFullName == typeof(SqlValue).FullName)
+                            {
+                                var t = dbmodel.PropertyList.FirstOrDefault(f => f.Name == item.ArgumentList[0]);
+                                if (t != null)
+                                {
+                                    values.Add(t);
+                                }
+                            }
+                        }
+
+                        StringBuilder sql = new StringBuilder();
+                        sql.Append("UPDATE ");
+                        sql.Append(tableName);
+                        sql.Append(" SET ");
+                        sql.Append(string.Join(",", values.Select(f => f.Name + "=@" + f.Name)));
+                        if (keys.Count > 0)
+                        {
+                            sql.Append(" WHERE ");
+                            sql.Append(string.Join(" and ", keys.Select(f => f.Name + "=@" + f.Name)));
+                        }
+
+
+                        // 写入db access内容
+                        List<string> newFile = new List<string>();
+                        newFile.Add("        public int " + method.Name + "(" + dbmodel.Name + " obj)");
+                        newFile.Add("        {");
+                        newFile.Add("            /// 该方法的代码由插件自动生成，请勿修改。");
+                        newFile.Add("            string sql = @\"" + sql.ToString() + "\";");
+                        newFile.Add("            return helper.ExecuteNonQuery(sql, " + string.Join(", ", values.Select(f => "obj." + f.Name)) + (keys.Count > 0 ? ", " : "") + string.Join(", ", keys.Select(f => "obj." + f.Name)) + ");");
+                        WriteMethod(cls.FilePath[0], cls.MethodList, method.MinLine, method.MaxLine, newFile.ToArray());
+                    }
+                    // delete
+                    if (method.AttributeList.Exists(f => f.TypeFullName == typeof(DbDelete).FullName))
+                    {
+                        string tableName = attr.ArgumentList[0];
+                        List<PropertyInfo> keys = new List<PropertyInfo>();
+                        foreach (var item in method.AttributeList)
+                        {
+                            if (item.TypeFullName == typeof(SqlKey).FullName)
+                            {
+                                var t = dbmodel.PropertyList.FirstOrDefault(f => f.Name == item.ArgumentList[0]);
+                                if (t != null)
+                                {
+                                    keys.Add(t);
+                                }
+                            }
+                        }
+
+                        StringBuilder sql = new StringBuilder();
+                        sql.Append("DELETE ");
+                        sql.Append(tableName);
+                        if (keys.Count > 0)
+                        {
+                            sql.Append(" WHERE ");
+                            sql.Append(string.Join(" and ", keys.Select(f => f.Name + "=@" + f.Name)));
+                        }
+
+
+                        // 写入db access内容
+                        List<string> newFile = new List<string>();
+                        newFile.Add("        public int " + method.Name + "(" + dbmodel.Name + " obj)");
+                        newFile.Add("        {");
+                        newFile.Add("            /// 该方法的代码由插件自动生成，请勿修改。");
+                        newFile.Add("            string sql = @\"" + sql.ToString() + "\";");
+                        newFile.Add("            return helper.ExecuteNonQuery(sql" + (keys.Count > 0 ? ", " : "") + string.Join(", ", keys.Select(f => "obj." + f.Name)) + ");");
+                        WriteMethod(cls.FilePath[0], cls.MethodList, method.MinLine, method.MaxLine, newFile.ToArray());
+                    }
+                    // read
+                    if (method.AttributeList.Exists(f => f.TypeFullName == typeof(DbRead).FullName))
+                    {
+                        string tableName = attr.ArgumentList[0];
+                        List<PropertyInfo> keys = new List<PropertyInfo>();
+                        foreach (var item in method.AttributeList)
+                        {
+                            if (item.TypeFullName == typeof(SqlKey).FullName)
+                            {
+                                var t = dbmodel.PropertyList.FirstOrDefault(f => f.Name == item.ArgumentList[0]);
+                                if (t != null)
+                                {
+                                    keys.Add(t);
+                                }
+                            }
+                        }
+
+                        StringBuilder sql = new StringBuilder();
+                        sql.Append("SELECT * FROM ");
+                        sql.Append(tableName);
+                        if (keys.Count > 0)
+                        {
+                            sql.Append(" WHERE ");
+                            sql.Append(string.Join(" and ", keys.Select(f => f.Name + "=@" + f.Name)));
+                        }
+
+
+                        // 写入db access内容
+                        List<string> newFile = new List<string>();
+                        newFile.Add("        public List<" + dbmodel.Name + "> " + method.Name + "(" + dbmodel.Name + " obj)");
+                        newFile.Add("        {");
+                        newFile.Add("            /// 该方法的代码由插件自动生成，请勿修改。");
+                        newFile.Add("            string sql = @\"" + sql.ToString() + "\";");
+                        newFile.Add("            DataTable dt = helper.Query(sql" + (keys.Count > 0 ? ", " : "") + string.Join(", ", keys.Select(f => "obj." + f.Name)) + ");");
+                        newFile.Add("            List<" + dbmodel.Name + "> rst = new List<" + dbmodel.Name + ">();");
+                        newFile.Add("            foreach (DataRow row in dt.Rows)");
+                        newFile.Add("            {");
+                        newFile.Add("                " + dbmodel.Name + " t = new " + dbmodel.Name + "();");
+                        foreach (var col in dbmodel.PropertyList.Where(f => f.AttributeList.Exists(g => g.TypeFullName == typeof(DbColumn).FullName)))
+                        {
+                            var colAttr = col.AttributeList.FirstOrDefault(t => t.TypeFullName == typeof(DbColumn).FullName);
+                            DataType type = (DataType)int.Parse(colAttr.ArgumentList[0]);
+                            switch (type)
+                            {
+                                case (DataType.VARCHAR):
+                                case (DataType.VARCHAR2):
+                                    newFile.Add("                t." + col.Name + " = row[nameof(" + dbmodel.Name + "." + col.Name + ")].TryToString();");
+                                    break;
+                                case (DataType.NUMBER):
+                                    newFile.Add("                t." + col.Name + " = row[nameof(" + dbmodel.Name + "." + col.Name + ")].TryToInt();");
+                                    break;
+                                case (DataType.FLOAT):
+                                    newFile.Add("                t." + col.Name + " = row[nameof(" + dbmodel.Name + "." + col.Name + ")].TryToFload();");
+                                    break;
+                                default:
+                                    newFile.Add("                t." + col.Name + " = row[nameof(" + dbmodel.Name + "." + col.Name + ")].TryToString();");
+                                    break;
+                            }
+
+                        }
+                        newFile.Add("                rst.Add(t);");
+                        newFile.Add("            }");
+                        newFile.Add("            return rst;");
+                        WriteMethod(cls.FilePath[0], cls.MethodList, method.MinLine, method.MaxLine, newFile.ToArray());
                     }
                 }
             }
         }
 
-        private static void WriteMethod(string path, int minLine, int maxLine, string[] methodStr)
+        private static void WriteMethod(string path, List<MethodInfo> methodList, int minLine, int maxLine, string[] methodStr)
         {
             // 写文件
             var oldFile = File.ReadAllLines(path);
             var newFile = new List<string>();
             // 根据']'找到函数开始行
-            for (int i = (int)minLine - 1; i > 0; i--)
+            for (int i = minLine - 1; i > 0; i--)
             {
                 var idx = oldFile[i].IndexOf(']');
                 if (idx >= 0)
@@ -241,11 +389,26 @@ namespace GenDbModel
             {
                 newFile.Add("        " + oldFile[maxLine - 1].Substring(endIdx));
             }
-            for (int i = (int)maxLine; i < oldFile.Length; i++)
+            var delta = newFile.Count - maxLine;
+            // 补回剩余行
+            for (int i = maxLine; i < oldFile.Length; i++)
             {
                 newFile.Add(oldFile[i]);
             }
             File.WriteAllLines(path, newFile.ToArray());
+
+            // 行号更新
+            foreach (var item in methodList)
+            {
+                if (item.MinLine > maxLine)
+                {
+                    item.MinLine += delta;
+                }
+                if (item.MaxLine > maxLine)
+                {
+                    item.MaxLine += delta;
+                }
+            }
         }
         // 生成dbModel代码
         private static void GenDbModel(AssemblyInfo assembly, List<string> csFiles, OracleConnection oracleConnection, ref int count, ref int fail, ref string failStr)

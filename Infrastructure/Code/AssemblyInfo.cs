@@ -118,7 +118,7 @@ namespace Infrastructure.Code
                         var method = new MethodInfo();
                         method.Name = item.Name;
                         method.ReturnType = item.ReturnType.FullName;
-                        var parameters= item.GetParameters();
+                        var parameters = item.GetParameters();
                         foreach (var attre in item.CustomAttributes)
                         {
                             var attr = new AttributeInfo();
@@ -193,13 +193,16 @@ namespace Infrastructure.Code
                                 var mlins = mem.Files[0].Lines;
                                 foreach (var elin in mlins)
                                 {
-                                    min = Math.Min(min, elin.LineStart);
-                                    max = Math.Max(max, elin.LineEnd);
+                                    if (elin.LineStart < 10000 && elin.LineEnd < 10000)
+                                    {
+                                        min = Math.Min(min, elin.LineStart);
+                                        max = Math.Max(max, elin.LineEnd);
+                                    }
                                 }
                                 if (min < max)
                                 {
-                                    method.MinLine = min;
-                                    method.MaxLine = max;
+                                    method.MinLine = (int)min;
+                                    method.MaxLine = (int)max;
                                 }
                             }
                         }
