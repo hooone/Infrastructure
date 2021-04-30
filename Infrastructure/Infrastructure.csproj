@@ -66,7 +66,11 @@
     <Compile Include="Code\PropertyInfo.cs" />
     <Compile Include="DB\DbColumn.cs" />
     <Compile Include="DB\DbConnectionString.cs" />
+    <Compile Include="DB\DbInsert.cs" />
     <Compile Include="DB\DbTable.cs" />
+    <Compile Include="DB\IDbAccess.cs" />
+    <Compile Include="DB\IDbModel.cs" />
+    <Compile Include="DB\SqlHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

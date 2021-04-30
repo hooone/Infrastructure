@@ -8,5 +8,10 @@ namespace Infrastructure.Code
 {
     public class MethodInfo
     {
+        public string Name { get; set; }
+        public string ReturnType { get; set; }
+        public uint MinLine { get; set; }
+        public uint MaxLine { get; set; }
+        public List<AttributeInfo> AttributeList { get; set; } = new List<AttributeInfo>();
     }
 }

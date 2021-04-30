@@ -1,5 +1,6 @@
 ﻿using SharpPdb.Windows;
 using SharpPdb.Windows.DebugSubsections;
+using SharpPdb.Windows.SymbolRecords;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -101,14 +102,33 @@ namespace Infrastructure.Code
                     foreach (var item in typ.CustomAttributes)
                     {
                         var attr = new AttributeInfo();
-                        attr.Description = item.ToString();
-                        attr.TypeName = item.AttributeType.Name;
                         attr.TypeFullName = item.AttributeType.FullName;
                         foreach (var arg in item.ConstructorArguments)
                         {
                             attr.ArgumentList.Add(arg.Value.ToString());
                         }
                         cls.AttributeList.Add(attr);
+                    }
+                    foreach (var item in typ.ImplementedInterfaces)
+                    {
+                        cls.Interfaces.Add(item.FullName);
+                    }
+                    foreach (var item in typ.DeclaredMethods)
+                    {
+                        var method = new MethodInfo();
+                        method.Name = item.Name;
+                        method.ReturnType = item.ReturnType.FullName;
+                        foreach (var attre in item.CustomAttributes)
+                        {
+                            var attr = new AttributeInfo();
+                            attr.TypeFullName = attre.AttributeType.FullName;
+                            foreach (var arg in attre.ConstructorArguments)
+                            {
+                                attr.ArgumentList.Add(arg.Value.ToString());
+                            }
+                            method.AttributeList.Add(attr);
+                        }
+                        cls.MethodList.Add(method);
                     }
                     foreach (var prop in typ.DeclaredProperties)
                     {
@@ -119,8 +139,6 @@ namespace Infrastructure.Code
                         {
 
                             var attr = new AttributeInfo();
-                            attr.Description = item.ToString();
-                            attr.TypeName = item.AttributeType.Name;
                             attr.TypeFullName = item.AttributeType.FullName;
                             foreach (var arg in item.ConstructorArguments)
                             {
@@ -141,22 +159,47 @@ namespace Infrastructure.Code
                             {
                                 continue;
                             }
-                            var lines = module.DebugSubsectionStream[DebugSubsectionKind.Lines].OfType<LinesSubsection>().ToArray();
-                            uint min = 999999;
-                            uint max = 0;
-                            foreach (var lin in lines)
+                            var pdbFunctions = GetManagedProcedures(module.LocalSymbolStream);
+                            // 确定函数的行号
+                            var classMembers = module.DebugSubsectionStream[DebugSubsectionKind.Lines].OfType<LinesSubsection>().ToArray();
+                            foreach (var mem in classMembers)
                             {
-                                var elins = lin.Files[0].Lines;
-                                foreach (var elin in elins)
+                                // 找对应的pdbFunction
+                                ManagedProcedureSymbol pdbFunction = null;
+                                foreach (var pdbf in pdbFunctions)
+                                {
+                                    if (pdbf.CodeOffset == mem.CodeOffset)
+                                    {
+                                        pdbFunction = pdbf;
+                                        break;
+                                    }
+                                }
+                                if (pdbFunction == null)
+                                {
+                                    continue;
+                                }
+
+                                // 找对应的FunctionInfo
+                                var method = cls.MethodList.FirstOrDefault(f => f.Name == pdbFunction.Name.String);
+                                if (method == null)
+                                {
+                                    continue;
+                                }
+
+                                // 统计行号
+                                uint min = 999999;
+                                uint max = 0;
+                                var mlins = mem.Files[0].Lines;
+                                foreach (var elin in mlins)
                                 {
                                     min = Math.Min(min, elin.LineStart);
                                     max = Math.Max(max, elin.LineEnd);
                                 }
-                            }
-                            if (min < max)
-                            {
-                                cls.MinLine = min;
-                                cls.MaxLine = max;
+                                if (min < max)
+                                {
+                                    method.MinLine = min;
+                                    method.MaxLine = max;
+                                }
                             }
                         }
                     }
@@ -172,6 +215,14 @@ namespace Infrastructure.Code
             {
                 Pdb.Dispose();
             }
+        }
+        private static ManagedProcedureSymbol[] GetManagedProcedures(SymbolStream symbolStream)
+        {
+            List<ManagedProcedureSymbol> managedProcedures = new List<ManagedProcedureSymbol>();
+
+            foreach (var kind in ManagedProcedureSymbol.Kinds)
+                managedProcedures.AddRange(symbolStream[kind].OfType<ManagedProcedureSymbol>());
+            return managedProcedures.ToArray();
         }
     }
 }
