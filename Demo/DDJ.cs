@@ -46,13 +46,19 @@ namespace Demo
     public class DDJ2 : IDbAccess
     {
         public SqlHelper helper { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         [DbInsert]
-        public int insert()
+        public int insert(DDJ obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
-            string sql=@"INSERT INTO ACTION_INFO (NUM,ACTION_CODE,CREATE_TIME,DEST_DEVICE,SOURCE_DEVICE,ACTION_REQUEST,ACTION_RESPONSE,FLAG ) values (@NUM,@ACTION_CODE,@CREATE_TIME,@DEST_DEVICE,@SOURCE_DEVICE,@ACTION_REQUEST,@ACTION_RESPONSE,@FLAG)";
-            return helper.ExecuteNonQuery(sql);
-        }//
+            string sql = @"INSERT INTO ACTION_INFO (NUM,ACTION_CODE,CREATE_TIME,DEST_DEVICE,SOURCE_DEVICE,ACTION_REQUEST,ACTION_RESPONSE,FLAG ) values (@NUM,@ACTION_CODE,@CREATE_TIME,@DEST_DEVICE,@SOURCE_DEVICE,@ACTION_REQUEST,@ACTION_RESPONSE,@FLAG)";
+            return helper.ExecuteNonQuery(sql, obj.NUM, obj.ACTION_CODE, obj.CREATE_TIME, obj.DEST_DEVICE, obj.SOURCE_DEVICE, obj.ACTION_REQUEST, obj.ACTION_RESPONSE, obj.FLAG);
+        }
 
     }
 

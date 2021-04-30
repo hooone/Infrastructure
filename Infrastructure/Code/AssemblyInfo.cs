@@ -118,6 +118,7 @@ namespace Infrastructure.Code
                         var method = new MethodInfo();
                         method.Name = item.Name;
                         method.ReturnType = item.ReturnType.FullName;
+                        var parameters= item.GetParameters();
                         foreach (var attre in item.CustomAttributes)
                         {
                             var attr = new AttributeInfo();

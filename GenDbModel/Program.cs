@@ -199,46 +199,54 @@ namespace GenDbModel
                         sql.Append(string.Join(",", columns.Select(f => "@" + f.Name)));
                         sql.Append(")");
 
-                        // 写文件
-                        var oldFile = File.ReadAllLines(cls.FilePath[0]);
-                        var newFile = new List<string>();
-                        // 补全上方无关内容
-                        for (int i = 0; i < method.MinLine - 1; i++)
-                        {
-                            newFile.Add(oldFile[i]);
-                        }
-                        // {所在行处理
-                        var beginIdx = oldFile[method.MinLine - 1].IndexOf("{");
-                        if (beginIdx < 0)
-                        {
-                            fail++;
-                            failStr += "方法" + cls.Name + "." + method.Name + "格式解析错误";
-                            continue;
-                        }
-                        newFile.Add(oldFile[method.MinLine - 1].Substring(0, beginIdx+1));
+
                         // 写入db access内容
+                        List<string> newFile = new List<string>();
+                        newFile.Add("        public int " + method.Name + "(" + dbmodel.Name + " obj)");
+                        newFile.Add("        {");
                         newFile.Add("            /// 该方法的代码由插件自动生成，请勿修改。");
-                        newFile.Add("            string sql=@\""+sql.ToString()+"\";");
-                        newFile.Add("            return helper.ExecuteNonQuery(sql);");
-                        // }所在行处理
-                        var endIdx = oldFile[method.MaxLine - 1].IndexOf("}");
-                        if (endIdx < 0)
-                        {
-                            fail++;
-                            failStr += "方法" + cls.Name + "." + method.Name + "格式解析错误";
-                            continue;
-                        }
-                        newFile.Add("        " + oldFile[method.MaxLine - 1].Substring(endIdx));
-                        for (int i = (int)method.MaxLine; i < oldFile.Length; i++)
-                        {
-                            newFile.Add(oldFile[i]);
-                        }
-                        File.WriteAllLines(cls.FilePath[0], newFile.ToArray());
+                        newFile.Add("            string sql = @\"" + sql.ToString() + "\";");
+                        newFile.Add("            return helper.ExecuteNonQuery(sql, " + string.Join(", ", columns.Select(f => "obj." + f.Name)) + ");");
+                        WriteMethod(cls.FilePath[0], (int)method.MinLine, (int)method.MaxLine, newFile.ToArray());
                     }
                 }
             }
         }
 
+        private static void WriteMethod(string path, int minLine, int maxLine, string[] methodStr)
+        {
+            // 写文件
+            var oldFile = File.ReadAllLines(path);
+            var newFile = new List<string>();
+            // 根据']'找到函数开始行
+            for (int i = (int)minLine - 1; i > 0; i--)
+            {
+                var idx = oldFile[i].IndexOf(']');
+                if (idx >= 0)
+                {
+                    // 补全上方无关内容
+                    for (int j = 0; j < i; j++)
+                    {
+                        newFile.Add(oldFile[j]);
+                    }
+                    newFile.Add(oldFile[i].Substring(0, idx + 1));
+                    break;
+                }
+            }
+            // 函数体。 不包含'}'
+            newFile.AddRange(methodStr);
+            // }所在行处理
+            var endIdx = oldFile[maxLine - 1].IndexOf("}");
+            if (endIdx >= 0)
+            {
+                newFile.Add("        " + oldFile[maxLine - 1].Substring(endIdx));
+            }
+            for (int i = (int)maxLine; i < oldFile.Length; i++)
+            {
+                newFile.Add(oldFile[i]);
+            }
+            File.WriteAllLines(path, newFile.ToArray());
+        }
         // 生成dbModel代码
         private static void GenDbModel(AssemblyInfo assembly, List<string> csFiles, OracleConnection oracleConnection, ref int count, ref int fail, ref string failStr)
         {

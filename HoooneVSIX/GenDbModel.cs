@@ -103,7 +103,7 @@ namespace HoooneVSIX
             // 二次确认弹窗
             var confirm = VsShellUtilities.ShowMessageBox(
                 this.package,
-                "在此项目中，所有包含DbTable特性的类都将根据数据库结构自动生成代码",
+                "所有包含DbTable特性的类都将根据数据库结构自动生成代码" + Environment.NewLine + "请确保现有代码已全部提交，避免生成失败带来损失。",
                 "生成DbModel",
                 OLEMSGICON.OLEMSGICON_INFO,
                 OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL,
