@@ -17,7 +17,7 @@ namespace Infrastructure.Code
         public string AssemblyName { get; set; }
         public DateTime LastModifyTime { get; set; }
         public List<ClassInfo> ClassList { get; set; }
-        private string AssemblyPath { get; }
+        public string AssemblyPath { get; }
         private string PdbPath { get; }
         public AssemblyInfo(string projPath)
         {

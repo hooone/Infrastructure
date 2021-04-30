@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.DB
 {
-    public interface IDbAccess
+    public interface IConnectionString
     {
-        SqlHelper Helper { get; set; }
+        string ConnectionString { get; }
     }
 }

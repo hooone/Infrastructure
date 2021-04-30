@@ -38,6 +38,9 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.122.19.1, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\packages\Oracle.ManagedDataAccess.19.11.0\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
+    </Reference>
     <Reference Include="SharpPdb.Windows">
       <HintPath>..\packages\SharpPdb.Windows.dll</HintPath>
     </Reference>
@@ -65,7 +68,7 @@
     <Compile Include="Code\MethodInfo.cs" />
     <Compile Include="Code\PropertyInfo.cs" />
     <Compile Include="DB\DbColumn.cs" />
-    <Compile Include="DB\DbConnectionString.cs" />
+    <Compile Include="DB\IConnectionString.cs" />
     <Compile Include="DB\DbConvert.cs" />
     <Compile Include="DB\DbDelete.cs" />
     <Compile Include="DB\DbInsert.cs" />
@@ -74,12 +77,16 @@
     <Compile Include="DB\DbUpdate.cs" />
     <Compile Include="DB\IDbAccess.cs" />
     <Compile Include="DB\IDbModel.cs" />
+    <Compile Include="DB\OracleHelper.cs" />
     <Compile Include="DB\SqlHelper.cs" />
     <Compile Include="DB\SqlKey.cs" />
     <Compile Include="DB\SqlValue.cs" />
+    <Compile Include="Log\ILogger.cs" />
+    <Compile Include="Log\NopLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

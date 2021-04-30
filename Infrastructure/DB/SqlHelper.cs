@@ -9,6 +9,7 @@ namespace Infrastructure.DB
 {
     public interface SqlHelper
     {
+        bool Connect(string connectionString);
         int ExecuteNonQuery(string sql, params object[] parameters);
         DataTable Query(string sql, params object[] parameters);
     }

@@ -35,5 +35,15 @@ namespace Infrastructure.DB
                 return rst;
             }
         }
+        public static DateTime TryToDateTime(this object strRes)
+        {
+            if (strRes == null)
+                return new DateTime(1970, 1, 1);
+            else
+            {
+                DateTime.TryParse(strRes.ToString(), out DateTime rst);
+                return rst;
+            }
+        }
     }
 }

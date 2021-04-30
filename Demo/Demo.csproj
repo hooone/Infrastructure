@@ -47,7 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DDJ.cs" />
+    <Compile Include="COracleParameter.cs" />
+    <Compile Include="DAL\ActionInfoDAL.cs" />
+    <Compile Include="Model\ActionInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Setting.cs" />

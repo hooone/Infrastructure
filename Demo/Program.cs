@@ -1,4 +1,7 @@
+using Demo.DAL;
+using Demo.Model;
 using Infrastructure.Code;
+using Infrastructure.DB;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,26 +17,18 @@ namespace Demo
     {
         static void Main(string[] args)
         {
-            FileInfo p = new FileInfo(@"C:\Users\techsun\Desktop\Infrastructure\AssemblyDecoder\Program.cs");
-            FileInfo g = new FileInfo(@"C:\Users\techsun\Desktop\Infrastructure\AssemblyDecoder\bin\debug\assemblyDecoder.exe");
-            if (p.LastWriteTime > g.LastWriteTime)
-            {
-
-            }
-            Process myProcess = new Process();
-            myProcess.StartInfo.FileName = "AssemblyDecoder.exe";
-            myProcess.StartInfo.UseShellExecute = false;
-            myProcess.StartInfo.RedirectStandardInput = true;
-            myProcess.StartInfo.RedirectStandardOutput = true;
-            myProcess.StartInfo.RedirectStandardError = true;
-            myProcess.StartInfo.CreateNoWindow = true;
-            myProcess.StartInfo.Arguments = @"C:\Users\techsun\Desktop\质检车间\澳爱\数据采集\HennessyCodeLink\HennessyCodeLink.csproj";
-            myProcess.Start();
-            var str = myProcess.StandardOutput.ReadToEnd();
-            myProcess.WaitForExit();
-            var asm = Newtonsoft.Json.JsonConvert.DeserializeObject<AssemblyInfo>(str);
+            SqlHelper hlp = new OracleHelper();
+            hlp.Connect(new COracleParameter().ConnectionString);
+            ActionInfoDAL dal = new ActionInfoDAL(hlp);
+            ActionInfo action = new ActionInfo();
+            action.CREATE_TIME = DateTime.Now;
+            action.ACTION_CODE = "1";
+            action.DEST_DEVICE = "dest";
+            dal.insert(action);
+            action.DEST_DEVICE = "22";
+            dal.update(action);
+            var lst = dal.read();
+            dal.delete(action);
         }
-
     }
-
 }

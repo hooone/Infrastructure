@@ -75,35 +75,33 @@ namespace GenDbModel
             }
 
             // 搜索数据库连接字符串
-            string connectionDB = "";
-            string connectionUser = "";
-            string connectionPass = "";
+            string strConn = "";
             {
                 foreach (var cls in assembly.ClassList)
                 {
-
-                    foreach (var prop in cls.PropertyList)
+                    if (cls.Interfaces.Contains(typeof(IConnectionString).FullName))
                     {
-                        foreach (var attr in prop.AttributeList)
+                        var assm = AppDomain.CurrentDomain.GetAssemblies();
+                        var select = assm.FirstOrDefault(f => f.Location.ToUpper() == assembly.AssemblyPath.ToUpper());
+                        if (select == null)
                         {
-                            if (attr.TypeFullName == typeof(DbConnectionString).FullName && attr.ArgumentList.Count == 3)
-                            {
-                                connectionDB = attr.ArgumentList[0];
-                                connectionUser = attr.ArgumentList[1];
-                                connectionPass = attr.ArgumentList[2];
-                            }
+                            Console.WriteLine("未找到程序集");
+                            return;
                         }
+
+                        dynamic conn = select.CreateInstance(cls.FullName);
+                        strConn = conn.ConnectionString;
+                        break;
                     }
                 }
             }
-            if (string.IsNullOrWhiteSpace(connectionDB))
+            if (string.IsNullOrWhiteSpace(strConn))
             {
                 Console.WriteLine("未找到数据库连接方式");
                 return;
             }
 
             // 连接数据库
-            string strConn = "Data Source = " + connectionDB + "; User ID = " + connectionUser + "; Password = " + connectionPass + ";Connection Lifetime=3;Connection Timeout=3;";
             var oracleConnection = new OracleConnection(strConn);
             try
             {
@@ -206,7 +204,7 @@ namespace GenDbModel
                         newFile.Add("        {");
                         newFile.Add("            /// 该方法的代码由插件自动生成，请勿修改。");
                         newFile.Add("            string sql = @\"" + sql.ToString() + "\";");
-                        newFile.Add("            return helper.ExecuteNonQuery(sql, " + string.Join(", ", columns.Select(f => "obj." + f.Name)) + ");");
+                        newFile.Add("            return Helper.ExecuteNonQuery(sql, " + string.Join(", ", columns.Select(f => "obj." + f.Name)) + ");");
                         WriteMethod(cls.FilePath[0], cls.MethodList, method.MinLine, method.MaxLine, newFile.ToArray());
                     }
                     // update
@@ -253,7 +251,7 @@ namespace GenDbModel
                         newFile.Add("        {");
                         newFile.Add("            /// 该方法的代码由插件自动生成，请勿修改。");
                         newFile.Add("            string sql = @\"" + sql.ToString() + "\";");
-                        newFile.Add("            return helper.ExecuteNonQuery(sql, " + string.Join(", ", values.Select(f => "obj." + f.Name)) + (keys.Count > 0 ? ", " : "") + string.Join(", ", keys.Select(f => "obj." + f.Name)) + ");");
+                        newFile.Add("            return Helper.ExecuteNonQuery(sql, " + string.Join(", ", values.Select(f => "obj." + f.Name)) + (keys.Count > 0 ? ", " : "") + string.Join(", ", keys.Select(f => "obj." + f.Name)) + ");");
                         WriteMethod(cls.FilePath[0], cls.MethodList, method.MinLine, method.MaxLine, newFile.ToArray());
                     }
                     // delete
@@ -289,7 +287,7 @@ namespace GenDbModel
                         newFile.Add("        {");
                         newFile.Add("            /// 该方法的代码由插件自动生成，请勿修改。");
                         newFile.Add("            string sql = @\"" + sql.ToString() + "\";");
-                        newFile.Add("            return helper.ExecuteNonQuery(sql" + (keys.Count > 0 ? ", " : "") + string.Join(", ", keys.Select(f => "obj." + f.Name)) + ");");
+                        newFile.Add("            return Helper.ExecuteNonQuery(sql" + (keys.Count > 0 ? ", " : "") + string.Join(", ", keys.Select(f => "obj." + f.Name)) + ");");
                         WriteMethod(cls.FilePath[0], cls.MethodList, method.MinLine, method.MaxLine, newFile.ToArray());
                     }
                     // read
@@ -321,11 +319,11 @@ namespace GenDbModel
 
                         // 写入db access内容
                         List<string> newFile = new List<string>();
-                        newFile.Add("        public List<" + dbmodel.Name + "> " + method.Name + "(" + dbmodel.Name + " obj)");
+                        newFile.Add("        public List<" + dbmodel.Name + "> " + method.Name + "()");
                         newFile.Add("        {");
                         newFile.Add("            /// 该方法的代码由插件自动生成，请勿修改。");
                         newFile.Add("            string sql = @\"" + sql.ToString() + "\";");
-                        newFile.Add("            DataTable dt = helper.Query(sql" + (keys.Count > 0 ? ", " : "") + string.Join(", ", keys.Select(f => "obj." + f.Name)) + ");");
+                        newFile.Add("            DataTable dt = Helper.Query(sql" + (keys.Count > 0 ? ", " : "") + string.Join(", ", keys.Select(f => "obj." + f.Name)) + ");");
                         newFile.Add("            List<" + dbmodel.Name + "> rst = new List<" + dbmodel.Name + ">();");
                         newFile.Add("            foreach (DataRow row in dt.Rows)");
                         newFile.Add("            {");
@@ -345,6 +343,10 @@ namespace GenDbModel
                                     break;
                                 case (DataType.FLOAT):
                                     newFile.Add("                t." + col.Name + " = row[nameof(" + dbmodel.Name + "." + col.Name + ")].TryToFload();");
+                                    break;
+                                case (DataType.DATE):
+                                case (DataType.TIMESTAMP_6):
+                                    newFile.Add("                t." + col.Name + " = row[nameof(" + dbmodel.Name + "." + col.Name + ")].TryToDateTime();");
                                     break;
                                 default:
                                     newFile.Add("                t." + col.Name + " = row[nameof(" + dbmodel.Name + "." + col.Name + ")].TryToString();");
@@ -447,7 +449,7 @@ namespace GenDbModel
                     foreach (var csfile in csFiles)
                     {
                         var txt = File.ReadAllText(csfile);
-                        var mth = Regex.Match(txt, @"class[\s\n]*?" + cls.Name);
+                        var mth = Regex.Match(txt, @"class[\s\n]*?" + cls.Name + @"[\s\S]*?IDbModel");
                         if (mth.Success)
                         {
                             cls.FilePath.Add(csfile);
@@ -506,10 +508,15 @@ namespace GenDbModel
                                 newFile.AppendLine("        /// " + row["COMMENTS"].ToString());
                                 newFile.AppendLine("        /// </summary>");
                             }
+
                             newFile.AppendLine("        [DbColumn(DataType." + row["DATA_TYPE"].ToString().Replace("(", "_").Replace(")", "") + ")]");
                             if (row["DATA_TYPE"].ToString() == "NUMBER")
                             {
                                 newFile.AppendLine("        public int " + row["COLUMN_NAME"] + " { get; set; }");
+                            }
+                            else if (row["DATA_TYPE"].ToString().Contains("TIMESTAMP"))
+                            {
+                                newFile.AppendLine("        public DateTime " + row["COLUMN_NAME"] + " { get; set; }");
                             }
                             else
                             {
