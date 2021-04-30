@@ -173,7 +173,7 @@ namespace HoooneVSIX
             // 调用进程生成DbModel
             System.Diagnostics.Process myProcess = new System.Diagnostics.Process();
             FileInfo cur = new FileInfo(this.GetType().Assembly.Location);
-            myProcess.StartInfo.FileName = Path.Combine(cur.Directory.FullName, "GenDbModel.exe");
+            myProcess.StartInfo.FileName = Path.Combine(cur.Directory.FullName, "GenerateCode.exe");
             myProcess.StartInfo.UseShellExecute = false;
             myProcess.StartInfo.RedirectStandardInput = true;
             myProcess.StartInfo.RedirectStandardOutput = true;
