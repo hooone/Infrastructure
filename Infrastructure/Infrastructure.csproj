@@ -84,6 +84,33 @@
     <Compile Include="Log\ILogger.cs" />
     <Compile Include="Log\NopLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SocketServer\AppSession.cs" />
+    <Compile Include="SocketServer\Async.cs" />
+    <Compile Include="SocketServer\AsyncSocketServer.cs" />
+    <Compile Include="SocketServer\AsyncSocketSession.cs" />
+    <Compile Include="SocketServer\AsyncStreamSocketSession.cs" />
+    <Compile Include="SocketServer\BufferManager.cs" />
+    <Compile Include="SocketServer\IAppServer.cs" />
+    <Compile Include="SocketServer\IAppSession.cs" />
+    <Compile Include="SocketServer\IAsyncSocketSession.cs" />
+    <Compile Include="SocketServer\ISessionBase.cs" />
+    <Compile Include="SocketServer\ISocketListener.cs" />
+    <Compile Include="SocketServer\ISocketServer.cs" />
+    <Compile Include="SocketServer\ISocketSession.cs" />
+    <Compile Include="SocketServer\ListenerInfo.cs" />
+    <Compile Include="SocketServer\Platform.cs" />
+    <Compile Include="SocketServer\SendingQueue.cs" />
+    <Compile Include="SocketServer\ServerConfig.cs" />
+    <Compile Include="SocketServer\ServerState.cs" />
+    <Compile Include="SocketServer\SmartPool.cs" />
+    <Compile Include="SocketServer\SocketAsyncEventArgsProxy.cs" />
+    <Compile Include="SocketServer\SocketEx.cs" />
+    <Compile Include="SocketServer\SocketListenerBase.cs" />
+    <Compile Include="SocketServer\SocketServer.cs" />
+    <Compile Include="SocketServer\SocketServerBase.cs" />
+    <Compile Include="SocketServer\SocketSession.cs" />
+    <Compile Include="SocketServer\TcpAsyncSocketListener.cs" />
+    <Compile Include="SocketServer\TcpSocketServerBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
