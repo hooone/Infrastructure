@@ -129,7 +129,7 @@ namespace Infrastructure.SocketServer
             SyncSend = true;
 
             if (m_SendingQueuePool == null)
-                m_SendingQueuePool = ((SocketServerBase)((ISocketServerAccessor)appSession.AppServer).SocketServer).SendingQueuePool;
+                m_SendingQueuePool = ((SocketServerBase)(appSession.AppServer).SocketServer).SendingQueuePool;
 
             SendingQueue queue;
             if (m_SendingQueuePool.TryGet(out queue))

@@ -41,9 +41,9 @@ namespace Infrastructure.SocketServer
         /// </summary>
         public const int DefaultSendBufferSize = 2048;
         /// <summary>
-        /// Default clear idle session interval
+        /// Default clear idle session interval(second)
         /// </summary>
-        public const int DefaultClearIdleSessionInterval = 120;
+        public const int DefaultClearIdleSessionInterval = 3;
         /// <summary>
         /// Default idle session timeout
         /// </summary>

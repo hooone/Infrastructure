@@ -39,7 +39,7 @@ namespace Infrastructure.SocketServer
                     return false;
                 }
 
-                // 为每一个可能的socket事件预分配buffer池
+                // 为每一个可能的socket预分配buffer池
                 SocketAsyncEventArgs socketEventArg;
                 var socketArgsProxyList = new List<SocketAsyncEventArgsProxy>(ServerConfig.DefaultMaxConnectionNumber);
                 for (int i = 0; i < ServerConfig.DefaultMaxConnectionNumber; i++)
@@ -49,7 +49,7 @@ namespace Infrastructure.SocketServer
                     socketArgsProxyList.Add(new SocketAsyncEventArgsProxy(socketEventArg));
                 }
 
-                // 实例化socket事件堆栈
+                // 实例化socket堆栈
                 m_ReadWritePool = new ConcurrentStack<SocketAsyncEventArgsProxy>(socketArgsProxyList);
 
                 if (!base.Start())
@@ -78,20 +78,19 @@ namespace Infrastructure.SocketServer
         /// <returns></returns>
         private IAppSession ProcessNewClient(Socket client)
         {
-            //Get the socket for the accepted client connection and put it into the 
-            //ReadEventArg object user token
+            // 取出proxy
             SocketAsyncEventArgsProxy socketEventArgsProxy;
             if (!m_ReadWritePool.TryPop(out socketEventArgsProxy))
             {
                 Async.AsyncRun(client.SafeClose);
-
                 return null;
             }
 
+            // 实例化SocketSession
             ISocketSession socketSession = new AsyncSocketSession(client, socketEventArgsProxy);
 
+            // 实例化AppSession
             var session = CreateSession(client, socketSession);
-
             if (session == null)
             {
                 socketEventArgsProxy.Reset();
@@ -99,25 +98,15 @@ namespace Infrastructure.SocketServer
                 Async.AsyncRun(client.SafeClose);
                 return null;
             }
-
             socketSession.Closed += SessionClosed;
 
-            var negotiateSession = socketSession as INegotiateSocketSession;
+            // 此处移除了握手操作
 
-            if (negotiateSession == null)
+            if (RegisterSession(session))
             {
-                if (RegisterSession(session))
-                {
-                    Async.AsyncRun(() => socketSession.Start());
-                }
-
-                return session;
+                Async.AsyncRun(() => socketSession.Start());
             }
-
-            negotiateSession.NegotiateCompleted += OnSocketSessionNegotiateCompleted;
-            negotiateSession.Negotiate();
-
-            return null;
+            return session;
         }
         void SessionClosed(ISocketSession session, CloseReason reason)
         {
@@ -154,30 +143,13 @@ namespace Infrastructure.SocketServer
             pool.Push(proxy);
         }
 
-        private void OnSocketSessionNegotiateCompleted(object sender, EventArgs e)
-        {
-            var socketSession = sender as ISocketSession;
-            var negotiateSession = socketSession as INegotiateSocketSession;
-
-            if (!negotiateSession.Result)
-            {
-                socketSession.Close(CloseReason.SocketError);
-                return;
-            }
-
-            if (RegisterSession(negotiateSession.AppSession))
-            {
-                Async.AsyncRun(() => socketSession.Start());
-            }
-        }
         private bool RegisterSession(IAppSession appSession)
         {
-            return true;
-            //if (AppServer.RegisterSession(appSession))
-            //    return true;
+            if (AppServer.RegisterSession(appSession))
+                return true;
 
-            //appSession.SocketSession.Close(CloseReason.InternalError);
-            //return false;
+            appSession.SocketSession.Close(CloseReason.InternalError);
+            return false;
         }
 
 

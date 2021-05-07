@@ -45,7 +45,7 @@ namespace Infrastructure.SocketServer
 
             ILog log = AppServer.Logger;
 
-            // 实例化线程池
+            // 实例化发送数据池
             var sendingQueuePool = new SmartPool<SendingQueue>();
             sendingQueuePool.Initialize(Math.Max(ServerConfig.DefaultMaxConnectionNumber / 6, 256),
                     Math.Max(ServerConfig.DefaultMaxConnectionNumber * 2, 256),

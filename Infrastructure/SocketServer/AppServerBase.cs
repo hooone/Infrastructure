@@ -169,6 +169,18 @@ namespace Infrastructure.SocketServer
 
         private ISocketServer m_SocketServer;
         /// <summary>
+        /// Gets the socket server.
+        /// </summary>
+        /// <value>
+        /// The socket server.
+        /// </value>
+        public ISocketServer SocketServer
+        {
+            get { return m_SocketServer; }
+        }
+
+
+        /// <summary>
         /// Setups the socket server.instance
         /// </summary>
         /// <returns></returns>
@@ -226,6 +238,18 @@ namespace Infrastructure.SocketServer
         }
 
         /// <summary>
+        /// Creates the app session.
+        /// </summary>
+        /// <param name="socketSession">The socket session.</param>
+        /// <returns></returns>
+        public IAppSession CreateAppSession(ISocketSession socketSession)
+        {
+            var appSession = new AppSession();
+            appSession.Initialize(this, socketSession);
+            return appSession;
+        }
+
+        /// <summary>
         /// Gets the app session by ID.
         /// </summary>
         /// <param name="sessionID">The session ID.</param>
@@ -239,19 +263,17 @@ namespace Infrastructure.SocketServer
         /// <returns></returns>
         bool IAppServer.RegisterSession(IAppSession session)
         {
+            var appSession = session as AppSession;
+
+            if (!RegisterSession(appSession.SessionID, appSession))
+                return false;
+
+            appSession.SocketSession.Closed += OnSocketSessionClosed;
+
+            Logger.Info("A new session connected!");
+
+            OnNewSessionConnected(appSession);
             return true;
-            //var appSession = session as AppSession;
-
-            //if (!RegisterSession(appSession.SessionID, appSession))
-            //    return false;
-
-            //appSession.SocketSession.Closed += OnSocketSessionClosed;
-
-            //if (Config.LogBasicSessionActivity && Logger.IsInfoEnabled)
-            //    Logger.Info(session, "A new session connected!");
-
-            //OnNewSessionConnected(appSession);
-            //return true;
         }
 
         /// <summary>
@@ -263,6 +285,91 @@ namespace Infrastructure.SocketServer
         protected virtual bool RegisterSession(string sessionID, AppSession appSession)
         {
             return true;
+        }
+
+        /// <summary>
+        /// Called when [socket session closed].
+        /// </summary>
+        /// <param name="session">The socket session.</param>
+        /// <param name="reason">The reason.</param>
+        private void OnSocketSessionClosed(ISocketSession session, CloseReason reason)
+        {
+            Logger.Info(string.Format("This session was closed for {0}!", reason));
+
+            var appSession = session.AppSession as AppSession;
+            appSession.Connected = false;
+            OnSessionClosed(appSession, reason);
+        }
+        /// <summary>
+        /// Called when [session closed].
+        /// </summary>
+        /// <param name="session">The appSession.</param>
+        /// <param name="reason">The reason.</param>
+        protected virtual void OnSessionClosed(AppSession session, CloseReason reason)
+        {
+            var handler = m_SessionClosed;
+            if (handler != null)
+            {
+                handler.BeginInvoke(session, reason, OnSessionClosedCallback, handler);
+            }
+        }
+
+        private void OnSessionClosedCallback(IAsyncResult result)
+        {
+            try
+            {
+                var handler = (SessionHandler< CloseReason>)result.AsyncState;
+                handler.EndInvoke(result);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+            }
+        }
+
+        private SessionHandler m_NewSessionConnected;
+        /// <summary>
+        /// The action which will be executed after a new session connect
+        /// </summary>
+        public event SessionHandler NewSessionConnected
+        {
+            add { m_NewSessionConnected += value; }
+            remove { m_NewSessionConnected -= value; }
+        }
+
+        private SessionHandler<CloseReason> m_SessionClosed;
+        /// <summary>
+        /// Gets/sets the session closed event handler.
+        /// </summary>
+        public event SessionHandler<CloseReason> SessionClosed
+        {
+            add { m_SessionClosed += value; }
+            remove { m_SessionClosed -= value; }
+        }
+
+        /// <summary>
+        /// Called when [new session connected].
+        /// </summary>
+        /// <param name="session">The session.</param>
+        protected virtual void OnNewSessionConnected(AppSession session)
+        {
+            var handler = m_NewSessionConnected;
+            if (handler == null)
+                return;
+
+            handler.BeginInvoke(session, OnNewSessionConnectedCallback, handler);
+        }
+        private void OnNewSessionConnectedCallback(IAsyncResult result)
+        {
+            try
+            {
+                var handler = (SessionHandler)result.AsyncState;
+                handler.EndInvoke(result);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+            }
         }
 
         /// <summary>

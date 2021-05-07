@@ -24,7 +24,7 @@ namespace Infrastructure.SocketServer
         /// <summary>
         /// Gets the items.
         /// </summary>
-        IDictionary<object, object> Items { get; }
+        //IDictionary<object, object> Items { get; }
 
         /// <summary>
         /// Gets the local listening endpoint.
@@ -64,18 +64,12 @@ namespace Infrastructure.SocketServer
         bool Connected { get; }
 
         /// <summary>
-        /// Gets or sets the charset which is used for transfering text message.
-        /// </summary>
-        /// <value>The charset.</value>
-        Encoding Charset { get; set; }
-
-        /// <summary>
         /// Gets or sets the previous command.
         /// </summary>
         /// <value>
         /// The prev command.
         /// </value>
-        string PrevCommand { get; set; }
+        //string PrevCommand { get; set; }
 
         /// <summary>
         /// Gets or sets the current executing command.
@@ -83,7 +77,7 @@ namespace Infrastructure.SocketServer
         /// <value>
         /// The current command.
         /// </value>
-        string CurrentCommand { get; set; }
+        //string CurrentCommand { get; set; }
 
         /// <summary>
         /// Processes the request.
@@ -93,28 +87,11 @@ namespace Infrastructure.SocketServer
         /// <param name="length">The length.</param>
         /// <param name="toBeCopied">if set to <c>true</c> [to be copied].</param>
         /// <returns>return offset delta of next receiving buffer</returns>
-        int ProcessRequest(byte[] readBuffer, int offset, int length, bool toBeCopied);
+        //int ProcessRequest(byte[] readBuffer, int offset, int length, bool toBeCopied);
 
         /// <summary>
         /// Starts the session.
         /// </summary>
         void StartSession();
     }
-
-    ///// <summary>
-    ///// The interface for appSession
-    ///// </summary>
-    ///// <typeparam name="TAppSession">The type of the app session.</typeparam>
-    ///// <typeparam name="TRequestInfo">The type of the request info.</typeparam>
-    //public interface IAppSession<TAppSession, TRequestInfo> : IAppSession
-    //    where TRequestInfo : IRequestInfo
-    //    where TAppSession : IAppSession, IAppSession<TAppSession, TRequestInfo>, new()
-    //{
-    //    /// <summary>
-    //    /// Initializes the specified session.
-    //    /// </summary>
-    //    /// <param name="server">The server.</param>
-    //    /// <param name="socketSession">The socket session.</param>
-    //    void Initialize(IAppServer<TAppSession, TRequestInfo> server, ISocketSession socketSession);
-    //}
 }

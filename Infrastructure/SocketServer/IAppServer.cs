@@ -40,13 +40,13 @@ namespace Infrastructure.SocketServer
         /// Gets the Receive filter factory.
         /// </summary>
         //object ReceiveFilterFactory { get; }
-     
+
         /// <summary>
         /// Creates the app session.
         /// </summary>
         /// <param name="socketSession">The socket session.</param>
         /// <returns></returns>
-        //IAppSession CreateAppSession(ISocketSession socketSession);
+        IAppSession CreateAppSession(ISocketSession socketSession);
 
 
         /// <summary>
@@ -67,13 +67,7 @@ namespace Infrastructure.SocketServer
         /// Gets the logger assosiated with this object.
         /// </summary>
         ILog Logger { get; }
-    }
 
-    /// <summary>
-    /// SocketServer Accessor interface
-    /// </summary>
-    public interface ISocketServerAccessor
-    {
         /// <summary>
         /// Gets the socket server.
         /// </summary>
@@ -82,5 +76,4 @@ namespace Infrastructure.SocketServer
         /// </value>
         ISocketServer SocketServer { get; }
     }
-
 }

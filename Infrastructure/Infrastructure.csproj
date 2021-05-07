@@ -103,6 +103,7 @@
     <Compile Include="SocketServer\SendingQueue.cs" />
     <Compile Include="SocketServer\ServerConfig.cs" />
     <Compile Include="SocketServer\ServerState.cs" />
+    <Compile Include="SocketServer\SessionHandler.cs" />
     <Compile Include="SocketServer\SmartPool.cs" />
     <Compile Include="SocketServer\SocketAsyncEventArgsProxy.cs" />
     <Compile Include="SocketServer\SocketEx.cs" />

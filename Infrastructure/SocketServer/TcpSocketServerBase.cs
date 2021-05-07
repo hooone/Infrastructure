@@ -53,8 +53,7 @@ namespace Infrastructure.SocketServer
             client.NoDelay = true;
             client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
 
-            return null;
-            //return this.AppServer.CreateAppSession(session);
+            return this.AppServer.CreateAppSession(session);
         }
 
         protected override ISocketListener CreateListener(ListenerInfo listenerInfo)
