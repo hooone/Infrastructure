@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Infrastructure.Log;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,14 +39,14 @@ namespace Infrastructure.SocketServer
         /// <summary>
         /// Gets the Receive filter factory.
         /// </summary>
-        object ReceiveFilterFactory { get; }
+        //object ReceiveFilterFactory { get; }
      
         /// <summary>
         /// Creates the app session.
         /// </summary>
         /// <param name="socketSession">The socket session.</param>
         /// <returns></returns>
-        IAppSession CreateAppSession(ISocketSession socketSession);
+        //IAppSession CreateAppSession(ISocketSession socketSession);
 
 
         /// <summary>
@@ -60,7 +61,12 @@ namespace Infrastructure.SocketServer
         /// </summary>
         /// <param name="sessionID">The session ID.</param>
         /// <returns></returns>
-        IAppSession GetSessionByID(string sessionID);
+        //IAppSession GetSessionByID(string sessionID);
+
+        /// <summary>
+        /// Gets the logger assosiated with this object.
+        /// </summary>
+        ILog Logger { get; }
     }
 
     /// <summary>

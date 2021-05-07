@@ -40,5 +40,17 @@ namespace Infrastructure.SocketServer
         /// The default send buffer size
         /// </summary>
         public const int DefaultSendBufferSize = 2048;
+        /// <summary>
+        /// Default clear idle session interval
+        /// </summary>
+        public const int DefaultClearIdleSessionInterval = 120;
+        /// <summary>
+        /// Default idle session timeout
+        /// </summary>
+        public const int DefaultIdleSessionTimeOut = 300;
+        /// <summary>
+        /// The default session snapshot interval
+        /// </summary>
+        public const int DefaultSessionSnapshotInterval = 5;
     }
 }

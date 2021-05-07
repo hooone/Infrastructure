@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.SocketServer
 {
-    class AsyncSocketServer : TcpSocketServerBase
+    class AsyncTcpServer : TcpSocketServerBase
     {
-        public AsyncSocketServer(ListenerInfo[] listeners)
-            : base(listeners)
+        public AsyncTcpServer(IAppServer appServer, ListenerInfo[] listeners)
+            : base(appServer, listeners)
         {
 
         }
@@ -24,36 +24,32 @@ namespace Infrastructure.SocketServer
         {
             try
             {
+                // 实例化buffer manager
                 int bufferSize = ServerConfig.DefaultReceiveBufferSize;
-
                 if (bufferSize <= 0)
                     bufferSize = 1024 * 4;
-
                 m_BufferManager = new BufferManager(bufferSize * ServerConfig.DefaultMaxConnectionNumber, bufferSize);
-
                 try
                 {
                     m_BufferManager.InitBuffer();
                 }
                 catch (Exception e)
                 {
+                    AppServer.Logger.Error("Failed to allocate buffer for async socket communication, may because there is no enough memory, please decrease maxConnectionNumber in configuration!", e);
                     return false;
                 }
 
-                // preallocate pool of SocketAsyncEventArgs objects
+                // 为每一个可能的socket事件预分配buffer池
                 SocketAsyncEventArgs socketEventArg;
-
                 var socketArgsProxyList = new List<SocketAsyncEventArgsProxy>(ServerConfig.DefaultMaxConnectionNumber);
-
                 for (int i = 0; i < ServerConfig.DefaultMaxConnectionNumber; i++)
                 {
-                    //Pre-allocate a set of reusable SocketAsyncEventArgs
                     socketEventArg = new SocketAsyncEventArgs();
                     m_BufferManager.SetBuffer(socketEventArg);
-
                     socketArgsProxyList.Add(new SocketAsyncEventArgsProxy(socketEventArg));
                 }
 
+                // 实例化socket事件堆栈
                 m_ReadWritePool = new ConcurrentStack<SocketAsyncEventArgsProxy>(socketArgsProxyList);
 
                 if (!base.Start())

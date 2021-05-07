@@ -16,8 +16,8 @@ namespace Infrastructure.SocketServer
         private readonly int m_ReceiveBufferSize;
         private readonly int m_SendBufferSize;
 
-        public TcpSocketServerBase(ListenerInfo[] listeners)
-            : base(listeners)
+        public TcpSocketServerBase(IAppServer appServer, ListenerInfo[] listeners)
+            : base(appServer, listeners)
         {
             uint dummy = 0;
             m_KeepAliveOptionValues = new byte[Marshal.SizeOf(dummy) * 3];

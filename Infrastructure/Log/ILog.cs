@@ -11,5 +11,8 @@ namespace Infrastructure.Log
         void Info(string msg);
         void Debug(string msg);
         void Release(string msg);
+        void Error(string msg);
+        void Error(Exception e);
+        void Error(string msg, Exception e);
     }
 }

@@ -12,7 +12,7 @@ namespace Infrastructure.DB
 {
     public class OracleHelper : SqlHelper
     {
-        private ILogger Log = new NopLogger();
+        private ILog Log = new NopLogger();
         private OracleConnection _conn;
         public OracleConnection Conn
         {

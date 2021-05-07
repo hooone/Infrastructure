@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Infrastructure.Log;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -23,8 +24,9 @@ namespace Infrastructure.SocketServer
 
         protected abstract ISocketListener CreateListener(ListenerInfo listenerInfo);
 
-        public SocketServerBase(ListenerInfo[] listeners)
+        public SocketServerBase(IAppServer appServer, ListenerInfo[] listeners)
         {
+            AppServer = appServer;
             IsRunning = false;
             ListenerInfos = listeners;
             Listeners = new List<ISocketListener>(listeners.Length);
@@ -41,11 +43,13 @@ namespace Infrastructure.SocketServer
         {
             IsStopped = false;
 
+            ILog log = AppServer.Logger;
+
+            // 实例化线程池
             var sendingQueuePool = new SmartPool<SendingQueue>();
             sendingQueuePool.Initialize(Math.Max(ServerConfig.DefaultMaxConnectionNumber / 6, 256),
                     Math.Max(ServerConfig.DefaultMaxConnectionNumber * 2, 256),
                     new SendingQueueSourceCreator(ServerConfig.DefaultSendingQueueSize));
-
             SendingQueuePool = sendingQueuePool;
 
             for (var i = 0; i < ListenerInfos.Length; i++)
@@ -58,9 +62,11 @@ namespace Infrastructure.SocketServer
                 if (listener.Start())
                 {
                     Listeners.Add(listener);
+                    log.Debug(string.Format("Listener ({0}) was started", listener.EndPoint));
                 }
-                else //If one listener failed to start, stop started listeners
+                else //如果有一个启动失败，则全部listener都关闭
                 {
+                    log.Debug(string.Format("Listener ({0}) failed to start", listener.EndPoint));
                     for (var j = 0; j < Listeners.Count; j++)
                     {
                         Listeners[j].Stop();
@@ -78,10 +84,15 @@ namespace Infrastructure.SocketServer
 
         void OnListenerError(ISocketListener listener, Exception e)
         {
+            var logger = this.AppServer.Logger;
+            logger.Error(string.Format("Listener ({0}) error: {1}", listener.EndPoint, e.Message), e);
         }
 
         void OnListenerStopped(object sender, EventArgs e)
         {
+            var listener = sender as ISocketListener;
+            ILog log = AppServer.Logger;
+            log.Debug(string.Format("Listener ({0}) was stoppped", listener.EndPoint));
         }
         public virtual void Stop()
         {

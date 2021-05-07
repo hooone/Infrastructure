@@ -19,5 +19,17 @@ namespace Infrastructure.Log
         public void Release(string msg)
         {
         }
+
+        public void Error(string msg)
+        {
+        }
+
+        public void Error(string msg, Exception e)
+        {
+        }
+
+        public void Error(Exception e)
+        {
+        }
     }
 }
