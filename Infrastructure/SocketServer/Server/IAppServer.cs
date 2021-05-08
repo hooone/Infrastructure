@@ -37,7 +37,7 @@ namespace Infrastructure.SocketServer
         /// <summary>
         /// 停止监听
         /// </summary>
-        bool Stop();
+        void Stop();
 
         /// <summary>
         /// 获取Session用于发送信息

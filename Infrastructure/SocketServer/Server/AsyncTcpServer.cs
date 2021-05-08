@@ -17,6 +17,7 @@ namespace Infrastructure.SocketServer
         private readonly int m_SendTimeOut;
         private readonly int m_ReceiveBufferSize;
         private readonly int m_SendBufferSize;
+        protected object SyncRoot = new object();
 
         protected ListenerInfo[] ListenerInfos { get; private set; }
 
@@ -182,7 +183,7 @@ namespace Infrastructure.SocketServer
             // 实例化AppSession
             var session = new AppSession();
             session.WithLogger(this.Logger);
-            session.Initialize(socketSession);
+            session.Initialize(AppServer, socketSession);
             if (session == null)
             {
                 socketEventArgsProxy.Reset();
@@ -254,7 +255,35 @@ namespace Infrastructure.SocketServer
 
         public void Stop()
         {
-            throw new NotImplementedException();
+            if (IsStopped)
+                return;
+            lock (SyncRoot)
+            {
+                if (IsStopped)
+                    return;
+
+                IsStopped = true;
+
+                for (var i = 0; i < Listeners.Count; i++)
+                {
+                    var listener = Listeners[i];
+
+                    listener.Stop();
+                }
+
+                Listeners.Clear();
+
+                SendingQueuePool = null;
+
+                IsRunning = false;
+
+                foreach (var item in m_SocketPool)
+                    item.SocketEventArgs.Dispose();
+
+                m_SocketPool = null;
+                m_ReceiveBufferManager = null;
+                IsRunning = false;
+            }
         }
 
         public void WithLogger(ILog logger)

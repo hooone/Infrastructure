@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.SocketServer
 {
+    public delegate void RequestHandler(AppSession session, byte[] requestInfo);
     public class AppServer : IAppServer, IDisposable
     {
 
@@ -21,6 +22,16 @@ namespace Infrastructure.SocketServer
                 return (ServerState)m_StateCode;
             }
         }
+
+
+        private RequestHandler m_RequestHandler;
+
+        public virtual event RequestHandler NewRequestReceived
+        {
+            add { m_RequestHandler += value; }
+            remove { m_RequestHandler -= value; }
+        }
+
 
         public DateTime StartedTime { get; private set; }
 
@@ -62,11 +73,11 @@ namespace Infrastructure.SocketServer
                 return false;
             }
 
-            //// 定时Session快照
-            //StartSessionSnapshotTimer();
+            // 定时Session快照
+            StartSessionSnapshotTimer();
 
-            //// 定时清理Session
-            //StartClearSessionTimer();
+            // 定时清理Session
+            StartClearSessionTimer();
 
             return true;
         }
@@ -86,6 +97,33 @@ namespace Infrastructure.SocketServer
             OnNewSessionConnected(appSession);
             return true;
         }
+
+        internal void ExecuteCommand(AppSession session, byte[] requestInfo)
+        {
+            if (m_RequestHandler != null)
+            {
+                try
+                {
+                    m_RequestHandler(session, requestInfo);
+                }
+                catch (Exception e)
+                {
+                    session.HandleException(e);
+                }
+            }
+            session.LastActiveTime = DateTime.Now;
+            Logger.Info(string.Format("Receive - {0}", ToHexStrFromByte(requestInfo)));
+        }
+        public static string ToHexStrFromByte(byte[] byteDatas)
+        {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < byteDatas.Length; i++)
+            {
+                builder.Append(string.Format("{0:X2} ", byteDatas[i]));
+            }
+            return builder.ToString().Trim();
+        }
+
         private void OnSocketSessionClosed(ISocketSession session, CloseReason reason)
         {
             Logger.Info(string.Format("This session was closed for {0}!", reason));
@@ -101,9 +139,57 @@ namespace Infrastructure.SocketServer
             throw new NotImplementedException();
         }
 
-        public bool Stop()
+        public void Stop()
         {
-            throw new NotImplementedException();
+            if (Interlocked.CompareExchange(ref m_StateCode, ServerStateConst.Stopping, ServerStateConst.Running)
+                    != ServerStateConst.Running)
+            {
+                return;
+            }
+
+            m_SocketServer.Stop();
+
+            m_StateCode = ServerStateConst.NotStarted;
+
+            Logger.Info(string.Format("The server instance has been stopped!"));
+            if (m_SessionSnapshotTimer != null)
+            {
+                m_SessionSnapshotTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                m_SessionSnapshotTimer.Dispose();
+                m_SessionSnapshotTimer = null;
+            }
+
+            if (m_ClearIdleSessionTimer != null)
+            {
+                m_ClearIdleSessionTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                m_ClearIdleSessionTimer.Dispose();
+                m_ClearIdleSessionTimer = null;
+            }
+
+            m_SessionsSnapshot = null;
+
+            var sessions = m_SessionDict.ToArray();
+
+            if (sessions.Length > 0)
+            {
+                var tasks = new Task[sessions.Length];
+
+                for (var i = 0; i < tasks.Length; i++)
+                {
+                    tasks[i] = Task.Factory.StartNew((s) =>
+                    {
+                        var session = s as AppSession;
+
+                        if (session != null)
+                        {
+                            session.Close(CloseReason.ServerShutdown);
+                        }
+
+                    }, sessions[i].Value);
+                }
+
+                Task.WaitAll(tasks);
+            }
         }
         #region setup
 
@@ -279,5 +365,116 @@ namespace Infrastructure.SocketServer
                 Stop();
         }
 
+
+        #region Take session snapshot
+
+        private System.Threading.Timer m_SessionSnapshotTimer = null;
+
+        private KeyValuePair<string, AppSession>[] m_SessionsSnapshot = new KeyValuePair<string, AppSession>[0];
+
+        private void StartSessionSnapshotTimer()
+        {
+            int interval = Math.Max(ServerConfig.DefaultClearIdleSessionInterval, 1) * 1000;//in milliseconds
+            m_SessionSnapshotTimer = new System.Threading.Timer(TakeSessionSnapshot, new object(), interval, interval);
+        }
+
+        private void TakeSessionSnapshot(object state)
+        {
+            if (Monitor.TryEnter(state))
+            {
+                Interlocked.Exchange(ref m_SessionsSnapshot, m_SessionDict.ToArray());
+                Monitor.Exit(state);
+            }
+        }
+
+        #endregion
+
+        #region Clear idle sessions
+
+        private System.Threading.Timer m_ClearIdleSessionTimer = null;
+
+        private void StartClearSessionTimer()
+        {
+            int interval = ServerConfig.DefaultClearIdleSessionInterval * 1000;//in milliseconds
+            m_ClearIdleSessionTimer = new System.Threading.Timer(ClearIdleSession, new object(), interval, interval);
+        }
+
+        /// <summary>
+        /// Clears the idle session.
+        /// </summary>
+        /// <param name="state">The state.</param>
+        private void ClearIdleSession(object state)
+        {
+            if (Monitor.TryEnter(state))
+            {
+                try
+                {
+                    var sessionSource = SessionSource;
+
+                    if (sessionSource == null)
+                        return;
+
+                    DateTime now = DateTime.Now;
+                    DateTime timeOut = now.AddSeconds(0 - ServerConfig.DefaultIdleSessionTimeOut);
+
+                    var timeOutSessions = sessionSource.Where(s => s.Value.LastActiveTime <= timeOut).Select(s => s.Value);
+
+                    System.Threading.Tasks.Parallel.ForEach(timeOutSessions, s =>
+                    {
+                        Logger.Info(string.Format("The session will be closed for {0} timeout, the session start time: {1}, last active time: {2}!", now.Subtract(s.LastActiveTime).TotalSeconds, s.StartTime, s.LastActiveTime));
+                        s.Close(CloseReason.TimeOut);
+                    });
+                }
+                catch (Exception e)
+                {
+                    Logger.Error("Clear idle session error!", e);
+                }
+                finally
+                {
+                    Monitor.Exit(state);
+                }
+            }
+        }
+
+        private KeyValuePair<string, AppSession>[] SessionSource
+        {
+            get
+            {
+                return m_SessionsSnapshot;
+            }
+        }
+
+        #endregion
+        #region Search session utils
+
+        /// <summary>
+        /// Gets the matched sessions from sessions snapshot.
+        /// </summary>
+        /// <param name="critera">The prediction critera.</param>
+        /// <returns></returns>
+        public IEnumerable<AppSession> GetSessions(Func<AppSession, bool> critera)
+        {
+            var sessionSource = SessionSource;
+
+            if (sessionSource == null)
+                return null;
+
+            return sessionSource.Select(p => p.Value).Where(critera);
+        }
+
+        /// <summary>
+        /// Gets all sessions in sessions snapshot.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<AppSession> GetAllSessions()
+        {
+            var sessionSource = SessionSource;
+
+            if (sessionSource == null)
+                return null;
+
+            return sessionSource.Select(p => p.Value);
+        }
+        #endregion
     }
 }

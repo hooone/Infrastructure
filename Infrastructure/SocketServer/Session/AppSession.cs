@@ -13,6 +13,7 @@ namespace Infrastructure.SocketServer
     {
         public ILog Logger { get; private set; } = new NopLogger();
         public string SessionID { get; private set; }
+        public AppServer AppServer { get; private set; }
 
         public DateTime LastActiveTime { get; set; }
 
@@ -33,8 +34,9 @@ namespace Infrastructure.SocketServer
         internal ISocketSession SocketSession { get; set; }
         IReceiveFilter m_ReceiveFilter;
 
-        internal void Initialize(ISocketSession socketSession)
+        internal void Initialize(AppServer appServer, ISocketSession socketSession)
         {
+            AppServer = appServer;
             SocketSession = socketSession;
             SessionID = socketSession.SessionID;
             m_Connected = true;
@@ -50,7 +52,14 @@ namespace Infrastructure.SocketServer
                 var requestInfo = FilterRequest(readBuffer, offset, length, toBeCopied, out rest, out offsetDelta);
                 if (requestInfo != null)
                 {
-                    // 上抛数据
+                    try
+                    {
+                        AppServer.ExecuteCommand(this, requestInfo);
+                    }
+                    catch (Exception e)
+                    {
+                        HandleException(e);
+                    }
                 }
 
                 if (rest <= 0)
@@ -62,6 +71,11 @@ namespace Infrastructure.SocketServer
                 offset = offset + length - rest;
                 length = rest;
             }
+        }
+        internal virtual void HandleException(Exception e)
+        {
+            Logger.Error(e);
+            //this.Close(CloseReason.ApplicationError);
         }
         byte[] FilterRequest(byte[] readBuffer, int offset, int length, bool toBeCopied, out int rest, out int offsetDelta)
         {

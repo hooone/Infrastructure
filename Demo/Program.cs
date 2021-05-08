@@ -2,7 +2,7 @@ using Demo.DAL;
 using Demo.Model;
 using Infrastructure.Code;
 using Infrastructure.DB;
-using Infrastructure.SocketServer.Server;
+using Infrastructure.SocketServer;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,12 +20,18 @@ namespace Demo
         {
             var appServer = new AppServer();
             appServer.Setup(9527);
+            appServer.NewRequestReceived += AppServer_NewRequestReceived;
             appServer.Start();
             while (Console.ReadKey().KeyChar != 'q')
             {
                 Console.WriteLine();
                 continue;
             }
+            appServer.Stop();
+        }
+
+        private static void AppServer_NewRequestReceived(AppSession session, byte[] requestInfo)
+        {
         }
     }
 }
