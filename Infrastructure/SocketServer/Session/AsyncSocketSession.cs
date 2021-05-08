@@ -96,7 +96,7 @@ namespace Infrastructure.SocketServer.Server
 
             try
             {
-                //offsetDelta = this.AppSession.ProcessRequest(e.Buffer, e.Offset, e.BytesTransferred, true);
+                offsetDelta = this.AppSession.ProcessRequest(e.Buffer, e.Offset, e.BytesTransferred, true);
             }
             catch (Exception exc)
             {

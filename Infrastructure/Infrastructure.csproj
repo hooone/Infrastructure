@@ -89,7 +89,8 @@
     <Compile Include="SocketServer\AppSession.cs" />
     <Compile Include="SocketServer\ArraySegmentEx.cs" />
     <Compile Include="SocketServer\ArraySegmentList.cs" />
-    <Compile Include="SocketServer\Async.cs" />
+    <Compile Include="SocketServer\Filter\TerminatorReceiveFilter.cs" />
+    <Compile Include="SocketServer\Tool\Async.cs" />
     <Compile Include="SocketServer\AsyncTcpServer.cs" />
     <Compile Include="SocketServer\AsyncSocketSession.cs" />
     <Compile Include="SocketServer\AsyncStreamSocketSession.cs" />
@@ -113,7 +114,7 @@
     <Compile Include="SocketServer\Server\AsyncTcpListener.cs" />
     <Compile Include="SocketServer\Server\AsyncTcpServer.cs" />
     <Compile Include="SocketServer\Server\ListenerInfo.cs" />
-    <Compile Include="SocketServer\Platform.cs" />
+    <Compile Include="SocketServer\Tool\Platform.cs" />
     <Compile Include="SocketServer\ReceiveFilterBase.cs" />
     <Compile Include="SocketServer\RequestHandler.cs" />
     <Compile Include="SocketServer\SearchMarkState.cs" />
@@ -143,8 +144,6 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="SocketServer\Filter\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

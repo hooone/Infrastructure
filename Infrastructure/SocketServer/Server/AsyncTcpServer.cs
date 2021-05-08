@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.SocketServer.Server
 {
-    class AsyncTcpServer : ISocketServer,IDisposable
+    class AsyncTcpServer : ISocketServer, IDisposable
     {
         private readonly byte[] m_KeepAliveOptionValues;
         private readonly byte[] m_KeepAliveOptionOutValues;
@@ -181,6 +181,7 @@ namespace Infrastructure.SocketServer.Server
 
             // 实例化AppSession
             var session = new AppSession();
+            session.WithLogger(this.Logger);
             session.Initialize(socketSession);
             if (session == null)
             {

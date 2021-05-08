@@ -14,5 +14,6 @@ namespace Infrastructure.SocketServer.Server
         Action<ISocketSession, CloseReason> Closed { get; set; }
         void Initialize(IAppSession appSession);
         void Start();
+        void Close(CloseReason reason);
     }
 }
