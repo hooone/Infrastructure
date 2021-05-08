@@ -32,6 +32,8 @@ namespace Infrastructure.SocketServer.Server
             internal set { m_Connected = value; }
         }
 
+        private AppSession AppSession { get; set; }
+
         public Action<ISocketSession, CloseReason> Closed { get; set; }
 
         private bool m_IsReset;
@@ -55,6 +57,8 @@ namespace Infrastructure.SocketServer.Server
 
         public void Initialize(IAppSession appSession)
         {
+            this.AppSession = appSession as AppSession;
+
             SendingQueue queue;
             if (m_SendingQueuePool.TryGet(out queue))
             {
@@ -75,6 +79,33 @@ namespace Infrastructure.SocketServer.Server
 
         public void ProcessReceive(SocketAsyncEventArgs e)
         {
+            // 更新Session活动时间
+            this.AppSession.LastActiveTime = DateTime.Now;
+
+            // 确认该事件是消息接收事件，否正挥手断开
+            if (!ProcessCompleted(e))
+            {
+                OnReceiveTerminated(e.SocketError == SocketError.Success ? CloseReason.ClientClosing : CloseReason.SocketError);
+                return;
+            }
+
+            // 切换到读取状态
+            OnReceiveEnded();
+
+            int offsetDelta = 0;
+
+            try
+            {
+                //offsetDelta = this.AppSession.ProcessRequest(e.Buffer, e.Offset, e.BytesTransferred, true);
+            }
+            catch (Exception exc)
+            {
+                this.Close(CloseReason.ProtocolError);
+                return;
+            }
+
+            //订阅接收下一个信息
+            StartReceive(e, offsetDelta);
         }
 
         /// <summary>
@@ -116,26 +147,33 @@ namespace Infrastructure.SocketServer.Server
 
         private void OnClosed(CloseReason reason)
         {
-            ////Already closed
-            //if (!TryAddStateFlag(SocketState.Closed))
-            //    return;
-
-            ////Before changing m_SendingQueue, must check m_IsClosed
-            //while (true)
+            // 停止发送
+            //var sae = m_SocketEventArgSend;
+            //if (sae != null)
             //{
-            //    var sendingQueue = m_SendingQueue;
-
-            //    if (sendingQueue == null)
-            //        break;
-
-            //    //There is no sending was started after the m_Closed ws set to 'true'
-            //    if (Interlocked.CompareExchange(ref m_SendingQueue, null, sendingQueue) == sendingQueue)
+            //    if (Interlocked.CompareExchange(ref m_SocketEventArgSend, null, sae) == sae)
             //    {
-            //        sendingQueue.Clear();
-            //        m_SendingQueuePool.Push(sendingQueue);
-            //        break;
+            //        sae.Dispose();
             //    }
             //}
+            // 状态位切换和释放资源
+            if (!TryAddStateFlag(SocketState.Closed))
+                return;
+            while (true)
+            {
+                var sendingQueue = m_SendingQueue;
+
+                if (sendingQueue == null)
+                    break;
+
+                //There is no sending was started after the m_Closed ws set to 'true'
+                if (Interlocked.CompareExchange(ref m_SendingQueue, null, sendingQueue) == sendingQueue)
+                {
+                    sendingQueue.Clear();
+                    m_SendingQueuePool.Push(sendingQueue);
+                    break;
+                }
+            }
 
             var closedHandler = this.Closed;
             if (closedHandler != null)
@@ -241,7 +279,17 @@ namespace Infrastructure.SocketServer.Server
                     return;
             }
         }
-
+        bool ProcessCompleted(SocketAsyncEventArgs e)
+        {
+            if (e.SocketError == SocketError.Success)
+            {
+                if (e.BytesTransferred > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         private void ValidateClosed(CloseReason closeReason, bool forceClose)
         {
             ValidateClosed(closeReason, forceClose, false);

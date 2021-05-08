@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.SocketServer.Server
 {
-    class AsyncTcpServer : ISocketServer
+    class AsyncTcpServer : ISocketServer,IDisposable
     {
         private readonly byte[] m_KeepAliveOptionValues;
         private readonly byte[] m_KeepAliveOptionOutValues;
@@ -27,7 +27,9 @@ namespace Infrastructure.SocketServer.Server
         public AsyncTcpServer(AppServer app, ListenerInfo[] listeners)
         {
             AppServer = app;
+            IsRunning = false;
             ListenerInfos = listeners;
+            Listeners = new List<ISocketListener>(listeners.Length);
 
             uint dummy = 0;
             m_KeepAliveOptionValues = new byte[Marshal.SizeOf(dummy) * 3];
@@ -257,6 +259,19 @@ namespace Infrastructure.SocketServer.Server
         public void WithLogger(ILog logger)
         {
             Logger = logger;
+        }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (IsRunning)
+                    Stop();
+            }
         }
     }
 }

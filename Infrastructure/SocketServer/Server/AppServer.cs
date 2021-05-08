@@ -3,13 +3,14 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Infrastructure.SocketServer.Server
 {
-    public class AppServer : IAppServer
+    public class AppServer : IAppServer, IDisposable
     {
 
         private int m_StateCode = ServerStateConst.NotInitialized;
@@ -35,6 +36,16 @@ namespace Infrastructure.SocketServer.Server
 
         public bool Setup(int port)
         {
+            // 确认AppServer状态
+            TrySetInitializedState();
+
+            // 线程池设置
+            SetupThreadPool();
+
+            // 监听端口设置
+            if (!SetupListeners(port))
+                return false;
+
             // SocketServer设置
             if (!SetupSocketServer(SocketMode.Tcp))
                 return false;
@@ -95,6 +106,61 @@ namespace Infrastructure.SocketServer.Server
             throw new NotImplementedException();
         }
         #region setup
+
+        private bool SetupListeners(int port)
+        {
+            var listeners = new List<ListenerInfo>();
+            try
+            {
+                if (port > 0)
+                {
+                    listeners.Add(new ListenerInfo
+                    {
+                        EndPoint = new IPEndPoint(IPAddress.Any, port),
+                    });
+                }
+                if (!listeners.Any())
+                {
+                    Logger.Error("No listener defined!");
+                    return false;
+                }
+                m_Listeners = listeners.ToArray();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+                return false;
+            }
+        }
+        // 线程池初始化标志位
+        private static bool m_ThreadPoolConfigured = false;
+        private void SetupThreadPool()
+        {
+            if (!m_ThreadPoolConfigured)
+            {
+                int oldMinWorkingThreads, oldMinCompletionPortThreads;
+                int oldMaxWorkingThreads, oldMaxCompletionPortThreads;
+
+                ThreadPool.GetMinThreads(out oldMinWorkingThreads, out oldMinCompletionPortThreads);
+                ThreadPool.GetMaxThreads(out oldMaxWorkingThreads, out oldMaxCompletionPortThreads);
+
+                ThreadPool.SetMinThreads(oldMinWorkingThreads, oldMinCompletionPortThreads);
+                ThreadPool.SetMaxThreads(oldMaxWorkingThreads, oldMaxCompletionPortThreads);
+
+                m_ThreadPoolConfigured = true;
+            }
+        }
+
+        private void TrySetInitializedState()
+        {
+            if (Interlocked.CompareExchange(ref m_StateCode, ServerStateConst.Initializing, ServerStateConst.NotInitialized)
+                    != ServerStateConst.NotInitialized)
+            {
+                throw new Exception("The server has been initialized already, you cannot initialize it again!");
+            }
+        }
+
         private bool SetupSocketServer(SocketMode mode)
         {
             try
@@ -207,5 +273,11 @@ namespace Infrastructure.SocketServer.Server
         {
             this.Logger = logger.SubLogger("SocketServer");
         }
+        public void Dispose()
+        {
+            if (m_StateCode == ServerStateConst.Running)
+                Stop();
+        }
+
     }
 }

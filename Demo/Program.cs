@@ -2,7 +2,7 @@ using Demo.DAL;
 using Demo.Model;
 using Infrastructure.Code;
 using Infrastructure.DB;
-using Infrastructure.SocketServer;
+using Infrastructure.SocketServer.Server;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,7 +19,7 @@ namespace Demo
         static void Main(string[] args)
         {
             var appServer = new AppServer();
-            appServer.Setup(9527, SocketMode.Tcp);
+            appServer.Setup(9527);
             appServer.Start();
             while (Console.ReadKey().KeyChar != 'q')
             {
