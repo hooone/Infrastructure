@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Infrastructure.SocketServer.Server
+namespace Infrastructure.SocketServer
 {
     internal class AsyncSocketSession : IAsyncSocketSession, ISocketSession
     {

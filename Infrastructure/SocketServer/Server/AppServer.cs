@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Infrastructure.SocketServer.Server
+namespace Infrastructure.SocketServer
 {
     public class AppServer : IAppServer, IDisposable
     {

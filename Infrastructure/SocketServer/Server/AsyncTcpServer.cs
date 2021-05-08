@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.SocketServer.Server
+namespace Infrastructure.SocketServer
 {
     class AsyncTcpServer : ISocketServer, IDisposable
     {

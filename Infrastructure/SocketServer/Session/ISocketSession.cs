@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.SocketServer.Server
+namespace Infrastructure.SocketServer
 {
     internal interface ISocketSession : ISessionBase
     {
