@@ -202,29 +202,33 @@ namespace Infrastructure.SocketServer
 
         public void ProcessReceive(SocketAsyncEventArgs e)
         {
+            // 更新Session活动时间
             this.AppSession.LastActiveTime = DateTime.Now;
-            //if (!ProcessCompleted(e))
-            //{
-            //    OnReceiveTerminated(e.SocketError == SocketError.Success ? CloseReason.ClientClosing : CloseReason.SocketError);
-            //    return;
-            //}
 
-            //OnReceiveEnded();
+            // 确认有待处理的数据，否则断开
+            if (!ProcessCompleted(e))
+            {
+                OnReceiveTerminated(e.SocketError == SocketError.Success ? CloseReason.ClientClosing : CloseReason.SocketError);
+                return;
+            }
 
-            //int offsetDelta;
+            // 切换到读取状态
+            OnReceiveEnded();
 
-            //try
-            //{
-            //    offsetDelta = this.AppSession.ProcessRequest(e.Buffer, e.Offset, e.BytesTransferred, true);
-            //}
-            //catch (Exception exc)
-            //{
-            //    this.Close(CloseReason.ProtocolError);
-            //    return;
-            //}
+            int offsetDelta;
 
-            ////read the next block of data sent from the client
-            //StartReceive(e, offsetDelta);
+            try
+            {
+                offsetDelta = this.AppSession.ProcessRequest(e.Buffer, e.Offset, e.BytesTransferred, true);
+            }
+            catch (Exception exc)
+            {
+                this.Close(CloseReason.ProtocolError);
+                return;
+            }
+
+            //订阅接收下一个信息
+            StartReceive(e, offsetDelta);
         }
 
         protected override void OnClosed(CloseReason reason)

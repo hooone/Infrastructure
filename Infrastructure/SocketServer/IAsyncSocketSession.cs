@@ -7,15 +7,12 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.SocketServer
 {
-    interface IAsyncSocketSessionBase 
+    interface IAsyncSocketSession
     {
         SocketAsyncEventArgsProxy SocketAsyncProxy { get; }
 
         Socket Client { get; }
-    }
 
-    interface IAsyncSocketSession : IAsyncSocketSessionBase
-    {
         void ProcessReceive(SocketAsyncEventArgs e);
     }
 }

@@ -52,5 +52,9 @@ namespace Infrastructure.SocketServer
         /// The default session snapshot interval
         /// </summary>
         public const int DefaultSessionSnapshotInterval = 5;
+        /// <summary>
+        /// Default MaxRequestLength
+        /// </summary>
+        public const int DefaultMaxRequestLength = 1024;
     }
 }

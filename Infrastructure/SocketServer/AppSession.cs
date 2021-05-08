@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Infrastructure.Log;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -41,6 +42,14 @@ namespace Infrastructure.SocketServer
         public IPEndPoint RemoteEndPoint
         {
             get { return SocketSession.RemoteEndPoint; }
+        }
+
+        /// <summary>
+        /// Gets the logger.
+        /// </summary>
+        public ILog Logger
+        {
+            get { return AppServer.Logger; }
         }
 
         /// <summary>
@@ -112,7 +121,134 @@ namespace Infrastructure.SocketServer
             SocketSession = socketSession;
             SessionID = socketSession.SessionID;
             m_Connected = true;
+            m_ReceiveFilter = new BeginEndMarkReceiveFilter(new byte[] { }, new byte[] { (byte)'\r', (byte)'\n' });
             socketSession.Initialize(this);
+
+        }
+
+
+        /// <summary>
+        /// Processes the request data.
+        /// </summary>
+        /// <param name="readBuffer">The read buffer.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="length">The length.</param>
+        /// <param name="toBeCopied">if set to <c>true</c> [to be copied].</param>
+        /// <returns>
+        /// return offset delta of next receiving buffer
+        /// </returns>
+        public int ProcessRequest(byte[] readBuffer, int offset, int length, bool toBeCopied)
+        {
+            int rest, offsetDelta;
+
+            while (true)
+            {
+                var requestInfo = FilterRequest(readBuffer, offset, length, toBeCopied, out rest, out offsetDelta);
+
+                if (requestInfo != null)
+                {
+                    try
+                    {
+                        AppServer.ExecuteCommand(this, requestInfo);
+                    }
+                    catch (Exception e)
+                    {
+                        HandleException(e);
+                    }
+                }
+
+                if (rest <= 0)
+                {
+                    return offsetDelta;
+                }
+
+                //Still have data has not been processed
+                offset = offset + length - rest;
+                length = rest;
+            }
+        }
+
+        IReceiveFilter m_ReceiveFilter;
+
+        /// <summary>
+        /// Filters the request.
+        /// </summary>
+        /// <param name="readBuffer">The read buffer.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="length">The length.</param>
+        /// <param name="toBeCopied">if set to <c>true</c> [to be copied].</param>
+        /// <param name="rest">The rest, the size of the data which has not been processed</param>
+        /// <param name="offsetDelta">return offset delta of next receiving buffer.</param>
+        /// <returns></returns>
+        byte[] FilterRequest(byte[] readBuffer, int offset, int length, bool toBeCopied, out int rest, out int offsetDelta)
+        {
+            var currentRequestLength = m_ReceiveFilter.LeftBufferSize;
+
+            var requestInfo = m_ReceiveFilter.Filter(readBuffer, offset, length, toBeCopied, out rest);
+
+            if (m_ReceiveFilter.State == FilterState.Error)
+            {
+                rest = 0;
+                offsetDelta = 0;
+                Close(CloseReason.ProtocolError);
+                return null;
+            }
+
+            var offsetAdapter = m_ReceiveFilter as IOffsetAdapter;
+
+            offsetDelta = offsetAdapter != null ? offsetAdapter.OffsetDelta : 0;
+
+            if (requestInfo == null)
+            {
+                //current buffered length
+                currentRequestLength = m_ReceiveFilter.LeftBufferSize;
+            }
+            else
+            {
+                //current request length
+                currentRequestLength = currentRequestLength + length - rest;
+            }
+
+            var maxRequestLength = GetMaxRequestLength();
+
+            if (currentRequestLength >= maxRequestLength)
+            {
+                Logger.Error(string.Format("Max request length: {0}, current processed length: {1}", maxRequestLength, currentRequestLength));
+
+                Close(CloseReason.ProtocolError);
+                return null;
+            }
+
+            //If next Receive filter wasn't set, still use current Receive filter in next round received data processing
+            if (m_ReceiveFilter.NextReceiveFilter != null)
+                m_ReceiveFilter = m_ReceiveFilter.NextReceiveFilter;
+
+            return requestInfo;
+        }
+
+        /// <summary>
+        /// Gets the maximum allowed length of the request.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual int GetMaxRequestLength()
+        {
+            return ServerConfig.DefaultMaxRequestLength;
+        }
+
+
+
+        internal void InternalHandleExcetion(Exception e)
+        {
+            HandleException(e);
+        }
+        /// <summary>
+        /// Handles the exceptional error, it only handles application error.
+        /// </summary>
+        /// <param name="e">The exception.</param>
+        protected virtual void HandleException(Exception e)
+        {
+            Logger.Error(e);
+            this.Close(CloseReason.ApplicationError);
         }
     }
 }

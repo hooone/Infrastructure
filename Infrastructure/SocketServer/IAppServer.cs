@@ -75,5 +75,7 @@ namespace Infrastructure.SocketServer
         /// The socket server.
         /// </value>
         ISocketServer SocketServer { get; }
+
+        void ExecuteCommand(AppSession session, byte[] requestInfo);
     }
 }

@@ -249,6 +249,18 @@ namespace Infrastructure.SocketServer
             return appSession;
         }
 
+        private RequestHandler m_RequestHandler;
+
+        /// <summary>
+        /// Occurs when a full request item received.
+        /// </summary>
+        public virtual event RequestHandler NewRequestReceived
+        {
+            add { m_RequestHandler += value; }
+            remove { m_RequestHandler -= value; }
+        }
+
+
         /// <summary>
         /// Gets the app session by ID.
         /// </summary>
@@ -274,6 +286,39 @@ namespace Infrastructure.SocketServer
 
             OnNewSessionConnected(appSession);
             return true;
+        }
+
+        /// <summary>
+        /// Executes the command for the session.
+        /// </summary>
+        /// <param name="session">The session.</param>
+        /// <param name="requestInfo">The request info.</param>
+        public void ExecuteCommand(AppSession session, byte[] requestInfo)
+        {
+            try
+            {
+                if (m_RequestHandler != null)
+                {
+                    m_RequestHandler(session, requestInfo);
+                }
+            }
+            catch (Exception e)
+            {
+                session.InternalHandleExcetion(e);
+            }
+
+            session.LastActiveTime = DateTime.Now;
+            Logger.Info(string.Format("Command - {0}", ToHexStrFromByte(requestInfo)));
+        }
+
+        public static string ToHexStrFromByte(byte[] byteDatas)
+        {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < byteDatas.Length; i++)
+            {
+                builder.Append(string.Format("{0:X2} ", byteDatas[i]));
+            }
+            return builder.ToString().Trim();
         }
 
         /// <summary>
@@ -318,7 +363,7 @@ namespace Infrastructure.SocketServer
         {
             try
             {
-                var handler = (SessionHandler< CloseReason>)result.AsyncState;
+                var handler = (SessionHandler<CloseReason>)result.AsyncState;
                 handler.EndInvoke(result);
             }
             catch (Exception e)

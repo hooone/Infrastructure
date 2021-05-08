@@ -39,7 +39,7 @@ namespace Infrastructure.SocketServer
                     return false;
                 }
 
-                // 为每一个可能的socket预分配buffer池
+                // 为每一个可能的socket预分配buffer池，并绑定到SocketAsyncEventArgs
                 SocketAsyncEventArgs socketEventArg;
                 var socketArgsProxyList = new List<SocketAsyncEventArgsProxy>(ServerConfig.DefaultMaxConnectionNumber);
                 for (int i = 0; i < ServerConfig.DefaultMaxConnectionNumber; i++)
@@ -110,7 +110,7 @@ namespace Infrastructure.SocketServer
         }
         void SessionClosed(ISocketSession session, CloseReason reason)
         {
-            var socketSession = session as IAsyncSocketSessionBase;
+            var socketSession = session as IAsyncSocketSession;
             if (socketSession == null)
                 return;
 
