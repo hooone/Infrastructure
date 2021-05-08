@@ -16,7 +16,7 @@ namespace Infrastructure.SocketServer
 
         }
 
-        private BufferManager m_BufferManager;
+        private ReceiveBuffer m_BufferManager;
 
         private ConcurrentStack<SocketAsyncEventArgsProxy> m_ReadWritePool;
 
@@ -28,7 +28,7 @@ namespace Infrastructure.SocketServer
                 int bufferSize = ServerConfig.DefaultReceiveBufferSize;
                 if (bufferSize <= 0)
                     bufferSize = 1024 * 4;
-                m_BufferManager = new BufferManager(bufferSize * ServerConfig.DefaultMaxConnectionNumber, bufferSize);
+                m_BufferManager = new ReceiveBuffer(bufferSize * ServerConfig.DefaultMaxConnectionNumber, bufferSize);
                 try
                 {
                     m_BufferManager.InitBuffer();

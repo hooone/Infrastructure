@@ -31,5 +31,10 @@ namespace Infrastructure.Log
         public void Error(Exception e)
         {
         }
+
+        public ILog SubLogger(string name)
+        {
+            return new NopLogger();
+        }
     }
 }

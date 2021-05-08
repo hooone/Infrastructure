@@ -10,12 +10,6 @@ namespace Infrastructure.SocketServer
 {
     public class ListenerInfo
     {
-        /// <summary>
-        /// Gets or sets the listen endpoint.
-        /// </summary>
-        /// <value>
-        /// The end point.
-        /// </value>
         public IPEndPoint EndPoint { get; set; }
     }
 }

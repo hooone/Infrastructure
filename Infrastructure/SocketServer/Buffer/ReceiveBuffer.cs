@@ -13,7 +13,7 @@ namespace Infrastructure.SocketServer
     /// 
     /// The operations exposed on the BufferManager class are not thread safe.
     /// </summary>
-    public class BufferManager
+    public class ReceiveBuffer
     {
         int m_numBytes;                 // the total number of bytes controlled by the buffer pool
         byte[] m_buffer;                // the underlying byte array maintained by the Buffer Manager
@@ -22,11 +22,11 @@ namespace Infrastructure.SocketServer
         int m_bufferSize;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BufferManager"/> class.
+        /// Initializes a new instance of the <see cref="ReceiveBuffer"/> class.
         /// </summary>
         /// <param name="totalBytes">The total bytes.</param>
         /// <param name="bufferSize">Size of the buffer.</param>
-        public BufferManager(int totalBytes, int bufferSize)
+        public ReceiveBuffer(int totalBytes, int bufferSize)
         {
             m_numBytes = totalBytes;
             m_currentIndex = 0;

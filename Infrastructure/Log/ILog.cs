@@ -14,5 +14,6 @@ namespace Infrastructure.Log
         void Error(string msg);
         void Error(Exception e);
         void Error(string msg, Exception e);
+        ILog SubLogger(string name);
     }
 }
