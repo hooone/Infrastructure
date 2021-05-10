@@ -14,7 +14,7 @@ namespace Infrastructure.CommandBus
         public Dispatcher()
         {
             var discoveredCommands = new Dictionary<string, ICommand>(StringComparer.OrdinalIgnoreCase);
-            if (!SetupCommands(discoveredCommands))
+            if (!SetupCommands(discoveredCommands) && m_CommandContainer != null)
                 return;
 
             OnCommandSetup(discoveredCommands);
@@ -54,14 +54,27 @@ namespace Infrastructure.CommandBus
             return true;
         }
 
-        private bool TryLoadCommands(out IEnumerable<ICommand> commands)
+        private bool TryLoadCommands(out IEnumerable<ICommand> commands, List<string> CommandAssemblies = null)
         {
             commands = null;
 
             var commandAssemblies = new List<Assembly>();
-            if (!commandAssemblies.Any())
+            commandAssemblies.Add(Assembly.GetEntryAssembly());
+          
+            if (CommandAssemblies != null && CommandAssemblies.Any())
             {
-                commandAssemblies.Add(Assembly.GetEntryAssembly());
+                try
+                {
+                    var definedAssemblies = GetAssembliesFromStrings(CommandAssemblies.ToArray());
+
+                    if (definedAssemblies.Any())
+                        commandAssemblies.AddRange(definedAssemblies);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error("Failed to load defined command assemblies!", e);
+                    return false;
+                }
             }
 
             var outputCommands = new List<ICommand>();
@@ -82,6 +95,18 @@ namespace Infrastructure.CommandBus
             commands = outputCommands;
 
             return true;
+        }
+
+        public static IEnumerable<Assembly> GetAssembliesFromStrings(string[] assemblies)
+        {
+            List<Assembly> result = new List<Assembly>(assemblies.Length);
+
+            foreach (var a in assemblies)
+            {
+                result.Add(Assembly.Load(a));
+            }
+
+            return result;
         }
 
         public static IEnumerable<TBaseInterface> GetImplementedObjectsByInterface<TBaseInterface>(Assembly assembly)
@@ -132,7 +157,8 @@ namespace Infrastructure.CommandBus
         public void ExecuteCommand(object sender, IRequestInfo requestInfo)
         {
             var commandProxy = GetCommandByName(requestInfo.Key);
-            commandProxy.Command.CallCommand(sender, requestInfo);
+            if (commandProxy != null)
+                commandProxy.Command.CallCommand(sender, requestInfo);
         }
         private CommandInfo<ICommand> GetCommandByName(string commandName)
         {
