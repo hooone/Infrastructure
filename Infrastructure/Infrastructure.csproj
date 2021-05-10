@@ -62,16 +62,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Code\AssemblyInfo.cs" />
-    <Compile Include="Code\AttributeInfo.cs" />
-    <Compile Include="Code\ClassInfo.cs" />
-    <Compile Include="Code\MethodInfo.cs" />
-    <Compile Include="Code\PropertyInfo.cs" />
     <Compile Include="CommandBus\CommandBase.cs" />
     <Compile Include="CommandBus\CommandInfo.cs" />
     <Compile Include="CommandBus\Dispatcher.cs" />
     <Compile Include="CommandBus\ICommand.cs" />
     <Compile Include="CommandBus\IRequestInfo.cs" />
+    <Compile Include="CommandBus\SocketCommandServer.cs" />
+    <Compile Include="CommandBus\StringRequestInfo.cs" />
     <Compile Include="DB\DbColumn.cs" />
     <Compile Include="DB\IConnectionString.cs" />
     <Compile Include="DB\DbConvert.cs" />

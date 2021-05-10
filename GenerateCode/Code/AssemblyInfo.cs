@@ -10,7 +10,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Infrastructure.Code
+namespace GenerateCode.Code
 {
     public class AssemblyInfo
     {

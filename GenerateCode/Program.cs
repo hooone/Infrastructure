@@ -1,4 +1,4 @@
-﻿using Infrastructure.Code;
+﻿using GenerateCode.Code;
 using Infrastructure.DB;
 using Oracle.ManagedDataAccess.Client;
 using System;

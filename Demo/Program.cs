@@ -1,18 +1,8 @@
 using Demo.DAL;
 using Demo.Model;
-using Infrastructure.Code;
 using Infrastructure.CommandBus;
-using Infrastructure.DB;
 using Infrastructure.SocketServer;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Security.Policy;
-using System.Text;
-using System.Text.RegularExpressions;
 namespace Demo
 {
     class Program
