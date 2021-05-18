@@ -11,8 +11,8 @@ namespace Infrastructure.SocketClient
     {
         bool IsConnected { get; }
         event EventHandler<byte[]> NewPackageReceived;
-        Task<bool> ConnectAsync(EndPoint remoteEndPoint);
-        void Send(byte[] data);
+        Task<bool> ConnectAsync(string ip, int port);
+        bool Send(byte[] data);
         Task<bool> Close();
     }
 }

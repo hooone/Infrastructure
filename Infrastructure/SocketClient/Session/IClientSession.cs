@@ -11,7 +11,7 @@ namespace Infrastructure.SocketClient
     {
         Socket Socket { get; }
 
-        void Send(ArraySegment<byte> segment);
+        bool Send(ArraySegment<byte> segment);
         void Close();
     }
 }

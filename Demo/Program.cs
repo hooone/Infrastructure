@@ -1,19 +1,23 @@
 using Demo.DAL;
 using Demo.Model;
 using Infrastructure.CommandBus;
+using Infrastructure.SocketClient;
 using Infrastructure.SocketServer;
 using System;
+using System.Threading;
+
 namespace Demo
 {
     class Program
     {
         static void Main(string[] args)
         {
-            // CommandBus
-            var dis = new Dispatcher();
-            StringRequestInfo cmd = new StringRequestInfo();
-            cmd.Key = "ADD";
-            dis.ExecuteCommand(null, cmd);
+            //// CommandBus
+            //var dis = new Dispatcher();
+            //StringRequestInfo cmd = new StringRequestInfo();
+            //cmd.Key = "ADD";
+            //dis.ExecuteCommand(null, cmd);
+
             // socket server
             //var appServer = new AppServer();
             //appServer.Setup(9527);
@@ -25,6 +29,23 @@ namespace Demo
             //    continue;
             //}
             //appServer.Stop();
+
+            // socket client
+            EasyClient client = new EasyClient();
+            var r = client.ConnectAsync("127.0.0.1", 9988);
+            var rst = r.Result;
+            Thread th = new Thread(() =>
+              {
+                  int n = 0;
+                  while (true)
+                  {
+                      if (client.Send(BitConverter.GetBytes(n)))
+                          n++;
+                      Thread.Sleep(1000);
+                  }
+              });
+            th.Start();
+            Console.ReadLine();
         }
 
         private static void AppServer_NewRequestReceived(AppSession session, byte[] requestInfo)

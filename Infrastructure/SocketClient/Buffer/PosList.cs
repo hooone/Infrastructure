@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.SocketClient.Buffer
+namespace Infrastructure.SocketClient
 {
     /// <summary>
     /// The generic list interface with position

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Infrastructure.SocketClient.Buffer
+namespace Infrastructure.SocketClient
 {
     /// <summary>
     /// Concurrent BatchQueue

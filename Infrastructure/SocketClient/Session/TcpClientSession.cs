@@ -1,5 +1,4 @@
-﻿using Infrastructure.SocketClient.Buffer;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -193,7 +192,7 @@ namespace Infrastructure.SocketClient
         {
             get { return m_IsSending == 1; }
         }
-        private bool DetectConnected()
+        protected override bool DetectConnected()
         {
             if (Client != null)
                 return true;
@@ -271,7 +270,7 @@ namespace Infrastructure.SocketClient
 
         #region Send
         protected abstract void SendInternal(PosList<ArraySegment<byte>> items);
-        
+
         protected void OnSendingCompleted()
         {
             var sendingItems = GetSendingItems();
@@ -290,12 +289,6 @@ namespace Infrastructure.SocketClient
         {
             if (segment.Array == null || segment.Count == 0)
             {
-                throw new Exception("The data to be sent cannot be empty.");
-            }
-
-            if (!DetectConnected())
-            {
-                //may be return false? 
                 return true;
             }
 

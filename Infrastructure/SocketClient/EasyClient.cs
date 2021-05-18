@@ -1,4 +1,6 @@
-﻿using Infrastructure.SocketClient;
+﻿using Infrastructure.Log;
+using Infrastructure.SocketClient;
+using Infrastructure.SocketClient.Filter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +12,8 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.SocketClient
 {
-    public class EasyClient : IClient
+    public delegate void RequestHandler(ClientSession session, byte[] requestInfo);
+    public class EasyClient : IClient, ILoggerProvider
     {
         private IClientSession m_Session;
         private TaskCompletionSource<bool> m_ConnectTaskSource;
@@ -18,8 +21,19 @@ namespace Infrastructure.SocketClient
 
         public event EventHandler<byte[]> NewPackageReceived;
 
+        private EndPoint m_RemoteEndPoint;
         private EndPoint m_EndPointToBind;
         private EndPoint m_LocalEndPoint;
+
+
+        private RequestHandler m_RequestHandler;
+
+        public virtual event RequestHandler NewRequestReceived
+        {
+            add { m_RequestHandler += value; }
+            remove { m_RequestHandler -= value; }
+        }
+
 
         public EndPoint LocalEndPoint
         {
@@ -54,6 +68,13 @@ namespace Infrastructure.SocketClient
 
         public int ReceiveBufferSize { get; set; }
 
+        public ILog Logger { get; private set; } = new NopLogger();
+
+        public async Task<bool> ConnectAsync(string ip, int port)
+        {
+            EndPoint remoteEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
+            return await ConnectAsync(remoteEndPoint);
+        }
         public async Task<bool> ConnectAsync(EndPoint remoteEndPoint)
         {
             var connectTaskSrc = InitConnect(remoteEndPoint);
@@ -61,15 +82,9 @@ namespace Infrastructure.SocketClient
         }
         private TaskCompletionSource<bool> InitConnect(EndPoint remoteEndPoint)
         {
+            m_RemoteEndPoint = remoteEndPoint;
+
             var session = GetUnderlyingSession();
-
-            var localEndPoint = m_EndPointToBind;
-
-            if (localEndPoint != null)
-            {
-                session.LocalEndPoint = m_EndPointToBind;
-            }
-
             session.NoDelay = true;
 
             //if (Proxy != null)
@@ -78,7 +93,7 @@ namespace Infrastructure.SocketClient
             session.Connected += new EventHandler(OnSessionConnected);
             session.Error += new EventHandler<ErrorEventArgs>(OnSessionError);
             session.Closed += new EventHandler(OnSessionClosed);
-            session.DataReceived += new EventHandler<DataEventArgs>(OnSessionDataReceived);
+            session.DataReceived += new EventHandler<byte[]>(OnSessionDataReceived);
 
             if (ReceiveBufferSize > 0)
                 session.ReceiveBufferSize = ReceiveBufferSize;
@@ -95,63 +110,55 @@ namespace Infrastructure.SocketClient
         {
             return new AsyncTcpSession();
         }
-        void OnSessionDataReceived(object sender, DataEventArgs e)
+        void OnSessionDataReceived(object sender, byte[] e)
         {
-            //ProcessResult result;
-
-            //try
-            //{
-            //    result = PipeLineProcessor.Process(new ArraySegment<byte>(e.Data, e.Offset, e.Length));
-            //}
-            //catch (Exception exc)
-            //{
-            //    OnError(exc);
-            //    m_Session.Close();
-            //    return;
-            //}
-
-            //if (result.State == ProcessState.Error)
-            //{
-            //    m_Session.Close();
-            //    return;
-            //}
-            //else if (result.State == ProcessState.Cached)
-            //{
-            //    // allocate new receive buffer if the previous one was cached
-            //    var session = m_Session;
-
-            //    if (session != null)
-            //    {
-            //        var bufferSetter = session as IBufferSetter;
-
-            //        if (bufferSetter != null)
-            //        {
-            //            bufferSetter.SetBuffer(new ArraySegment<byte>(new byte[session.ReceiveBufferSize]));
-            //        }
-            //    }
-            //}
-
-            //if (result.Packages != null && result.Packages.Count > 0)
-            //{
-            //    foreach (var item in result.Packages)
-            //    {
-            //        HandlePackage(item);
-            //    }
-            //}
+            if (m_RequestHandler != null)
+            {
+                try
+                {
+                    m_RequestHandler((ClientSession)sender, e);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex);
+                }
+            }
+            Logger.Info(string.Format("Receive - {0}", ToHexStrFromByte(e)));
         }
-        public void Send(byte[] data)
+        public static string ToHexStrFromByte(byte[] byteDatas)
         {
-            Send(new ArraySegment<byte>(data, 0, data.Length));
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < byteDatas.Length; i++)
+            {
+                builder.Append(string.Format("{0:X2} ", byteDatas[i]));
+            }
+            return builder.ToString().Trim();
         }
 
-        public void Send(ArraySegment<byte> segment)
+
+        public bool Send(byte[] data)
+        {
+            return Send(new ArraySegment<byte>(data, 0, data.Length));
+        }
+
+        public bool Send(ArraySegment<byte> segment)
         {
             var session = m_Session;
 
             if (!m_Connected || session == null)
-                throw new Exception("The socket is not connected.");
+            {
+                if (m_RemoteEndPoint == null)
+                {
+                    return false;
+                }
+                var r = ConnectAsync(m_RemoteEndPoint);
+                if (!r.Result)
+                {
+                    return false;
+                }
+            }
 
-            session.Send(segment);
+            return session.Send(segment);
         }
         public async Task<bool> Close()
         {
@@ -252,7 +259,12 @@ namespace Infrastructure.SocketClient
             }
         }
 
-       
+        public void WithLogger(ILog logger)
+        {
+            this.Logger = logger;
+        }
+
+
         #endregion
     }
 }

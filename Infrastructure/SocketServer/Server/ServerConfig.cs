@@ -55,6 +55,6 @@ namespace Infrastructure.SocketServer
         /// <summary>
         /// Default MaxRequestLength
         /// </summary>
-        public const int DefaultMaxRequestLength = 1024;
+        public const int DefaultMaxRequestLength = 4096;
     }
 }

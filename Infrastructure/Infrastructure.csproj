@@ -91,7 +91,16 @@
     <Compile Include="SocketClient\Buffer\IBatchQueue.cs" />
     <Compile Include="SocketClient\Buffer\PosList.cs" />
     <Compile Include="SocketClient\EasyClient.cs" />
+    <Compile Include="SocketClient\Filter\ArraySegmentEx.cs" />
+    <Compile Include="SocketClient\Filter\ArraySegmentList.cs" />
+    <Compile Include="SocketClient\Filter\BinaryUtil.cs" />
     <Compile Include="SocketClient\Filter\DataEventArgs.cs" />
+    <Compile Include="SocketClient\Filter\FilterState.cs" />
+    <Compile Include="SocketClient\Filter\IOffsetAdapter.cs" />
+    <Compile Include="SocketClient\Filter\IReceiveFilter.cs" />
+    <Compile Include="SocketClient\Filter\ReceiveFilterBase.cs" />
+    <Compile Include="SocketClient\Filter\SearchMarkState.cs" />
+    <Compile Include="SocketClient\Filter\TerminatorReceiveFilter.cs" />
     <Compile Include="SocketClient\IClient.cs" />
     <Compile Include="SocketClient\Session\AsyncTcpSession.cs" />
     <Compile Include="SocketClient\Session\ClientSession.cs" />

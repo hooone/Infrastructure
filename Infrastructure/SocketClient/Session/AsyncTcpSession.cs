@@ -1,5 +1,4 @@
-﻿using Infrastructure.SocketClient.Buffer;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -56,7 +55,7 @@ namespace Infrastructure.SocketClient
             m_SocketEventArgs = e;
 
             OnConnected();
-            StartReceive();
+            StartReceive(0);
         }
         private void ProcessReceive(SocketAsyncEventArgs e)
         {
@@ -76,10 +75,19 @@ namespace Infrastructure.SocketClient
                 return;
             }
 
-            OnDataReceived(e.Buffer, e.Offset, e.BytesTransferred);
-            StartReceive();
+            int offsetDelta = 0;
+            try
+            {
+                offsetDelta = OnDataReceived(e.Buffer, e.Offset, e.BytesTransferred);
+            }
+            catch (Exception exc)
+            {
+                offsetDelta = 0;
+                Logger.Error(exc);
+            }
+            StartReceive(offsetDelta);
         }
-        void StartReceive()
+        void StartReceive(int offsetDelta)
         {
             bool raiseEvent;
 
@@ -90,6 +98,7 @@ namespace Infrastructure.SocketClient
 
             try
             {
+                m_SocketEventArgs.SetBuffer(offsetDelta, DefaultReceiveBufferSize - offsetDelta);
                 raiseEvent = client.ReceiveAsync(m_SocketEventArgs);
             }
             catch (SocketException exc)
