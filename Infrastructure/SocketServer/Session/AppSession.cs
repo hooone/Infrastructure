@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Infrastructure.SocketServer
@@ -43,6 +44,7 @@ namespace Infrastructure.SocketServer
             m_ReceiveFilter = new TerminatorReceiveFilter(new byte[] { (byte)'\r', (byte)'\n' });
             socketSession.Initialize(this);
         }
+
         public int ProcessRequest(byte[] readBuffer, int offset, int length, bool toBeCopied)
         {
             int rest, offsetDelta;
@@ -122,6 +124,56 @@ namespace Infrastructure.SocketServer
 
             return requestInfo;
         }
+
+        public bool Send(byte[] data)
+        {
+            return InternalSend(new ArraySegment<byte>(data, 0, data.Length));
+        }
+        private bool InternalSend(ArraySegment<byte> segment)
+        {
+            if (!m_Connected)
+                return false;
+
+            if (InternalTrySend(segment))
+                return true;
+
+            var sendTimeOut = ServerConfig.DefaultSendTimeout;
+
+            //Don't retry, timeout directly
+            if (sendTimeOut < 0)
+            {
+                throw new TimeoutException("The sending attempt timed out");
+            }
+
+            var timeOutTime = sendTimeOut > 0 ? DateTime.Now.AddMilliseconds(sendTimeOut) : DateTime.Now;
+
+            var spinWait = new SpinWait();
+
+            while (m_Connected)
+            {
+                spinWait.SpinOnce();
+
+                if (InternalTrySend(segment))
+                    return true;
+
+                //If sendTimeOut = 0, don't have timeout check
+                if (sendTimeOut > 0 && DateTime.Now >= timeOutTime)
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        private bool InternalTrySend(ArraySegment<byte> segment)
+        {
+            if (!SocketSession.TrySend(segment))
+                return false;
+
+            LastActiveTime = DateTime.Now;
+            return true;
+        }
+
         /// <summary>
         /// Closes this session.
         /// </summary>

@@ -18,6 +18,7 @@ namespace Infrastructure.SocketServer
         public IPEndPoint RemoteEndPoint { get; protected set; }
 
         internal SocketProxy SocketAsyncProxy { get; set; }
+        private SocketAsyncEventArgs m_SocketEventArgSend;
 
         private Socket m_Client;
         internal Socket Client
@@ -67,6 +68,10 @@ namespace Infrastructure.SocketServer
             }
 
             SocketAsyncProxy.Initialize(this);
+
+            //Initialize SocketAsyncEventArgs for sending
+            m_SocketEventArgSend = new SocketAsyncEventArgs();
+            m_SocketEventArgSend.Completed += new EventHandler<SocketAsyncEventArgs>(OnSendingCompleted);
         }
         public void Start()
         {
@@ -145,17 +150,223 @@ namespace Infrastructure.SocketServer
             }
         }
 
+        public bool TrySend(ArraySegment<byte> segment)
+        {
+            if (IsClosed)
+                return false;
+
+            var queue = m_SendingQueue;
+
+            if (queue == null)
+                return false;
+
+            var trackID = queue.TrackID;
+
+            if (!queue.Enqueue(segment, trackID))
+                return false;
+
+            StartSend(queue, trackID, true);
+            return true;
+        }
+
+        private void StartSend(SendingQueue queue, int sendingTrackID, bool initial)
+        {
+            if (initial)
+            {
+                if (!TryAddStateFlag(SocketState.InSending))
+                {
+                    return;
+                }
+
+                var currentQueue = m_SendingQueue;
+
+                if (currentQueue != queue || sendingTrackID != currentQueue.TrackID)
+                {
+                    //Has been sent
+                    OnSendEnd();
+                    return;
+                }
+            }
+
+            Socket client;
+
+            if (IsInClosingOrClosed && TryValidateClosedBySocket(out client))
+            {
+                OnSendEnd();
+                return;
+            }
+
+            SendingQueue newQueue;
+
+            if (!m_SendingQueuePool.TryGet(out newQueue))
+            {
+                OnSendEnd(CloseReason.InternalError, true);
+                AppSession.Logger.Error("There is no enougth sending queue can be used.");
+                return;
+            }
+
+            var oldQueue = Interlocked.CompareExchange(ref m_SendingQueue, newQueue, queue);
+
+            if (!ReferenceEquals(oldQueue, queue))
+            {
+                if (newQueue != null)
+                    m_SendingQueuePool.Push(newQueue);
+
+                if (IsInClosingOrClosed)
+                {
+                    OnSendEnd();
+                }
+                else
+                {
+                    OnSendEnd(CloseReason.InternalError, true);
+                    AppSession.Logger.Error("Failed to switch the sending queue.");
+                }
+
+                return;
+            }
+
+            //Start to allow enqueue
+            newQueue.StartEnqueue();
+            queue.StopEnqueue();
+
+            if (queue.Count == 0)
+            {
+
+                m_SendingQueuePool.Push(queue);
+                OnSendEnd(CloseReason.InternalError, true);
+                AppSession.Logger.Error("There is no data to be sent in the queue.");
+                return;
+            }
+
+            Send(queue);
+        }
+        private void Send(SendingQueue queue)
+        {
+            SendAsync(queue);
+        }
+        protected void SendAsync(SendingQueue queue)
+        {
+            try
+            {
+                m_SocketEventArgSend.UserToken = queue;
+
+                if (queue.Count > 1)
+                    m_SocketEventArgSend.BufferList = queue;
+                else
+                {
+                    var item = queue[0];
+                    m_SocketEventArgSend.SetBuffer(item.Array, item.Offset, item.Count);
+                }
+
+                var client = Client;
+
+                if (client == null)
+                {
+                    OnSendError(queue, CloseReason.SocketError);
+                    return;
+                }
+
+                if (!client.SendAsync(m_SocketEventArgSend))
+                    OnSendingCompleted(client, m_SocketEventArgSend);
+            }
+            catch (Exception e)
+            {
+                ClearPrevSendState(m_SocketEventArgSend);
+                OnSendError(queue, CloseReason.SocketError);
+            }
+        }
+        void OnSendingCompleted(object sender, SocketAsyncEventArgs e)
+        {
+            var queue = e.UserToken as SendingQueue;
+
+            if (!ProcessCompleted(e))
+            {
+                ClearPrevSendState(e);
+                OnSendError(queue, CloseReason.SocketError);
+                return;
+            }
+
+            var count = queue.Sum(q => q.Count);
+
+            if (count != e.BytesTransferred)
+            {
+                queue.InternalTrim(e.BytesTransferred);
+                ClearPrevSendState(e);
+                SendAsync(queue);
+                return;
+            }
+
+            ClearPrevSendState(e);
+
+
+            queue.Clear();
+            m_SendingQueuePool.Push(queue);
+
+            var newQueue = m_SendingQueue;
+
+            if (IsInClosingOrClosed)
+            {
+                Socket client;
+
+                //has data is being sent and the socket isn't closed
+                if (newQueue.Count > 0 && !TryValidateClosedBySocket(out client))
+                {
+                    StartSend(newQueue, newQueue.TrackID, false);
+                    return;
+                }
+
+                OnSendEnd();
+                return;
+            }
+
+            if (newQueue.Count == 0)
+            {
+                OnSendEnd();
+
+                if (newQueue.Count > 0)
+                {
+                    StartSend(newQueue, newQueue.TrackID, true);
+                }
+            }
+            else
+            {
+                StartSend(newQueue, newQueue.TrackID, false);
+            }
+        }
+
+        private void ClearPrevSendState(SocketAsyncEventArgs e)
+        {
+            e.UserToken = null;
+
+            //Clear previous sending buffer of sae to avoid memory leak
+            if (e.Buffer != null)
+            {
+                e.SetBuffer(null, 0, 0);
+            }
+            else if (e.BufferList != null)
+            {
+                e.BufferList = null;
+            }
+        }
+
+        protected void OnSendError(SendingQueue queue, CloseReason closeReason)
+        {
+            queue.Clear();
+            m_SendingQueuePool.Push(queue);
+            OnSendEnd(closeReason, true);
+        }
+
         private void OnClosed(CloseReason reason)
         {
-            // 停止发送
-            //var sae = m_SocketEventArgSend;
-            //if (sae != null)
-            //{
-            //    if (Interlocked.CompareExchange(ref m_SocketEventArgSend, null, sae) == sae)
-            //    {
-            //        sae.Dispose();
-            //    }
-            //}
+            //停止发送
+            var sae = m_SocketEventArgSend;
+            if (sae != null)
+            {
+                if (Interlocked.CompareExchange(ref m_SocketEventArgSend, null, sae) == sae)
+                {
+                    sae.Dispose();
+                }
+            }
             // 状态位切换和释放资源
             if (!TryAddStateFlag(SocketState.Closed))
                 return;
@@ -237,6 +448,17 @@ namespace Infrastructure.SocketServer
             // the connection is in closing
             ValidateClosed(CloseReason.Unknown, false);
             return false;
+        }
+
+        private void OnSendEnd()
+        {
+            OnSendEnd(CloseReason.Unknown, false);
+        }
+
+        private void OnSendEnd(CloseReason closeReason, bool forceClose)
+        {
+            RemoveStateFlag(SocketState.InSending);
+            ValidateClosed(closeReason, forceClose, true);
         }
         private bool AddStateFlag(int stateValue, bool notClosing)
         {

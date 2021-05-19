@@ -14,6 +14,7 @@ namespace Infrastructure.SocketServer
         Action<ISocketSession, CloseReason> Closed { get; set; }
         void Initialize(IAppSession appSession);
         void Start();
+        bool TrySend(ArraySegment<byte> segment);
         void Close(CloseReason reason);
     }
 }

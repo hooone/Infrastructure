@@ -19,33 +19,33 @@ namespace Demo
             //dis.ExecuteCommand(null, cmd);
 
             // socket server
-            //var appServer = new AppServer();
-            //appServer.Setup(9527);
-            //appServer.NewRequestReceived += AppServer_NewRequestReceived;
-            //appServer.Start();
-            //while (Console.ReadKey().KeyChar != 'q')
-            //{
-            //    Console.WriteLine();
-            //    continue;
-            //}
-            //appServer.Stop();
+            var appServer = new AppServer();
+            appServer.Setup(9527);
+            appServer.NewRequestReceived += AppServer_NewRequestReceived;
+            appServer.Start();
+            while (Console.ReadKey().KeyChar != 'q')
+            {
+                Console.WriteLine();
+                continue;
+            }
+            appServer.Stop();
 
-            // socket client
-            EasyClient client = new EasyClient();
-            var r = client.ConnectAsync("127.0.0.1", 9988);
-            client.NewRequestReceived += Client_NewRequestReceived;
-            var rst = r.Result;
-            Thread th = new Thread(() =>
-              {
-                  int n = 0;
-                  while (true)
-                  {
-                      if (client.Send(BitConverter.GetBytes(n)))
-                          n++;
-                      Thread.Sleep(1000);
-                  }
-              });
-            th.Start();
+            //// socket client
+            //EasyClient client = new EasyClient();
+            //var r = client.ConnectAsync("127.0.0.1", 9988);
+            //client.NewRequestReceived += Client_NewRequestReceived;
+            //var rst = r.Result;
+            //Thread th = new Thread(() =>
+            //  {
+            //      int n = 0;
+            //      while (true)
+            //      {
+            //          if (client.Send(BitConverter.GetBytes(n)))
+            //              n++;
+            //          Thread.Sleep(1000);
+            //      }
+            //  });
+            //th.Start();
             Console.ReadLine();
         }
 
@@ -55,6 +55,17 @@ namespace Demo
 
         private static void AppServer_NewRequestReceived(AppSession session, byte[] requestInfo)
         {
+            Thread th = new Thread(() =>
+              {
+                  int n = 0;
+                  while (true)
+                  {
+                      if (session.Send(BitConverter.GetBytes(n)))
+                          n++;
+                      Thread.Sleep(1000);
+                  }
+              });
+            th.Start();
         }
     }
     public class ADD : CommandBase<StringRequestInfo>
