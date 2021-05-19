@@ -19,8 +19,6 @@ namespace Infrastructure.SocketClient
         private TaskCompletionSource<bool> m_ConnectTaskSource;
         private TaskCompletionSource<bool> m_CloseTaskSource;
 
-        public event EventHandler<byte[]> NewPackageReceived;
-
         private EndPoint m_RemoteEndPoint;
         private EndPoint m_EndPointToBind;
         private EndPoint m_LocalEndPoint;

@@ -33,6 +33,7 @@ namespace Demo
             // socket client
             EasyClient client = new EasyClient();
             var r = client.ConnectAsync("127.0.0.1", 9988);
+            client.NewRequestReceived += Client_NewRequestReceived;
             var rst = r.Result;
             Thread th = new Thread(() =>
               {
@@ -46,6 +47,10 @@ namespace Demo
               });
             th.Start();
             Console.ReadLine();
+        }
+
+        private static void Client_NewRequestReceived(ClientSession session, byte[] requestInfo)
+        {
         }
 
         private static void AppServer_NewRequestReceived(AppSession session, byte[] requestInfo)
