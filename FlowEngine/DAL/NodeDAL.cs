@@ -27,7 +27,7 @@ namespace FlowEngine.DAL
         }
 
         [DbRead]
-        public List<Node> read()
+        public List<Node> read(Node obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
             string sql = @"SELECT * FROM NODE";
@@ -44,6 +44,16 @@ namespace FlowEngine.DAL
                 rst.Add(t);
             }
             return rst;
+        }
+
+        [DbUpdate]
+        [SqlKey(nameof(Node.ID))]
+        [SqlValue(nameof(Node.X), nameof(Node.Y))]
+        public int UpdateLocation(Node obj)
+        {
+            /// 该方法的代码由插件自动生成，请勿修改。
+            string sql = @"UPDATE NODE SET X=@X,Y=@Y WHERE ID=@ID";
+            return Helper.ExecuteNonQuery(sql, obj.X, obj.Y, obj.ID);
         }
     }
 }

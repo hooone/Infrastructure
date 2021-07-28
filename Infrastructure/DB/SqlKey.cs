@@ -9,10 +9,10 @@ namespace Infrastructure.DB
     [AttributeUsage(AttributeTargets.Method)]
     public class SqlKey : Attribute
     {
-        public string Column { get; set;  }
-        public SqlKey(string column)
+        public List<string> Column { get; set; }
+        public SqlKey(params string[] column)
         {
-
+            Column = column.ToList();
         }
     }
 }

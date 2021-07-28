@@ -105,7 +105,18 @@ namespace GenerateCode.Code
                         attr.TypeFullName = item.AttributeType.FullName;
                         foreach (var arg in item.ConstructorArguments)
                         {
-                            attr.ArgumentList.Add(arg.Value.ToString());
+                            if (!(arg.Value is string) && typeof(System.Collections.IEnumerable).IsAssignableFrom(arg.Value.GetType()))
+                            {
+                                var list = (System.Collections.IEnumerable)arg.Value;
+                                foreach (var tt in list)
+                                {
+                                    attr.ArgumentList.Add(tt.ToString());
+                                }
+                            }
+                            else
+                            {
+                                attr.ArgumentList.Add(arg.Value.ToString());
+                            }
                         }
                         cls.AttributeList.Add(attr);
                     }
@@ -125,7 +136,18 @@ namespace GenerateCode.Code
                             attr.TypeFullName = attre.AttributeType.FullName;
                             foreach (var arg in attre.ConstructorArguments)
                             {
-                                attr.ArgumentList.Add(arg.Value.ToString());
+                                if (!(arg.Value is string) && typeof(System.Collections.IEnumerable).IsAssignableFrom(arg.Value.GetType()))
+                                {
+                                    var list = (System.Collections.IEnumerable)arg.Value;
+                                    foreach (var tt in list)
+                                    {
+                                        attr.ArgumentList.Add(tt.ToString());
+                                    }
+                                }
+                                else
+                                {
+                                    attr.ArgumentList.Add(arg.Value.ToString());
+                                }
                             }
                             method.AttributeList.Add(attr);
                         }
@@ -143,7 +165,18 @@ namespace GenerateCode.Code
                             attr.TypeFullName = item.AttributeType.FullName;
                             foreach (var arg in item.ConstructorArguments)
                             {
-                                attr.ArgumentList.Add(arg.Value.ToString());
+                                if (!(arg.Value is string) && typeof(System.Collections.IEnumerable).IsAssignableFrom(arg.Value.GetType()))
+                                {
+                                    var list = (System.Collections.IEnumerable)arg.Value;
+                                    foreach (var tt in list)
+                                    {
+                                        attr.ArgumentList.Add(tt.ToString());
+                                    }
+                                }
+                                else
+                                {
+                                    attr.ArgumentList.Add(arg.Value.ToString());
+                                }
                             }
 
                             property.AttributeList.Add(attr);

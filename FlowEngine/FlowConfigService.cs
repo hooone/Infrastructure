@@ -23,7 +23,7 @@ namespace FlowEngine
         {
             FlowConfig rst = new FlowConfig();
             rst.Nodes = new List<NodeProperty>();
-            var nodes = nodeDAL.read();
+            var nodes = nodeDAL.read(null);
             foreach (var nd in nodes)
             {
                 NodeProperty node = new NodeProperty();
@@ -35,6 +35,15 @@ namespace FlowEngine
                 rst.Nodes.Add(node);
             }
             return rst;
+        }
+
+        public int UpdateLocation(string id, int x, int y)
+        {
+            DTO.Node node = new DTO.Node();
+            node.ID = id;
+            node.X = x;
+            node.Y = y;
+            return nodeDAL.UpdateLocation(node);
         }
     }
 }

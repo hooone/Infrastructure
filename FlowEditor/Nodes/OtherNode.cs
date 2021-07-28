@@ -133,8 +133,6 @@ namespace FlowEditor.Nodes
         bool MoveFlag = false;
         int xPos = 0;
         int yPos = 0;
-        public event NodeEvent GragStart;
-        public event NodeEvent GragEnd;
         public override void SetDragEnable(bool enable)
         {
             dragAble = enable;
@@ -146,7 +144,7 @@ namespace FlowEditor.Nodes
             MoveFlag = true;//已经按下.
             xPos = e.X;//当前x坐标.
             yPos = e.Y;//当前y坐标.
-            GragStart?.Invoke(this);
+            OnDragStart();
         }
 
         private void Node_MouseUp(object sender, MouseEventArgs e)
@@ -160,7 +158,7 @@ namespace FlowEditor.Nodes
                 this.Location = new Point(760 - this.Width, this.Location.Y);
             if (this.Location.Y > 620 - this.Height)
                 this.Location = new Point(this.Location.X, 620 - this.Height);
-            GragEnd?.Invoke(this);
+            OnDragEnd();
         }
         private void Node_MouseMove(object sender, MouseEventArgs e)
         {

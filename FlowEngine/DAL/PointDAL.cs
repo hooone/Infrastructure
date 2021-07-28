@@ -27,7 +27,7 @@ namespace FlowEngine.DAL
         }
 
         [DbRead]
-        public List<Point> read()
+        public List<Point> read(Point obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
             string sql = @"SELECT * FROM POINT";

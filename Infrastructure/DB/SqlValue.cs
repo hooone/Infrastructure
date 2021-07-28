@@ -9,10 +9,10 @@ namespace Infrastructure.DB
     [AttributeUsage(AttributeTargets.Method)]
     public class SqlValue : Attribute
     {
-        public string Column { get; set; }
-        public SqlValue(string column)
+        public List<string> Column { get; set; }
+        public SqlValue(params string[] column)
         {
-
+            Column = column.ToList();
         }
     }
 }

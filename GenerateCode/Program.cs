@@ -16,8 +16,8 @@ namespace GenerateCode
     {
         static void Main(string[] args)
         {
-            string projPath = args[0];
-
+            //string projPath = args[0];
+            string projPath = @"C:\Users\techsun\Desktop\Infrastructure\FlowEngine\FlowEngine.csproj";
             // 获得项目信息
             var assembly = new AssemblyInfo(projPath);
             var loadRst = assembly.Load();
@@ -216,18 +216,24 @@ namespace GenerateCode
                         {
                             if (item.TypeFullName == typeof(SqlKey).FullName)
                             {
-                                var t = dbmodel.PropertyList.FirstOrDefault(f => f.Name == item.ArgumentList[0]);
-                                if (t != null)
+                                foreach (var argus in item.ArgumentList)
                                 {
-                                    keys.Add(t);
+                                    var t = dbmodel.PropertyList.FirstOrDefault(f => f.Name == argus.Replace("\"", ""));
+                                    if (t != null)
+                                    {
+                                        keys.Add(t);
+                                    }
                                 }
                             }
                             if (item.TypeFullName == typeof(SqlValue).FullName)
                             {
-                                var t = dbmodel.PropertyList.FirstOrDefault(f => f.Name == item.ArgumentList[0]);
-                                if (t != null)
+                                foreach (var argus in item.ArgumentList)
                                 {
-                                    values.Add(t);
+                                    var t = dbmodel.PropertyList.FirstOrDefault(f => f.Name == argus.Replace("\"", ""));
+                                    if (t != null)
+                                    {
+                                        values.Add(t);
+                                    }
                                 }
                             }
                         }

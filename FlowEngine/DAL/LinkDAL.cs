@@ -27,10 +27,10 @@ namespace FlowEngine.DAL
         }
 
         [DbRead]
-        public List<Link> read()
+        public List<Link> read(Link obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
-            string sql = @"SELECT * FROM LINK WHERE LINKFROM=@LINKFROM";
+            string sql = @"SELECT * FROM LINK";
             DataTable dt = Helper.Query(sql);
             List<Link> rst = new List<Link>();
             foreach (DataRow row in dt.Rows)
