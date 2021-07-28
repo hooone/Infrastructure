@@ -66,9 +66,10 @@
     <Compile Include="DAL\PointDAL.cs" />
     <Compile Include="FlowConfigService.cs" />
     <Compile Include="Model\FlowConfig.cs" />
-    <Compile Include="Model\DBModel\Link.cs" />
-    <Compile Include="Model\DBModel\Node.cs" />
-    <Compile Include="Model\DBModel\Point.cs" />
+    <Compile Include="DTO\LinkDTO.cs" />
+    <Compile Include="DTO\NodeDTO.cs" />
+    <Compile Include="DTO\PointDTO.cs" />
+    <Compile Include="Model\NodeProperty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SQLiteHelper.cs" />
   </ItemGroup>

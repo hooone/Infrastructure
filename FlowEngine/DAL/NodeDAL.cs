@@ -1,5 +1,5 @@
 using Infrastructure.DB;
-using FlowEngine.Model;
+using FlowEngine.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;

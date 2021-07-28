@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FlowEngine.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,12 @@ namespace FlowEngine
                 _ins = new FlowConfigService();
                 return _ins;
             }
+        }
+        public FlowConfig GetFlowConfig()
+        {
+            FlowConfig rst = new FlowConfig();
+            rst.Nodes = new List<NodeProperty>();
+            return rst;
         }
     }
 }

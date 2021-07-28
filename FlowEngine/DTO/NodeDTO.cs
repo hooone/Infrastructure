@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FlowEngine.Model
+namespace FlowEngine.DTO
 {
-    [DbTable("POINT")]
-    public class Point : IDbModel
+    [DbTable("NODE")]
+    public class Node : IDbModel
     {
         /// 该类型的代码由插件自动生成，请勿修改。
 
@@ -16,7 +16,16 @@ namespace FlowEngine.Model
         public string ID { get; set; }
 
         [DbColumn(DataType.VARCHAR2)]
-        public string NODEID { get; set; }
+        public string TYPE { get; set; }
+
+        [DbColumn(DataType.VARCHAR2)]
+        public string TEXT { get; set; }
+
+        [DbColumn(DataType.NUMBER)]
+        public int X { get; set; }
+
+        [DbColumn(DataType.NUMBER)]
+        public int Y { get; set; }
 
     }
 }

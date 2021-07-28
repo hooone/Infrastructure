@@ -1,5 +1,5 @@
 using Infrastructure.DB;
-using FlowEngine.Model;
+using FlowEngine.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,12 +27,11 @@ namespace FlowEngine.DAL
         }
 
         [DbRead]
-        [SqlKey(nameof(Link.LINKFROM))]
-        public List<Link> read(Link obj)
+        public List<Link> read()
         {
             /// 该方法的代码由插件自动生成，请勿修改。
             string sql = @"SELECT * FROM LINK WHERE LINKFROM=@LINKFROM";
-            DataTable dt = Helper.Query(sql, obj.LINKFROM);
+            DataTable dt = Helper.Query(sql);
             List<Link> rst = new List<Link>();
             foreach (DataRow row in dt.Rows)
             {

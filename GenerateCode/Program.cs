@@ -318,7 +318,7 @@ namespace GenerateCode
 
                         // 写入db access内容
                         List<string> newFile = new List<string>();
-                        newFile.Add("        public List<" + dbmodel.Name + "> " + method.Name + "()");
+                        newFile.Add("        public List<" + dbmodel.Name + "> " + method.Name + "(" + dbmodel.Name + " obj)");
                         newFile.Add("        {");
                         newFile.Add("            /// 该方法的代码由插件自动生成，请勿修改。");
                         newFile.Add("            string sql = @\"" + sql.ToString() + "\";");
