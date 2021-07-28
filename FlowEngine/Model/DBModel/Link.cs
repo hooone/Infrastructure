@@ -1,4 +1,4 @@
-﻿using Infrastructure.DB;
+using Infrastructure.DB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +10,16 @@ namespace FlowEngine.Model
     [DbTable("LINK")]
     public class Link : IDbModel
     {
-        public string Id { get; set; }
-        public string From { get; set; }
-        public string To { get; set; }
+        /// 该类型的代码由插件自动生成，请勿修改。
+
+        [DbColumn(DataType.VARCHAR2)]
+        public string ID { get; set; }
+
+        [DbColumn(DataType.VARCHAR2)]
+        public string LINKFROM { get; set; }
+
+        [DbColumn(DataType.VARCHAR2)]
+        public string LINKTO { get; set; }
+
     }
 }

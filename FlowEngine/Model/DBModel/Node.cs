@@ -1,4 +1,4 @@
-﻿using Infrastructure.DB;
+using Infrastructure.DB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +10,22 @@ namespace FlowEngine.Model
     [DbTable("NODE")]
     public class Node : IDbModel
     {
-        public string Id { get; set; }
-        public string Type { get; set; }
-        public string Text { get; set; }
+        /// 该类型的代码由插件自动生成，请勿修改。
+
+        [DbColumn(DataType.VARCHAR2)]
+        public string ID { get; set; }
+
+        [DbColumn(DataType.VARCHAR2)]
+        public string TYPE { get; set; }
+
+        [DbColumn(DataType.VARCHAR2)]
+        public string TEXT { get; set; }
+
+        [DbColumn(DataType.NUMBER)]
         public int X { get; set; }
+
+        [DbColumn(DataType.NUMBER)]
         public int Y { get; set; }
+
     }
 }

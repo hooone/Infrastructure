@@ -20,8 +20,8 @@ namespace FlowEngine.DAL
 
         public string DbName { set; get; } = "XE";
 
-        public string UserName { set; get; } = "RFID";
+        public string UserName { set; get; } = "flow";
 
-        public string Password { set; get; } = "RFID";
+        public string Password { set; get; } = "flow";
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+using Infrastructure.DB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,9 +7,16 @@ using System.Threading.Tasks;
 
 namespace FlowEngine.Model
 {
-    public class Point
+    [DbTable("POINT")]
+    public class Point : IDbModel
     {
-        public string Id { get; set; }
-        public string NodeId { get; set; }
+        /// 该类型的代码由插件自动生成，请勿修改。
+
+        [DbColumn(DataType.VARCHAR2)]
+        public string ID { get; set; }
+
+        [DbColumn(DataType.VARCHAR2)]
+        public string NODEID { get; set; }
+
     }
 }

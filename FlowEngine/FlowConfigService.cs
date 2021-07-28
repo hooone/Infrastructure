@@ -19,6 +19,5 @@ namespace FlowEngine
                 return _ins;
             }
         }
-        public 
     }
 }

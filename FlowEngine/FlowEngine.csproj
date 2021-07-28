@@ -61,6 +61,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DAL\COracleParameter.cs" />
+    <Compile Include="DAL\LinkDAL.cs" />
+    <Compile Include="DAL\NodeDAL.cs" />
+    <Compile Include="DAL\PointDAL.cs" />
     <Compile Include="FlowConfigService.cs" />
     <Compile Include="Model\FlowConfig.cs" />
     <Compile Include="Model\DBModel\Link.cs" />
