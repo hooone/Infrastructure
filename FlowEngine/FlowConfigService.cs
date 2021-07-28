@@ -28,6 +28,7 @@ namespace FlowEngine
             {
                 NodeProperty node = new NodeProperty();
                 node.Id = nd.ID;
+                node.Type = nd.TYPE;
                 node.Text = nd.TEXT;
                 node.X = nd.X;
                 node.Y = nd.Y;
@@ -44,6 +45,30 @@ namespace FlowEngine
             node.X = x;
             node.Y = y;
             return nodeDAL.UpdateLocation(node);
+        }
+
+        public NodeProperty CreateNode(string type, int x, int y)
+        {
+            // 插入node表
+            DTO.Node nd = new DTO.Node();
+            nd.ID = Guid.NewGuid().ToString("N");
+            nd.TYPE = type;
+            nd.TEXT = "新节点";
+            nd.X = x;
+            nd.Y = y;
+            if (nodeDAL.insert(nd) != 1)
+            {
+                return null;
+            }
+            // 装箱
+            NodeProperty node = new NodeProperty();
+            node.Id = nd.ID;
+            node.Type = nd.TYPE;
+            node.Text = nd.TEXT;
+            node.X = nd.X;
+            node.Y = nd.Y;
+            node.Points = new Dictionary<string, int>();
+            return node;
         }
     }
 }

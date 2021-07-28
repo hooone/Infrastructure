@@ -9,6 +9,7 @@ namespace FlowEngine.Model
     public class NodeProperty
     {
         public string Id { get; set; }
+        public string Type { get; set; }
         public string Text { get; set; }
         public int X { get; set; }
         public int Y { get; set; }

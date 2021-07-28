@@ -35,7 +35,9 @@
             this.button2 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.canvas = new System.Windows.Forms.Panel();
+            this.otherNode1 = new FlowEditor.Nodes.OtherNode();
             this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -47,9 +49,11 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(212, 630);
             this.tabControl1.TabIndex = 0;
+            this.tabControl1.SelectedIndexChanged += TabControl1_SelectedIndexChanged;
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.otherNode1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -100,11 +104,21 @@
             // 
             this.canvas.AutoScroll = true;
             this.canvas.AutoScrollMinSize = new System.Drawing.Size(2000, 1000);
-            this.canvas.BackColor = System.Drawing.Color.FromArgb(214, 214, 214);
+            this.canvas.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(214)))), ((int)(((byte)(214)))), ((int)(((byte)(214)))));
             this.canvas.Location = new System.Drawing.Point(230, 50);
             this.canvas.Name = "canvas";
             this.canvas.Size = new System.Drawing.Size(760, 620);
             this.canvas.TabIndex = 3;
+            // 
+            // otherNode1
+            // 
+            this.otherNode1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(208)))), ((int)(((byte)(162)))));
+            this.otherNode1.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.otherNode1.Id = null;
+            this.otherNode1.Location = new System.Drawing.Point(40, 20);
+            this.otherNode1.Name = "otherNode1";
+            this.otherNode1.Size = new System.Drawing.Size(100, 30);
+            this.otherNode1.TabIndex = 0;
             // 
             // FormMain
             // 
@@ -124,9 +138,11 @@
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
+
 
         #endregion
 
@@ -137,6 +153,7 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Panel canvas;
         private System.Windows.Forms.GroupBox groupBox1;
+        private Nodes.OtherNode otherNode1;
     }
 }
 

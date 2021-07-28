@@ -181,7 +181,8 @@ namespace FlowEditor.Nodes
                 }
                 if (this.Parent.Name != "canvas")
                 {
-                    if (this.Location.X > 200 && this.Location.Y > 50)
+                    if (this.Location.X > 230 && this.Location.Y > 50
+                        && this.Location.X < 230 + 760 && this.Location.Y < 50 + 620)
                     {
                         this.Cursor = Cursors.Arrow;
                     }
