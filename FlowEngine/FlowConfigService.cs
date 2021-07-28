@@ -31,8 +31,7 @@ namespace FlowEngine
                 node.Text = nd.TEXT;
                 node.X = nd.X;
                 node.Y = nd.Y;
-                node.LinkIn = new Dictionary<string, int>();
-                node.LinkOut = new Dictionary<string, int>();
+                node.Points = new Dictionary<string, int>();
                 rst.Nodes.Add(node);
             }
             return rst;

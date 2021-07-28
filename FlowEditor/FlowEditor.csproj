@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=4.9.4.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.9.4\lib\net45\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,8 +55,32 @@
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="LinkLine.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LinkLine.Designer.cs">
+      <DependentUpon>LinkLine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LinkPoint.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LinkPoint.Designer.cs">
+      <DependentUpon>LinkPoint.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Nodes\Node.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Nodes\OtherNode.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Nodes\OtherNode.Designer.cs">
+      <DependentUpon>OtherNode.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FormMain.resx">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -63,6 +90,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -75,6 +103,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FlowEngine\FlowEngine.csproj">
+      <Project>{1D3364AD-F4D7-46D8-A48E-C88504C0A24D}</Project>
+      <Name>FlowEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj">
+      <Project>{2340905A-0A3D-46C4-B1D6-54BE1008C2EC}</Project>
+      <Name>Infrastructure</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

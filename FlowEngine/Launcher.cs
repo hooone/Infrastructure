@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using FlowEngine.DAL;
 using Infrastructure.DB;
 using System;
 using System.Collections.Generic;
@@ -10,8 +11,8 @@ namespace FlowEngine
 {
     public class Launcher
     {
-        public IContainer Container = null;
-        public void InitAutoFac()
+        public static IContainer Container = null;
+        public static void InitAutoFac()
         {
             var builder = new ContainerBuilder();
             // DB
@@ -23,6 +24,11 @@ namespace FlowEngine
             // Service
             builder.RegisterType<FlowConfigService>().SingleInstance();
             Container = builder.Build();
+        }
+
+        public static void InitDatabase()
+        {
+            Container.Resolve<SqlHelper>().Connect(new COracleParameter().ConnectionString);
         }
     }
 }

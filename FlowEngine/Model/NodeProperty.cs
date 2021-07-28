@@ -12,7 +12,6 @@ namespace FlowEngine.Model
         public string Text { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
-        public Dictionary<string, int> LinkIn { get; set; }
-        public Dictionary<string, int> LinkOut { get; set; }
+        public Dictionary<string, int> Points { get; set; }
     }
 }

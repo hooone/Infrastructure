@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Autofac;
+using FlowEngine;
+using Infrastructure.DB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +17,8 @@ namespace FlowEditor
         [STAThread]
         static void Main()
         {
+            Launcher.InitAutoFac();
+            Launcher.InitDatabase();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FormMain());

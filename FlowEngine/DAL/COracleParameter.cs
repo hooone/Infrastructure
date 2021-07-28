@@ -9,10 +9,12 @@ namespace FlowEngine.DAL
 {
     public class COracleParameter : IConnectionString
     {
+        //public string ConnectionString =>
+        //    $"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={ServerIp})(PORT={Port}))" +
+        //    $"(CONNECT_DATA=(SERVICE_NAME={DbName})));" +
+        //    $"Persist Security Info=True;User ID={UserName};Password={Password};";
         public string ConnectionString =>
-            $"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={ServerIp})(PORT={Port}))" +
-            $"(CONNECT_DATA=(SERVICE_NAME={DbName})));" +
-            $"Persist Security Info=True;User ID={UserName};Password={Password};";
+            $"Data Source={ServerIp};User Id={UserName};Password={Password};" ;
 
         public string ServerIp { set; get; } = "127.0.0.1";
 
