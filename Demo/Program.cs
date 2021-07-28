@@ -18,23 +18,23 @@ namespace Demo
             //cmd.Key = "ADD";
             //dis.ExecuteCommand(null, cmd);
 
-            // socket server
-            var appServer = new AppServer();
-            appServer.Setup(9527);
-            appServer.NewRequestReceived += AppServer_NewRequestReceived;
-            appServer.Start();
-            while (Console.ReadKey().KeyChar != 'q')
-            {
-                Console.WriteLine();
-                continue;
-            }
-            appServer.Stop();
+            //// socket server
+            //var appServer = new AppServer();
+            //appServer.Setup(9527);
+            //appServer.NewRequestReceived += AppServer_NewRequestReceived;
+            //appServer.Start();
+            //while (Console.ReadKey().KeyChar != 'q')
+            //{
+            //    Console.WriteLine();
+            //    continue;
+            //}
+            //appServer.Stop();
 
-            //// socket client
-            //EasyClient client = new EasyClient();
-            //var r = client.ConnectAsync("127.0.0.1", 9988);
-            //client.NewRequestReceived += Client_NewRequestReceived;
-            //var rst = r.Result;
+            // socket client
+            EasyClient client = new EasyClient();
+            var r = client.ConnectAsync("127.0.0.1", 9988);
+            client.NewRequestReceived += Client_NewRequestReceived;
+            var rst = r.Result;
             //Thread th = new Thread(() =>
             //  {
             //      int n = 0;

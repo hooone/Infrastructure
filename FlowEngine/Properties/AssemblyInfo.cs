@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("AssemblyDecoder")]
+[assembly: AssemblyTitle("FlowEngine")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("AssemblyDecoder")]
+[assembly: AssemblyProduct("FlowEngine")]
 [assembly: AssemblyCopyright("Copyright ©  2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("54b11b2f-6f2f-49c2-8ef7-760e8ec1ebf7")]
+[assembly: Guid("1d3364ad-f4d7-46d8-a48e-c88504c0a24d")]
 
 // 程序集的版本信息由下列四个值组成: 
 //

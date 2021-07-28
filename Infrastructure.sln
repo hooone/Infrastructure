@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfrastructureTests", "Infr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateCode", "GenerateCode\GenerateCode.csproj", "{F6B02653-A8CC-4AAE-9D01-E35A06F52C58}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowEditor", "FlowEditor\FlowEditor.csproj", "{C632568B-B244-4A51-94EC-F356A0109796}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowEngine", "FlowEngine\FlowEngine.csproj", "{1D3364AD-F4D7-46D8-A48E-C88504C0A24D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{F6B02653-A8CC-4AAE-9D01-E35A06F52C58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6B02653-A8CC-4AAE-9D01-E35A06F52C58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6B02653-A8CC-4AAE-9D01-E35A06F52C58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C632568B-B244-4A51-94EC-F356A0109796}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C632568B-B244-4A51-94EC-F356A0109796}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C632568B-B244-4A51-94EC-F356A0109796}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C632568B-B244-4A51-94EC-F356A0109796}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D3364AD-F4D7-46D8-A48E-C88504C0A24D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D3364AD-F4D7-46D8-A48E-C88504C0A24D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D3364AD-F4D7-46D8-A48E-C88504C0A24D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D3364AD-F4D7-46D8-A48E-C88504C0A24D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
