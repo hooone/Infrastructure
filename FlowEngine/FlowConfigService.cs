@@ -22,11 +22,11 @@ namespace FlowEngine
         public FlowConfig GetFlowConfig()
         {
             FlowConfig rst = new FlowConfig();
-            rst.Nodes = new List<NodeProperty>();
+            rst.Nodes = new List<NodeViewModel>();
             var nodes = nodeDAL.read(null);
             foreach (var nd in nodes)
             {
-                NodeProperty node = new NodeProperty();
+                NodeViewModel node = new NodeViewModel();
                 node.Id = nd.ID;
                 node.Type = nd.TYPE;
                 node.Text = nd.TEXT;
@@ -38,7 +38,7 @@ namespace FlowEngine
             return rst;
         }
 
-        public int UpdateLocation(string id, int x, int y)
+        public int UpdateNodeLocation(string id, int x, int y)
         {
             DTO.Node node = new DTO.Node();
             node.ID = id;
@@ -47,7 +47,7 @@ namespace FlowEngine
             return nodeDAL.UpdateLocation(node);
         }
 
-        public NodeProperty CreateNode(string type, int x, int y)
+        public NodeViewModel CreateNode(string type, int x, int y)
         {
             // 插入node表
             DTO.Node nd = new DTO.Node();
@@ -61,7 +61,7 @@ namespace FlowEngine
                 return null;
             }
             // 装箱
-            NodeProperty node = new NodeProperty();
+            NodeViewModel node = new NodeViewModel();
             node.Id = nd.ID;
             node.Type = nd.TYPE;
             node.Text = nd.TEXT;
@@ -75,6 +75,31 @@ namespace FlowEngine
         {
             nodeDAL.Delete(new DTO.Node() { ID = id });
             pointDAL.DeleteByNode(new DTO.Point() { NODEID = id });
+        }
+
+        public NodeViewModel GetNodeInfo(string id)
+        {
+            var nodes = nodeDAL.ReadById(new DTO.Node() { ID = id });
+            if (nodes.Count != 1)
+                return null;
+            // 装箱
+            var nd = nodes[0];
+            NodeViewModel node = new NodeViewModel();
+            node.Id = nd.ID;
+            node.Type = nd.TYPE;
+            node.Text = nd.TEXT;
+            node.X = nd.X;
+            node.Y = nd.Y;
+            node.Points = new Dictionary<string, int>();
+            return node;
+        }
+
+        public int UpdateNodeText(string id, string text)
+        {
+            DTO.Node node = new DTO.Node();
+            node.ID = id;
+            node.TEXT = text;
+            return nodeDAL.UpdateText(node);
         }
     }
 }

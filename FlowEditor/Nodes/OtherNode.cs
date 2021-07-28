@@ -27,7 +27,8 @@ namespace FlowEditor.Nodes
             this.Width = width;
             this.Text = text;
             this.linkOutPoint1.Location = new Point(this.Width - 8, 11);
-            this.Region = new System.Drawing.Region(Round(0, 0, this.Width, this.Height));//窗体圆角
+            this.Region = new System.Drawing.Region(Round(0, 0, this.Width, this.Height));
+            this.Invalidate();
         }
 
         private string inPointId = Guid.NewGuid().ToString("N");

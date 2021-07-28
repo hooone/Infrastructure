@@ -128,7 +128,7 @@ namespace FlowEditor
                 && this.Location.Y < this.canvas.Location.Y + this.canvas.Height)
             {
                 // 生成新控件
-                NodeProperty prop = service.CreateNode(node.Type,
+                NodeViewModel prop = service.CreateNode(node.Type,
                     node.Location.X - this.canvas.Location.X + this.canvas.HorizontalScroll.Value,
                     node.Location.Y - this.canvas.Location.Y + this.canvas.VerticalScroll.Value);
                 if (prop == null)
@@ -162,8 +162,9 @@ namespace FlowEditor
         {
             var x = node.Location.X + this.canvas.HorizontalScroll.Value;
             var y = node.Location.Y + this.canvas.VerticalScroll.Value;
-            service.UpdateLocation(node.Id, x, y);
+            service.UpdateNodeLocation(node.Id, x, y);
         }
+        // 选择节点
         private Nodes.Node selectNode = null;
         private void Node_Click(object sender, EventArgs e)
         {
@@ -175,6 +176,23 @@ namespace FlowEditor
             var node = (Nodes.Node)sender;
             node.HighLight(true);
             selectNode = node;
+            var info = service.GetNodeInfo(node.Id);
+            if (info == null)
+                return;
+            this.textBox1.Text = info.Text;
+        }
+
+        // 保存属性修改
+        private void savebtn_Click(object sender, EventArgs e)
+        {
+            if (selectNode == null)
+                return;
+            service.UpdateNodeText(selectNode.Id, this.textBox1.Text);
+            var info = service.GetNodeInfo(selectNode.Id);
+            if (info == null)
+                return;
+            this.textBox1.Text = info.Text;
+            nodes[info.Id].SetText(info.Text);
         }
         // 删除节点
         private void NodeDelete()
@@ -195,7 +213,7 @@ namespace FlowEditor
             {
                 NodeDelete();
             }
-            return true;
+            return base.ProcessCmdKey(ref msg, keyData);
         }
     }
 }

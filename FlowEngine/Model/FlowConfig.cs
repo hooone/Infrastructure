@@ -8,6 +8,6 @@ namespace FlowEngine.Model
 {
     public class FlowConfig
     {
-        public List<NodeProperty> Nodes { get; set; }
+        public List<NodeViewModel> Nodes { get; set; }
     }
 }

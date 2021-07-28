@@ -60,6 +60,7 @@ namespace Infrastructure.DB
 
         public DataTable Query(string sql, params object[] parameters)
         {
+            sql = sql.Replace("@", ":");
             CheckConnection();
             OracleCommand command = Conn.CreateCommand();
             command.CommandText = sql;
@@ -74,6 +75,7 @@ namespace Infrastructure.DB
 
         private OracleParameterCollection AttachParameters(OracleCommand cmd, string commandText, object[] paramList)
         {
+            commandText = commandText.Replace("@", ":");
             if (paramList == null || paramList.Length == 0)
                 return null;
             OracleParameterCollection parameters = cmd.Parameters;

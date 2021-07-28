@@ -45,6 +45,26 @@ namespace FlowEngine.DAL
             }
             return rst;
         }
+        [DbRead]
+        [SqlKey(nameof(Node.ID))]
+        public List<Node> ReadById(Node obj)
+        {
+            /// 该方法的代码由插件自动生成，请勿修改。
+            string sql = @"SELECT * FROM NODE WHERE ID=@ID";
+            DataTable dt = Helper.Query(sql, obj.ID);
+            List<Node> rst = new List<Node>();
+            foreach (DataRow row in dt.Rows)
+            {
+                Node t = new Node();
+                t.ID = row[nameof(Node.ID)].TryToString();
+                t.TYPE = row[nameof(Node.TYPE)].TryToString();
+                t.TEXT = row[nameof(Node.TEXT)].TryToString();
+                t.X = row[nameof(Node.X)].TryToInt();
+                t.Y = row[nameof(Node.Y)].TryToInt();
+                rst.Add(t);
+            }
+            return rst;
+        }
 
         [DbUpdate]
         [SqlKey(nameof(Node.ID))]
@@ -63,6 +83,16 @@ namespace FlowEngine.DAL
             /// 该方法的代码由插件自动生成，请勿修改。
             string sql = @"DELETE NODE WHERE ID=@ID";
             return Helper.ExecuteNonQuery(sql, obj.ID);
+        }
+
+        [DbUpdate]
+        [SqlKey(nameof(Node.ID))]
+        [SqlValue(nameof(Node.TEXT))]
+        public int UpdateText(Node obj)
+        {
+            /// 该方法的代码由插件自动生成，请勿修改。
+            string sql = @"UPDATE NODE SET TEXT=@TEXT WHERE ID=@ID";
+            return Helper.ExecuteNonQuery(sql, obj.TEXT, obj.ID);
         }
     }
 }

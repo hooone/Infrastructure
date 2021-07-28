@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FlowEngine.Model
 {
-    public class NodeProperty
+    public class NodeViewModel
     {
         public string Id { get; set; }
         public string Type { get; set; }
