@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
+using System.Diagnostics;
 
 namespace FlowEditor.Nodes
 {
@@ -151,6 +152,14 @@ namespace FlowEditor.Nodes
         private void Node_MouseUp(object sender, MouseEventArgs e)
         {
             MoveFlag = false;
+            if (this.Location.X < 0)
+                this.Location = new Point(0, this.Location.Y);
+            if (this.Location.Y < 0)
+                this.Location = new Point(this.Location.X, 0);
+            if (this.Location.X > 760 - this.Width)
+                this.Location = new Point(760 - this.Width, this.Location.Y);
+            if (this.Location.Y > 620 - this.Height)
+                this.Location = new Point(this.Location.X, 620 - this.Height);
             GragEnd?.Invoke(this);
         }
         private void Node_MouseMove(object sender, MouseEventArgs e)

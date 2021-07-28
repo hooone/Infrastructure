@@ -33,8 +33,8 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
-            this.canvas = new System.Windows.Forms.Panel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.canvas = new System.Windows.Forms.Panel();
             this.tabControl1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -45,7 +45,7 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(212, 705);
+            this.tabControl1.Size = new System.Drawing.Size(212, 630);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
@@ -53,7 +53,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(199, 400);
+            this.tabPage1.Size = new System.Drawing.Size(204, 604);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "通用";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -63,7 +63,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(204, 679);
+            this.tabPage2.Size = new System.Drawing.Size(204, 604);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "RFID";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -87,27 +87,30 @@
             this.button2.Text = "流程2";
             this.button2.UseVisualStyleBackColor = true;
             // 
-            // canvas
-            // 
-            this.canvas.Location = new System.Drawing.Point(230, 50);
-            this.canvas.Name = "canvas";
-            this.canvas.Size = new System.Drawing.Size(493, 667);
-            this.canvas.TabIndex = 3;
-            // 
             // groupBox1
             // 
-            this.groupBox1.Location = new System.Drawing.Point(739, 13);
+            this.groupBox1.Location = new System.Drawing.Point(1007, 13);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(257, 704);
+            this.groupBox1.Size = new System.Drawing.Size(245, 620);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "属性";
+            // 
+            // canvas
+            // 
+            this.canvas.AutoScroll = true;
+            this.canvas.AutoScrollMinSize = new System.Drawing.Size(2000, 1000);
+            this.canvas.BackColor = System.Drawing.Color.FromArgb(214, 214, 214);
+            this.canvas.Location = new System.Drawing.Point(230, 50);
+            this.canvas.Name = "canvas";
+            this.canvas.Size = new System.Drawing.Size(760, 620);
+            this.canvas.TabIndex = 3;
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1008, 729);
+            this.ClientSize = new System.Drawing.Size(1264, 681);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.canvas);
             this.Controls.Add(this.button2);

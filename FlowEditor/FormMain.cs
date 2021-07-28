@@ -24,12 +24,14 @@ namespace FlowEditor
 
         private void button1_Click(object sender, EventArgs e)
         {
-
+            LoadFlow();
         }
         private void LoadFlow()
         {
             // 清空现有数据
             this.canvas.Controls.Clear();
+            this.canvas.HorizontalScroll.Value = 0;
+            this.canvas.VerticalScroll.Value = 0;
             nodes.Clear();
             point_nodes.Clear();
 
