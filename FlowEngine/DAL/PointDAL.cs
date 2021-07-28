@@ -42,5 +42,14 @@ namespace FlowEngine.DAL
             }
             return rst;
         }
+
+        [DbDelete]
+        [SqlKey(nameof(Point.NODEID))]
+        public int DeleteByNode(Point obj)
+        {
+            /// 该方法的代码由插件自动生成，请勿修改。
+            string sql = @"DELETE POINT WHERE NODEID=@NODEID";
+            return Helper.ExecuteNonQuery(sql, obj.NODEID);
+        }
     }
 }

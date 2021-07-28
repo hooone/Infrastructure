@@ -55,5 +55,14 @@ namespace FlowEngine.DAL
             string sql = @"UPDATE NODE SET X=@X,Y=@Y WHERE ID=@ID";
             return Helper.ExecuteNonQuery(sql, obj.X, obj.Y, obj.ID);
         }
+
+        [DbDelete]
+        [SqlKey(nameof(Node.ID))]
+        public int Delete(Node obj)
+        {
+            /// 该方法的代码由插件自动生成，请勿修改。
+            string sql = @"DELETE NODE WHERE ID=@ID";
+            return Helper.ExecuteNonQuery(sql, obj.ID);
+        }
     }
 }

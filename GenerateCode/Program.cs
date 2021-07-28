@@ -268,10 +268,13 @@ namespace GenerateCode
                         {
                             if (item.TypeFullName == typeof(SqlKey).FullName)
                             {
-                                var t = dbmodel.PropertyList.FirstOrDefault(f => f.Name == item.ArgumentList[0]);
-                                if (t != null)
+                                foreach (var argus in item.ArgumentList)
                                 {
-                                    keys.Add(t);
+                                    var t = dbmodel.PropertyList.FirstOrDefault(f => f.Name == argus.Replace("\"", ""));
+                                    if (t != null)
+                                    {
+                                        keys.Add(t);
+                                    }
                                 }
                             }
                         }
@@ -304,10 +307,13 @@ namespace GenerateCode
                         {
                             if (item.TypeFullName == typeof(SqlKey).FullName)
                             {
-                                var t = dbmodel.PropertyList.FirstOrDefault(f => f.Name == item.ArgumentList[0]);
-                                if (t != null)
+                                foreach (var argus in item.ArgumentList)
                                 {
-                                    keys.Add(t);
+                                    var t = dbmodel.PropertyList.FirstOrDefault(f => f.Name == argus.Replace("\"", ""));
+                                    if (t != null)
+                                    {
+                                        keys.Add(t);
+                                    }
                                 }
                             }
                         }

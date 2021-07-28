@@ -14,7 +14,7 @@ namespace FlowEditor.Nodes
         public string Id { get; set; }
         public string Type { get; set; }
         public abstract void SetText(string text);
-        public abstract void HighLight(bool high);
+        public abstract void HighLight(bool select);
         public abstract void SetDragEnable(bool enable);
         public event NodeEvent DragStart;
         public event NodeEvent DragEnd;

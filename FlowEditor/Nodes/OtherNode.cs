@@ -196,9 +196,12 @@ namespace FlowEditor.Nodes
         #endregion
 
         #region 选中
-        public override void HighLight(bool high)
+        public override void HighLight(bool select)
         {
-            throw new NotImplementedException();
+            if (!select)
+                this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(208)))), ((int)(((byte)(162)))));
+            else
+                this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(240)))), ((int)(((byte)(200)))));
         }
 
 

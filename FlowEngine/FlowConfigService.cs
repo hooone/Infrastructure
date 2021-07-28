@@ -70,5 +70,11 @@ namespace FlowEngine
             node.Points = new Dictionary<string, int>();
             return node;
         }
+
+        public void DeleteNode(string id)
+        {
+            nodeDAL.Delete(new DTO.Node() { ID = id });
+            pointDAL.DeleteByNode(new DTO.Point() { NODEID = id });
+        }
     }
 }

@@ -66,6 +66,7 @@ namespace FlowEditor
             node.SetText(text);
             node.Location = new Point(x - this.canvas.HorizontalScroll.Value, y - this.canvas.VerticalScroll.Value);
             node.DragEnd += NodeMove_DragEnd;
+            node.Click += Node_Click;
             this.canvas.Controls.Add(node);
             nodes.Add(id, node);
             if (linkPoint != null)
@@ -163,7 +164,38 @@ namespace FlowEditor
             var y = node.Location.Y + this.canvas.VerticalScroll.Value;
             service.UpdateLocation(node.Id, x, y);
         }
+        private Nodes.Node selectNode = null;
+        private void Node_Click(object sender, EventArgs e)
+        {
+            if (selectNode != null)
+            {
+                selectNode.HighLight(false);
+                selectNode = null;
+            }
+            var node = (Nodes.Node)sender;
+            node.HighLight(true);
+            selectNode = node;
+        }
+        // 删除节点
+        private void NodeDelete()
+        {
+            if (selectNode != null)
+            {
+                this.canvas.Controls.Remove(selectNode);
+                nodes.Remove(selectNode.Id);
+                service.DeleteNode(selectNode.Id);
+            }
+        }
         #endregion
 
+        // 删除键
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Delete)
+            {
+                NodeDelete();
+            }
+            return true;
+        }
     }
 }
