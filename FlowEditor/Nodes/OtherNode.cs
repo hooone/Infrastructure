@@ -159,6 +159,14 @@ namespace FlowEditor.Nodes
                 this.Location = new Point(760 - this.Width, this.Location.Y);
             if (this.Location.Y > 620 - this.Height)
                 this.Location = new Point(this.Location.X, 620 - this.Height);
+            foreach (var line in InLines)
+            {
+                line.SetEnd(this.Location.X + 4, this.Location.Y + this.Height / 2);
+            }
+            foreach (var line in OutLines)
+            {
+                line.SetStart(this.Location.X + this.Width - 4, this.Location.Y + this.Height / 2);
+            }
             OnDragEnd();
         }
         private void Node_MouseMove(object sender, MouseEventArgs e)
@@ -194,6 +202,17 @@ namespace FlowEditor.Nodes
                 }
             }
         }
+        public override void ResetLine()
+        {
+            foreach (var line in InLines)
+            {
+                line.SetEnd(this.Location.X + 4, this.Location.Y + this.Height / 2);
+            }
+            foreach (var line in OutLines)
+            {
+                line.SetStart(this.Location.X + this.Width - 4, this.Location.Y + this.Height / 2);
+            }
+        }
         #endregion
 
         #region 选中
@@ -206,10 +225,31 @@ namespace FlowEditor.Nodes
         }
 
 
-        public override void SelectPoint(string pointId, bool select)
+        private void LinkOutPoint1_Click(object sender, System.EventArgs e)
         {
-            throw new NotImplementedException();
+            if (sender == linkInPoint1)
+            {
+                OnPointClick(false, inPointId);
+            }
+            else if (sender == linkOutPoint1)
+            {
+                OnPointClick(true, outPointId);
+            }
         }
+
+        public override void HighLightPoint(string pointId, bool select)
+        {
+            Color c = select ? Color.Red : Color.FromArgb(217, 217, 217);
+            if (pointId == inPointId)
+            {
+                linkInPoint1.BackColor = c;
+            }
+            if (pointId == outPointId)
+            {
+                linkOutPoint1.BackColor = c;
+            }
+        }
+
         #endregion
     }
 }

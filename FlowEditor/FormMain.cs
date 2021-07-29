@@ -65,7 +65,9 @@ namespace FlowEditor
             node.Type = type;
             node.SetText(text);
             node.Location = new Point(x - this.canvas.HorizontalScroll.Value, y - this.canvas.VerticalScroll.Value);
+            node.DragStart += Node_DragStart;
             node.DragEnd += NodeMove_DragEnd;
+            node.PointClickEvent += Node_PointClickEvent;
             node.Click += Node_Click;
             this.canvas.Controls.Add(node);
             nodes.Add(id, node);
@@ -81,6 +83,7 @@ namespace FlowEditor
                 point_nodes.Add(item, node);
             }
         }
+
 
         // 工具栏页面切换
         private void TabControl1_SelectedIndexChanged(object sender, System.EventArgs e)
@@ -157,7 +160,7 @@ namespace FlowEditor
         #endregion
 
         #region 修改流程节点
-        // 拖动完成
+        // 拖动修改位置
         private void NodeMove_DragEnd(Node node)
         {
             var x = node.Location.X + this.canvas.HorizontalScroll.Value;
@@ -207,7 +210,153 @@ namespace FlowEditor
         }
         #endregion
 
-        // 删除键
+        #region 连接线
+        private Nodes.Node selectInNode = null;
+        private string selectInId = "";
+        private Nodes.Node selectOutNode = null;
+        private string selectOutId = "";
+        // 连接点选择
+        private void Node_PointClickEvent(Nodes.Node node, bool isOut, string Id)
+        {
+            // 相同元素选择
+            if (isOut && selectInNode == node)
+            {
+                if (selectInNode != null)
+                {
+                    selectInNode.HighLightPoint(selectInId, false);
+                }
+                selectInNode = null;
+                if (selectOutNode != null)
+                {
+                    selectOutNode.HighLightPoint(selectOutId, false);
+                }
+                selectOutNode = node;
+                selectOutId = Id;
+                selectOutNode.HighLightPoint(selectOutId, true);
+            }
+            // 相同元素选择
+            else if (!isOut && selectOutNode == node)
+            {
+                if (selectOutNode != null)
+                {
+                    selectOutNode.HighLightPoint(selectOutId, false);
+                }
+                selectOutNode = null;
+                if (selectInNode != null)
+                {
+                    selectInNode.HighLightPoint(selectInId, false);
+                }
+                selectInNode = node;
+                selectInId = Id;
+                selectInNode.HighLightPoint(selectInId, true);
+
+            }
+            // 连线
+            else if (isOut && selectInNode != null)
+            {
+                // 写入
+                selectOutId = Id;
+                selectOutNode = node;
+                // 添加线
+                AddLine(selectInId, selectOutId);
+                // 复位
+                if (selectOutNode != null)
+                {
+                    selectOutNode.HighLightPoint(selectOutId, false);
+                    selectOutNode = null;
+                }
+                if (selectInNode != null)
+                {
+                    selectInNode.HighLightPoint(selectInId, false);
+                    selectInNode = null;
+                }
+            }
+            // 连线
+            else if (!isOut && selectOutNode != null)
+            {
+                // 写入
+                selectInId = Id;
+                selectInNode = node;
+                // 添加线
+                AddLine(selectInId, selectOutId);
+                // 复位
+                if (selectOutNode != null)
+                {
+                    selectOutNode.HighLightPoint(selectOutId, false);
+                    selectOutNode = null;
+                }
+                if (selectInNode != null)
+                {
+                    selectInNode.HighLightPoint(selectInId, false);
+                    selectInNode = null;
+                }
+            }
+            // 选择
+            else if (isOut)
+            {
+                if (selectOutNode != null)
+                {
+                    selectOutNode.HighLightPoint(selectOutId, false);
+                }
+                selectOutNode = node;
+                selectOutId = Id;
+                selectOutNode.HighLightPoint(selectOutId, true);
+            }
+            // 选择
+            else if (!isOut)
+            {
+                if (selectInNode != null)
+                {
+                    selectInNode.HighLightPoint(selectInId, false);
+                }
+                selectInNode = node;
+                selectInId = Id;
+                selectInNode.HighLightPoint(selectInId, true);
+            }
+            //// 复位选中线
+            //if (selectLine != null)
+            //{
+            //    selectLine.BackColor = Color.FromArgb(144, 144, 144);
+            //    selectLine = null;
+            //}
+            // 复位选中节点
+            if (selectNode != null)
+            {
+                selectNode.HighLight(false);
+                selectNode = null;
+            }
+        }
+
+        private HashSet<string> lines = new HashSet<string>();
+        // 添加连接线到canvas
+        private void AddLine(string inId, string outId)
+        {
+            if (string.IsNullOrWhiteSpace(inId) || string.IsNullOrWhiteSpace(outId))
+                return;
+            if (lines.Contains(inId + outId))
+                return;
+            lines.Add(inId + outId);
+            if (!point_nodes.ContainsKey(inId) || !point_nodes.ContainsKey(outId))
+                return;
+            LinkLine line = new LinkLine();
+            line.Key = inId + outId;
+            this.canvas.Controls.Add(line);
+            var from = point_nodes[outId];
+            from.RegisterLine(outId, line);
+            var to = point_nodes[inId];
+            to.RegisterLine(inId, line);
+        }
+
+        // 节点拖动开始时，重置所有线的位置
+        private void Node_DragStart(Node control)
+        {
+            foreach (var item in nodes)
+            {
+                item.Value.ResetLine();
+            }
+        }
+        #endregion
+        // 删除按键
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.Delete)
@@ -216,5 +365,24 @@ namespace FlowEditor
             }
             return base.ProcessCmdKey(ref msg, keyData);
         }
+        /// <summary>
+        /// 水平滚动条
+        /// </summary>
+        public static int HScrollValue = 0;
+        /// <summary>
+        /// 竖直滚动条
+        /// </summary>
+        public static int VScrollValue = 0;
+        private void canvas_Scroll(object sender, ScrollEventArgs e)
+        {
+            HScrollValue = this.canvas.HorizontalScroll.Value;
+            VScrollValue = this.canvas.VerticalScroll.Value;
+        }
+        private void Canvas_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            HScrollValue = this.canvas.HorizontalScroll.Value;
+            VScrollValue = this.canvas.VerticalScroll.Value;
+        }
+
     }
 }

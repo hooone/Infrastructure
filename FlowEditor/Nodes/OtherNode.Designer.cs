@@ -40,6 +40,7 @@ namespace FlowEditor.Nodes
             this.linkInPoint1.Location = new System.Drawing.Point(0, 11);
             this.linkInPoint1.Name = "linkInPoint1";
             this.linkInPoint1.Size = new System.Drawing.Size(8, 8);
+            this.linkInPoint1.Click += LinkOutPoint1_Click;
             this.linkInPoint1.TabIndex = 0;
             // 
             // linkOutPoint1
@@ -48,6 +49,7 @@ namespace FlowEditor.Nodes
             this.linkOutPoint1.Location = new System.Drawing.Point(92, 11);
             this.linkOutPoint1.Name = "linkOutPoint1";
             this.linkOutPoint1.Size = new System.Drawing.Size(8, 8);
+            this.linkOutPoint1.Click += LinkOutPoint1_Click;
             this.linkOutPoint1.TabIndex = 1;
             // 
             // CalcNode

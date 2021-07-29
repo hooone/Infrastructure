@@ -16,7 +16,6 @@ namespace FlowEditor
         {
             InitializeComponent();
         }
-        public bool IsOut { get; set; }
         protected override void OnPaint(PaintEventArgs e)
         {
             ControlPaint.DrawBorder(e.Graphics, this.ClientRectangle, Color.Black, ButtonBorderStyle.Solid);

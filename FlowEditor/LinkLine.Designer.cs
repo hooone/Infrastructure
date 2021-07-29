@@ -39,7 +39,7 @@ namespace FlowEditor
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(144)))), ((int)(((byte)(144)))), ((int)(((byte)(144)))));
             this.Name = "LinkLine";
             this.Cursor = Cursors.Cross;
-            this.Size = new System.Drawing.Size(1024, 1024);
+            this.Size = new System.Drawing.Size(2000, 1000);
             this.ResumeLayout(false);
         }
 

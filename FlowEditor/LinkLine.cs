@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
+using System.Diagnostics;
 
 namespace FlowEditor
 {
@@ -16,17 +17,26 @@ namespace FlowEditor
         public LinkLine()
         {
             InitializeComponent();
+            this.Location = new Point(0 - FormMain.HScrollValue, 0 - FormMain.VScrollValue);
             this.Region = new Region(Round(0, 0, 0, 0));
         }
         public string Key = "";
         public GraphicsPath Round(int startX, int startY, int width, int height)
         {
+            Debug.WriteLine("startY:" + startY + " VScrollValue:" + FormMain.VScrollValue);
             GraphicsPath oPath = new GraphicsPath();
             if (width == 0 && height == 0)
             {
                 return oPath;
             }
-            oPath.AddBezier(startX, startY, startX + 100, startY, startX + width - 100, startY + height, startX + width, startY + height);
+            oPath.AddBezier(FormMain.HScrollValue + startX,
+                FormMain.VScrollValue + startY,
+                FormMain.HScrollValue + startX + 100,
+                FormMain.VScrollValue + startY,
+                FormMain.HScrollValue + startX + width - 100,
+                FormMain.VScrollValue + startY + height,
+                FormMain.HScrollValue + startX + width,
+                FormMain.VScrollValue + startY + height);
             Pen p = new Pen(Color.Black, 3);
             oPath.Widen(p);
             return oPath;
