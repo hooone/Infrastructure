@@ -1,4 +1,5 @@
-﻿using FlowEngine.DAL;
+﻿using FlowEngine.Command;
+using FlowEngine.DAL;
 using FlowEngine.Model;
 using System;
 using System.Collections.Generic;
@@ -49,16 +50,43 @@ namespace FlowEngine
 
         public NodeViewModel CreateNode(string type, int x, int y)
         {
+            // 获取command
+            ICommand cmd = GetCommand(type);
             // 插入node表
             DTO.Node nd = new DTO.Node();
-            nd.ID = Guid.NewGuid().ToString("N");
+            nd.ID = cmd.Id;
             nd.TYPE = type;
-            nd.TEXT = "新节点";
+            nd.TEXT = cmd.Name;
             nd.X = x;
             nd.Y = y;
             if (nodeDAL.insert(nd) != 1)
             {
                 return null;
+            }
+            // 插入Point表
+            var pres = cmd.GetPrecondition();
+            foreach (var item in pres)
+            {
+                DTO.Point pt = new DTO.Point();
+                pt.ID = item.Id;
+                pt.NODEID = item.CommandId;
+                pt.SEQ = item.Seq;
+                if (pointDAL.insert(pt) != 1)
+                {
+                    return null;
+                }
+            }
+            var posts = cmd.GetPostcondition();
+            foreach (var item in posts)
+            {
+                DTO.Point pt = new DTO.Point();
+                pt.ID = item.Id;
+                pt.NODEID = item.CommandId;
+                pt.SEQ = item.Seq;
+                if (pointDAL.insert(pt) != 1)
+                {
+                    return null;
+                }
             }
             // 装箱
             NodeViewModel node = new NodeViewModel();
@@ -68,6 +96,14 @@ namespace FlowEngine
             node.X = nd.X;
             node.Y = nd.Y;
             node.Points = new Dictionary<string, int>();
+            foreach (var item in pres)
+            {
+                node.Points.Add(item.Id, item.Seq);
+            }
+            foreach (var item in posts)
+            {
+                node.Points.Add(item.Id, item.Seq);
+            }
             return node;
         }
 
@@ -100,6 +136,10 @@ namespace FlowEngine
             node.ID = id;
             node.TEXT = text;
             return nodeDAL.UpdateText(node);
+        }
+        public ICommand GetCommand(string type)
+        {
+            return CommonCommand.NewCommonCommand();
         }
     }
 }

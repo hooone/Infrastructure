@@ -18,5 +18,8 @@ namespace FlowEngine.DTO
         [DbColumn(DataType.VARCHAR2)]
         public string NODEID { get; set; }
 
+        [DbColumn(DataType.NUMBER)]
+        public int SEQ { get; set; }
+
     }
 }

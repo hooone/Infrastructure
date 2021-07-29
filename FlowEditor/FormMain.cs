@@ -202,6 +202,7 @@ namespace FlowEditor
                 this.canvas.Controls.Remove(selectNode);
                 nodes.Remove(selectNode.Id);
                 service.DeleteNode(selectNode.Id);
+                selectNode = null;
             }
         }
         #endregion

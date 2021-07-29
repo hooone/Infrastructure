@@ -22,8 +22,8 @@ namespace FlowEngine.DAL
         public int insert(Point obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
-            string sql = @"INSERT INTO POINT (ID,NODEID ) values (@ID,@NODEID)";
-            return Helper.ExecuteNonQuery(sql, obj.ID, obj.NODEID);
+            string sql = @"INSERT INTO POINT (ID,NODEID,SEQ ) values (@ID,@NODEID,@SEQ)";
+            return Helper.ExecuteNonQuery(sql, obj.ID, obj.NODEID, obj.SEQ);
         }
 
         [DbRead]
@@ -38,6 +38,7 @@ namespace FlowEngine.DAL
                 Point t = new Point();
                 t.ID = row[nameof(Point.ID)].TryToString();
                 t.NODEID = row[nameof(Point.NODEID)].TryToString();
+                t.SEQ = row[nameof(Point.SEQ)].TryToInt();
                 rst.Add(t);
             }
             return rst;

@@ -14,7 +14,7 @@ namespace FlowEditor.Nodes
 {
     public partial class OtherNode : Node
     {
-        private const int _Radius = 6;  // 圆角弧度
+        private const int _Radius = 6;
         public delegate void NodeEvent(Control control);
         public OtherNode()
         {

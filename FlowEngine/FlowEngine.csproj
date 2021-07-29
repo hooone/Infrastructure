@@ -63,6 +63,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Command\CommonCommand.cs" />
+    <Compile Include="Command\ICommand.cs" />
     <Compile Include="DAL\COracleParameter.cs" />
     <Compile Include="DAL\LinkDAL.cs" />
     <Compile Include="DAL\NodeDAL.cs" />
