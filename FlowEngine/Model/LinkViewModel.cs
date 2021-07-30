@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace FlowEngine.Model
 {
-    public class FlowConfig
+    public class LinkViewModel
     {
-        public List<NodeViewModel> Nodes { get; set; }
-        public List<LinkViewModel> Links { get; set; }
+        public string Id { get; set; }
+        public string From { get; set; }
+        public string To { get; set; }
     }
 }

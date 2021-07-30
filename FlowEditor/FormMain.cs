@@ -31,7 +31,8 @@ namespace FlowEditor
         private void FormMain_Load(object sender, EventArgs e)
         {
             this.LoadFlow();
-            InitDragCreateNode();
+            // 初始化工具栏
+            InitDragToolsNode();
         }
         private void LoadFlow()
         {
@@ -49,6 +50,11 @@ namespace FlowEditor
             foreach (var prop in config.Nodes)
             {
                 CreateNode(prop.Id, prop.Type, prop.Text, prop.X, prop.Y, prop.Points);
+            }
+            // 添加线
+            foreach (var item in config.Links)
+            {
+                AddLine(item.Id, item.To, item.From);
             }
         }
         #region 流程选择
@@ -90,12 +96,12 @@ namespace FlowEditor
         // 工具栏页面切换
         private void TabControl1_SelectedIndexChanged(object sender, System.EventArgs e)
         {
-            InitDragCreateNode();
+            InitDragToolsNode();
         }
 
         // 向工具栏添加假控件
         private List<Node> drags = new List<Node>();
-        private void InitDragCreateNode()
+        private void InitDragToolsNode()
         {
             var page = this.tabControl1.TabPages[this.tabControl1.SelectedIndex];
             // 移除原有假控件
@@ -269,7 +275,7 @@ namespace FlowEditor
                 selectOutId = Id;
                 selectOutNode = node;
                 // 添加线
-                AddLine(selectInId, selectOutId);
+                CreateLine(selectInId, selectOutId);
                 // 复位
                 if (selectOutNode != null)
                 {
@@ -289,7 +295,7 @@ namespace FlowEditor
                 selectInId = Id;
                 selectInNode = node;
                 // 添加线
-                AddLine(selectInId, selectOutId);
+                CreateLine(selectInId, selectOutId);
                 // 复位
                 if (selectOutNode != null)
                 {
@@ -340,25 +346,33 @@ namespace FlowEditor
 
         private HashSet<string> lines = new HashSet<string>();
         // 添加连接线到canvas
-        private void AddLine(string inId, string outId)
+        private void AddLine(string id, string point1, string point2)
         {
-            if (string.IsNullOrWhiteSpace(inId) || string.IsNullOrWhiteSpace(outId))
+            if (string.IsNullOrWhiteSpace(point1) || string.IsNullOrWhiteSpace(point2))
                 return;
-            if (lines.Contains(inId + outId))
+            if (lines.Contains(id))
                 return;
-            lines.Add(inId + outId);
-            if (!point_nodes.ContainsKey(inId) || !point_nodes.ContainsKey(outId))
+            lines.Add(id);
+            if (!point_nodes.ContainsKey(point1) || !point_nodes.ContainsKey(point2))
                 return;
             LinkLine line = new LinkLine();
-            line.Key = inId + outId;
+            line.Key = id;
             line.Click += Line_Click;
             this.canvas.Controls.Add(line);
-            var from = point_nodes[outId];
-            from.RegisterLine(outId, line);
-            var to = point_nodes[inId];
-            to.RegisterLine(inId, line);
+            var from = point_nodes[point2];
+            from.RegisterLine(point2, line);
+            var to = point_nodes[point1];
+            to.RegisterLine(point1, line);
         }
 
+        // 创建连接线
+        private void CreateLine(string point1, string point2)
+        {
+            var link = service.CreateLine(point1, point2);
+            if (link == null)
+                return;
+            AddLine(link.Id, link.From, link.To);
+        }
         private void Line_Click(object sender, EventArgs e)
         {
 
@@ -368,7 +382,7 @@ namespace FlowEditor
         #endregion
 
         #region 删除连接线
-      
+
         #endregion
         // 删除按键
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

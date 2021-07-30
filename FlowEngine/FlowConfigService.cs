@@ -24,6 +24,7 @@ namespace FlowEngine
         {
             FlowConfig rst = new FlowConfig();
             rst.Nodes = new List<NodeViewModel>();
+            rst.Links = new List<LinkViewModel>();
             var nodes = nodeDAL.read(null);
             foreach (var nd in nodes)
             {
@@ -34,7 +35,21 @@ namespace FlowEngine
                 node.X = nd.X;
                 node.Y = nd.Y;
                 node.Points = new Dictionary<string, int>();
+                var points = pointDAL.read(new DTO.Point() { NODEID = nd.ID });
+                foreach (var pt in points)
+                {
+                    node.Points.Add(pt.ID, pt.SEQ);
+                }
                 rst.Nodes.Add(node);
+            }
+            var links = linkDAL.read(null);
+            foreach (var lk in links)
+            {
+                LinkViewModel link = new LinkViewModel();
+                link.Id = lk.ID;
+                link.From = lk.LINKFROM;
+                link.To = lk.LINKTO;
+                rst.Links.Add(link);
             }
             return rst;
         }
@@ -140,6 +155,23 @@ namespace FlowEngine
         public ICommand GetCommand(string type)
         {
             return CommonCommand.NewCommonCommand();
+        }
+
+        public LinkViewModel CreateLine(string point1, string point2)
+        {
+            DTO.Link link = new DTO.Link();
+            link.ID = Guid.NewGuid().ToString("N");
+            link.LINKFROM = point1;
+            link.LINKTO = point2;
+            if (linkDAL.insert(link) != 1)
+            {
+                return null;
+            }
+            LinkViewModel lv = new LinkViewModel();
+            lv.Id = link.ID;
+            lv.From = link.LINKFROM;
+            lv.To = link.LINKTO;
+            return lv;
         }
     }
 }

@@ -27,11 +27,12 @@ namespace FlowEngine.DAL
         }
 
         [DbRead]
+        [SqlKey(nameof(Point.NODEID))]
         public List<Point> read(Point obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
-            string sql = @"SELECT * FROM POINT";
-            DataTable dt = Helper.Query(sql);
+            string sql = @"SELECT * FROM POINT WHERE NODEID=@NODEID";
+            DataTable dt = Helper.Query(sql, obj.NODEID);
             List<Point> rst = new List<Point>();
             foreach (DataRow row in dt.Rows)
             {

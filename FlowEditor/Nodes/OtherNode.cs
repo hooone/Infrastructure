@@ -31,8 +31,8 @@ namespace FlowEditor.Nodes
             this.Invalidate();
         }
 
-        private string inPointId = Guid.NewGuid().ToString("N");
-        private string outPointId = Guid.NewGuid().ToString("N");
+        private string inPointId = Guid.NewGuid().ToString("N") + "aaaaa";
+        private string outPointId = Guid.NewGuid().ToString("N") + "aaaaa";
         public override void SetPointId(int index, string pointId)
         {
             if (index == 1)
