@@ -28,7 +28,7 @@ namespace FlowEngine.DAL
 
         [DbRead]
         [SqlKey(nameof(Point.NODEID))]
-        public List<Point> read(Point obj)
+        public List<Point> ReadByNode(Point obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
             string sql = @"SELECT * FROM POINT WHERE NODEID=@NODEID";

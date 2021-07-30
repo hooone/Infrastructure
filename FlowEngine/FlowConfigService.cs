@@ -35,7 +35,7 @@ namespace FlowEngine
                 node.X = nd.X;
                 node.Y = nd.Y;
                 node.Points = new Dictionary<string, int>();
-                var points = pointDAL.read(new DTO.Point() { NODEID = nd.ID });
+                var points = pointDAL.ReadByNode(new DTO.Point() { NODEID = nd.ID });
                 foreach (var pt in points)
                 {
                     node.Points.Add(pt.ID, pt.SEQ);
@@ -124,6 +124,11 @@ namespace FlowEngine
 
         public void DeleteNode(string id)
         {
+            var lines = GetLinesByNode(id);
+            foreach (var item in lines)
+            {
+                linkDAL.Delete(new DTO.Link() { ID = item.Id });
+            }
             nodeDAL.Delete(new DTO.Node() { ID = id });
             pointDAL.DeleteByNode(new DTO.Point() { NODEID = id });
         }
@@ -172,6 +177,50 @@ namespace FlowEngine
             lv.From = link.LINKFROM;
             lv.To = link.LINKTO;
             return lv;
+        }
+
+        public void DeleteLine(string id)
+        {
+            linkDAL.Delete(new DTO.Link() { ID = id });
+        }
+
+        public List<LinkViewModel> GetLinesByNode(string nodeId)
+        {
+            List<LinkViewModel> rst = new List<LinkViewModel>();
+            var points = pointDAL.ReadByNode(new DTO.Point() { NODEID = nodeId });
+            foreach (var item in points)
+            {
+                var fms = linkDAL.ReadByFrom(new DTO.Link() { LINKFROM = item.ID });
+                foreach (var lk in fms)
+                {
+                    var p = new LinkViewModel();
+                    p.Id = lk.ID;
+                    p.From = lk.LINKFROM;
+                    p.To = lk.LINKTO;
+                    rst.Add(p);
+                }
+                var tos = linkDAL.ReadByTo(new DTO.Link() { LINKTO = item.ID });
+                foreach (var lk in tos)
+                {
+                    var p = new LinkViewModel();
+                    p.Id = lk.ID;
+                    p.From = lk.LINKFROM;
+                    p.To = lk.LINKTO;
+                    rst.Add(p);
+                }
+            }
+            return rst;
+        }
+
+        public List<string> GetPointsByNode(string nodeid)
+        {
+            List<string> rst = new List<string>();
+            var pts = pointDAL.ReadByNode(new DTO.Point() { NODEID = nodeid });
+            foreach (var item in pts)
+            {
+                rst.Add(item.ID);
+            }
+            return rst;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace FlowEditor
             this.Location = new Point(0 - FormMain.HScrollValue, 0 - FormMain.VScrollValue);
             this.Region = new Region(Round(0, 0, 0, 0));
         }
-        public string Key = "";
+        public string Id { get; set; }
         public GraphicsPath Round(int startX, int startY, int width, int height)
         {
             GraphicsPath oPath = new GraphicsPath();
@@ -31,9 +31,9 @@ namespace FlowEditor
             }
             oPath.AddBezier(FormMain.HScrollValue + startX,
                 FormMain.VScrollValue + startY,
-                FormMain.HScrollValue + startX + 100,
+                FormMain.HScrollValue + startX + 50,
                 FormMain.VScrollValue + startY,
-                FormMain.HScrollValue + startX + width - 100,
+                FormMain.HScrollValue + startX + width - 50,
                 FormMain.VScrollValue + startY + height,
                 FormMain.HScrollValue + startX + width,
                 FormMain.VScrollValue + startY + height);

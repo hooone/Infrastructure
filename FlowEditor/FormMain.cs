@@ -25,9 +25,13 @@ namespace FlowEditor
             InitializeComponent();
             service = Launcher.Container.Resolve<FlowConfigService>();
             this.otherNode1.Type = "OTHER";
-            this.canvas.MouseWheel += Canvas_MouseWheel;
+            this.canvas.MouseWheel += canvas_Scroll;
+            this.canvas.ChangeUICues += canvas_Scroll;
+            this.canvas.GotFocus += canvas_Scroll;
+            this.canvas.Layout += canvas_Scroll;
+            this.canvas.Leave += canvas_Scroll;
+            this.canvas.Paint += canvas_Scroll;
         }
-
         private void FormMain_Load(object sender, EventArgs e)
         {
             this.LoadFlow();
@@ -200,6 +204,23 @@ namespace FlowEditor
             if (info == null)
                 return;
             this.textBox1.Text = info.Text;
+            // 清除线选择
+            if (selectLine != null)
+            {
+                selectLine.BackColor = Color.FromArgb(144, 144, 144);
+                selectLine = null;
+            }
+            // 清除连接点选择
+            if (selectOutNode != null)
+            {
+                selectOutNode.HighLightPoint(selectOutId, false);
+                selectOutNode = null;
+            }
+            if (selectInNode != null)
+            {
+                selectInNode.HighLightPoint(selectInId, false);
+                selectInNode = null;
+            }
         }
 
         // 保存属性修改
@@ -219,8 +240,26 @@ namespace FlowEditor
         {
             if (selectNode != null)
             {
+                // 移除节点
                 this.canvas.Controls.Remove(selectNode);
                 nodes.Remove(selectNode.Id);
+                // 移除连接线
+                var linedata = service.GetLinesByNode(selectNode.Id);
+                foreach (var item in linedata)
+                {
+                    if (lines.ContainsKey(item.Id))
+                    {
+                        this.canvas.Controls.Remove(lines[item.Id]);
+                        lines.Remove(item.Id);
+                    }
+                }
+                // 移除point_nodes缓存
+                var points = service.GetPointsByNode(selectNode.Id);
+                foreach (var item in points)
+                {
+                    point_nodes.Remove(item);
+                }
+                // 删除数据库
                 service.DeleteNode(selectNode.Id);
                 selectNode = null;
             }
@@ -330,13 +369,13 @@ namespace FlowEditor
                 selectInId = Id;
                 selectInNode.HighLightPoint(selectInId, true);
             }
-            //// 复位选中线
-            //if (selectLine != null)
-            //{
-            //    selectLine.BackColor = Color.FromArgb(144, 144, 144);
-            //    selectLine = null;
-            //}
-            // 复位选中节点
+            // 清除线选择
+            if (selectLine != null)
+            {
+                selectLine.BackColor = Color.FromArgb(144, 144, 144);
+                selectLine = null;
+            }
+            // 清除节点选择
             if (selectNode != null)
             {
                 selectNode.HighLight(false);
@@ -344,21 +383,21 @@ namespace FlowEditor
             }
         }
 
-        private HashSet<string> lines = new HashSet<string>();
+        private Dictionary<string, LinkLine> lines = new Dictionary<string, LinkLine>();
         // 添加连接线到canvas
         private void AddLine(string id, string point1, string point2)
         {
             if (string.IsNullOrWhiteSpace(point1) || string.IsNullOrWhiteSpace(point2))
                 return;
-            if (lines.Contains(id))
+            if (lines.ContainsKey(id))
                 return;
-            lines.Add(id);
             if (!point_nodes.ContainsKey(point1) || !point_nodes.ContainsKey(point2))
                 return;
             LinkLine line = new LinkLine();
-            line.Key = id;
+            line.Id = id;
             line.Click += Line_Click;
             this.canvas.Controls.Add(line);
+            lines.Add(id, line);
             var from = point_nodes[point2];
             from.RegisterLine(point2, line);
             var to = point_nodes[point1];
@@ -373,16 +412,55 @@ namespace FlowEditor
                 return;
             AddLine(link.Id, link.From, link.To);
         }
-        private void Line_Click(object sender, EventArgs e)
-        {
-
-        }
 
 
         #endregion
 
         #region 删除连接线
+        private LinkLine selectLine = null;
+        private void Line_Click(object sender, EventArgs e)
+        {
 
+            var line = (LinkLine)sender;
+            bool select = (line.BackColor.R == line.BackColor.G && line.BackColor.G == 144);
+            if (selectLine != null)
+            {
+                selectLine.BackColor = Color.FromArgb(144, 144, 144);
+            }
+            if (select)
+            {
+                line.BackColor = Color.FromArgb(0xFF, 0x7F, 0x0E);
+                selectLine = line;
+            }
+            // 清除连接点选择
+            if (selectOutNode != null)
+            {
+                selectOutNode.HighLightPoint(selectOutId, false);
+                selectOutNode = null;
+            }
+            if (selectInNode != null)
+            {
+                selectInNode.HighLightPoint(selectInId, false);
+                selectInNode = null;
+            }
+            // 清除节点选择
+            if (selectNode != null)
+            {
+                selectNode.HighLight(false);
+                selectNode = null;
+            }
+        }
+        // 删除连接线
+        private void LineDelete()
+        {
+            if (selectLine != null)
+            {
+                this.canvas.Controls.Remove(selectLine);
+                lines.Remove(selectLine.Id);
+                service.DeleteLine(selectLine.Id);
+                selectLine = null;
+            }
+        }
         #endregion
         // 删除按键
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -390,6 +468,7 @@ namespace FlowEditor
             if (keyData == Keys.Delete)
             {
                 NodeDelete();
+                LineDelete();
             }
             return base.ProcessCmdKey(ref msg, keyData);
         }
@@ -401,12 +480,7 @@ namespace FlowEditor
         /// 竖直滚动条
         /// </summary>
         public static int VScrollValue = 0;
-        private void canvas_Scroll(object sender, ScrollEventArgs e)
-        {
-            HScrollValue = this.canvas.HorizontalScroll.Value;
-            VScrollValue = this.canvas.VerticalScroll.Value;
-        }
-        private void Canvas_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void canvas_Scroll(object sender, object e)
         {
             HScrollValue = this.canvas.HorizontalScroll.Value;
             VScrollValue = this.canvas.VerticalScroll.Value;
