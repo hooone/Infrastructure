@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,7 @@ namespace FlowEditor
             InitializeComponent();
             service = Launcher.Container.Resolve<FlowConfigService>();
             this.otherNode1.Type = "OTHER";
+            this.canvas.MouseWheel += Canvas_MouseWheel;
         }
 
         private void FormMain_Load(object sender, EventArgs e)
@@ -167,6 +169,15 @@ namespace FlowEditor
             var y = node.Location.Y + this.canvas.VerticalScroll.Value;
             service.UpdateNodeLocation(node.Id, x, y);
         }
+
+        // 节点拖动开始时，重置所有线的位置
+        private void Node_DragStart(Node control)
+        {
+            foreach (var item in nodes)
+            {
+                item.Value.ResetLine();
+            }
+        }
         // 选择节点
         private Nodes.Node selectNode = null;
         private void Node_Click(object sender, EventArgs e)
@@ -210,7 +221,7 @@ namespace FlowEditor
         }
         #endregion
 
-        #region 连接线
+        #region 添加连接线
         private Nodes.Node selectInNode = null;
         private string selectInId = "";
         private Nodes.Node selectOutNode = null;
@@ -340,6 +351,7 @@ namespace FlowEditor
                 return;
             LinkLine line = new LinkLine();
             line.Key = inId + outId;
+            line.Click += Line_Click;
             this.canvas.Controls.Add(line);
             var from = point_nodes[outId];
             from.RegisterLine(outId, line);
@@ -347,14 +359,16 @@ namespace FlowEditor
             to.RegisterLine(inId, line);
         }
 
-        // 节点拖动开始时，重置所有线的位置
-        private void Node_DragStart(Node control)
+        private void Line_Click(object sender, EventArgs e)
         {
-            foreach (var item in nodes)
-            {
-                item.Value.ResetLine();
-            }
+
         }
+
+
+        #endregion
+
+        #region 删除连接线
+      
         #endregion
         // 删除按键
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

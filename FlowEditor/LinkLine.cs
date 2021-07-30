@@ -12,7 +12,8 @@ using System.Diagnostics;
 
 namespace FlowEditor
 {
-    public partial class LinkLine : UserControl
+    public delegate void LineEvent(LinkLine line);
+    public partial class LinkLine : Label
     {
         public LinkLine()
         {
@@ -23,7 +24,6 @@ namespace FlowEditor
         public string Key = "";
         public GraphicsPath Round(int startX, int startY, int width, int height)
         {
-            Debug.WriteLine("startY:" + startY + " VScrollValue:" + FormMain.VScrollValue);
             GraphicsPath oPath = new GraphicsPath();
             if (width == 0 && height == 0)
             {
@@ -63,5 +63,9 @@ namespace FlowEditor
         {
             this.Region = new Region(Round(startX, startY, endX - startX, endY - startY));
         }
+        //protected override System.Drawing.Point ScrollToControl(Control activeControl)
+        //{
+        //    return DisplayRectangle.Location;
+        //}
     }
 }

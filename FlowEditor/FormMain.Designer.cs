@@ -154,14 +154,12 @@
             // 
             // canvas
             // 
-            this.canvas.AutoScroll = true;
             this.canvas.AutoScrollMinSize = new System.Drawing.Size(2000, 1000);
             this.canvas.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(214)))), ((int)(((byte)(214)))), ((int)(((byte)(214)))));
             this.canvas.Location = new System.Drawing.Point(230, 50);
             this.canvas.Name = "canvas";
             this.canvas.Size = new System.Drawing.Size(760, 620);
             this.canvas.TabIndex = 3;
-            this.canvas.MouseWheel += Canvas_MouseWheel;
             this.canvas.Scroll += new System.Windows.Forms.ScrollEventHandler(this.canvas_Scroll);
             // 
             // FormMain
