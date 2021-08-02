@@ -12,6 +12,7 @@ namespace Infrastructure.DB
 {
     public class OracleHelper : SqlHelper
     {
+        public string aa = "1";
         private ILog Log = new NopLogger();
         private OracleConnection _conn;
         public OracleConnection Conn
@@ -27,6 +28,15 @@ namespace Infrastructure.DB
                 return _conn;
             }
             set => _conn = value;
+        }
+
+        public bool Close()
+        {
+            if (_conn != null)
+            {
+                _conn.Close();
+            }
+            return true;
         }
 
         public bool Connect(string connect)
@@ -54,7 +64,6 @@ namespace Infrastructure.DB
             AttachParameters(command, command.CommandText, parameters);
             int num = command.ExecuteNonQuery();
             command.Dispose();
-            Conn.Close();
             return num;
         }
 
@@ -75,13 +84,14 @@ namespace Infrastructure.DB
 
         private OracleParameterCollection AttachParameters(OracleCommand cmd, string commandText, object[] paramList)
         {
-            commandText = commandText.Replace("@", ":");
             if (paramList == null || paramList.Length == 0)
                 return null;
             OracleParameterCollection parameters = cmd.Parameters;
             MatchCollection matchCollection = new Regex("(:)\\S*(.*?)\\b", RegexOptions.IgnoreCase)
                 .Matches(commandText.Substring(commandText.IndexOf(":", StringComparison.Ordinal))
                     .Replace(",", " ,"));
+            if (paramList.Length!= matchCollection.Count)
+                throw new SystemException("oracle parameter length error");
             string[] strArray = new string[matchCollection.Count];
             int index1 = 0;
             foreach (Match match in matchCollection)

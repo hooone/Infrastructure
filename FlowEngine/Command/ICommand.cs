@@ -10,7 +10,7 @@ namespace FlowEngine.Command
     {
         string Id { get; set; }
         string Name { get; set; }
-        bool Execute();
+        bool Init();
         List<Precondition> GetPrecondition();
         List<Postcondition> GetPostcondition();
     }

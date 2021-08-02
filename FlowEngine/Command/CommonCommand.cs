@@ -25,8 +25,13 @@ namespace FlowEngine.Command
         }
         public string Id { get; set; }
         public string Name { get; set; }
-        public Precondition Pre { get; set; }
+        public Precondition Pre { get; set; } 
         public Postcondition Post { get; set; }
+
+        public bool Init()
+        {
+            return true;
+        }
 
         public bool Execute()
         {
@@ -42,5 +47,6 @@ namespace FlowEngine.Command
         {
             return new List<Precondition>() { Pre };
         }
+
     }
 }

@@ -31,9 +31,9 @@ namespace FlowEditor
             }
             oPath.AddBezier(FormMain.HScrollValue + startX,
                 FormMain.VScrollValue + startY,
-                FormMain.HScrollValue + startX + 50,
+                FormMain.HScrollValue + startX + 60,
                 FormMain.VScrollValue + startY,
-                FormMain.HScrollValue + startX + width - 50,
+                FormMain.HScrollValue + startX + width - 60,
                 FormMain.VScrollValue + startY + height,
                 FormMain.HScrollValue + startX + width,
                 FormMain.VScrollValue + startY + height);

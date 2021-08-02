@@ -16,7 +16,7 @@ namespace FlowEngine
         {
             var builder = new ContainerBuilder();
             // DB
-            builder.RegisterType<OracleHelper>().As<SqlHelper>().SingleInstance();
+            builder.RegisterType<OracleHelper>().Named<SqlHelper>("ORACLE").As<SqlHelper>().SingleInstance();
             // DAL
             builder.RegisterType<DAL.LinkDAL>().SingleInstance();
             builder.RegisterType<DAL.NodeDAL>().SingleInstance();
@@ -24,11 +24,14 @@ namespace FlowEngine
             // Service
             builder.RegisterType<FlowConfigService>().SingleInstance();
             Container = builder.Build();
+
         }
 
         public static void InitDatabase()
         {
-            Container.Resolve<SqlHelper>().Connect(new COracleParameter().ConnectionString);
+            // 打开数据库
+            var a = Container.ResolveNamed<SqlHelper>("ORACLE");
+            a.Connect(new COracleParameter().ConnectionString);
         }
     }
 }
