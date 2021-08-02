@@ -76,6 +76,12 @@
     <Compile Include="Nodes\OtherNode.Designer.cs">
       <DependentUpon>OtherNode.cs</DependentUpon>
     </Compile>
+    <Compile Include="Nodes\SqlExecuteNode.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Nodes\SqlExecuteNode.Designer.cs">
+      <DependentUpon>SqlExecuteNode.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="FormMain.resx">

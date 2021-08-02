@@ -32,28 +32,35 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.otherNode1 = new FlowEditor.Nodes.OtherNode();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.sqlExecuteNode1 = new FlowEditor.Nodes.SqlExecuteNode();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
             this.savebtn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.canvas = new System.Windows.Forms.Panel();
+            this.tabControl2 = new System.Windows.Forms.TabControl();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            this.groupBox1.SuspendLayout();
+            this.tabPage3.SuspendLayout();
+            this.tabControl2.SuspendLayout();
+            this.tabPage4.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(212, 630);
             this.tabControl1.TabIndex = 0;
+            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.TabControl1_SelectedIndexChanged);
             // 
             // tabPage1
             // 
@@ -75,7 +82,6 @@
             this.otherNode1.Name = "otherNode1";
             this.otherNode1.Size = new System.Drawing.Size(100, 30);
             this.otherNode1.TabIndex = 0;
-            this.otherNode1.Type = null;
             // 
             // tabPage2
             // 
@@ -86,6 +92,26 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "RFID";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.sqlExecuteNode1);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Size = new System.Drawing.Size(204, 604);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "存储";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // sqlExecuteNode1
+            // 
+            this.sqlExecuteNode1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(216)))), ((int)(((byte)(191)))), ((int)(((byte)(216)))));
+            this.sqlExecuteNode1.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.sqlExecuteNode1.Id = null;
+            this.sqlExecuteNode1.Location = new System.Drawing.Point(33, 20);
+            this.sqlExecuteNode1.Name = "sqlExecuteNode1";
+            this.sqlExecuteNode1.Size = new System.Drawing.Size(130, 30);
+            this.sqlExecuteNode1.TabIndex = 0;
             // 
             // button1
             // 
@@ -106,29 +132,9 @@
             this.button2.Text = "流程2";
             this.button2.UseVisualStyleBackColor = true;
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.textBox2);
-            this.groupBox1.Controls.Add(this.savebtn);
-            this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Controls.Add(this.textBox1);
-            this.groupBox1.Location = new System.Drawing.Point(1007, 13);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(245, 620);
-            this.groupBox1.TabIndex = 4;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "属性";
-            // 
-            // textBox2
-            // 
-            this.textBox2.Location = new System.Drawing.Point(76, 239);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(100, 21);
-            this.textBox2.TabIndex = 3;
-            // 
             // savebtn
             // 
-            this.savebtn.Location = new System.Drawing.Point(154, 580);
+            this.savebtn.Location = new System.Drawing.Point(143, 580);
             this.savebtn.Name = "savebtn";
             this.savebtn.Size = new System.Drawing.Size(75, 23);
             this.savebtn.TabIndex = 2;
@@ -139,7 +145,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(31, 41);
+            this.label1.Location = new System.Drawing.Point(21, 19);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(29, 12);
             this.label1.TabIndex = 1;
@@ -147,13 +153,14 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(76, 37);
+            this.textBox1.Location = new System.Drawing.Point(65, 15);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(153, 21);
             this.textBox1.TabIndex = 0;
             // 
             // canvas
             // 
+            this.canvas.AutoScroll = true;
             this.canvas.AutoScrollMinSize = new System.Drawing.Size(2000, 1000);
             this.canvas.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(214)))), ((int)(((byte)(214)))), ((int)(((byte)(214)))));
             this.canvas.Location = new System.Drawing.Point(230, 50);
@@ -162,12 +169,45 @@
             this.canvas.TabIndex = 3;
             this.canvas.Scroll += new System.Windows.Forms.ScrollEventHandler(this.canvas_Scroll);
             // 
+            // tabControl2
+            // 
+            this.tabControl2.Controls.Add(this.tabPage4);
+            this.tabControl2.Controls.Add(this.tabPage5);
+            this.tabControl2.Location = new System.Drawing.Point(1007, 13);
+            this.tabControl2.Name = "tabControl2";
+            this.tabControl2.SelectedIndex = 0;
+            this.tabControl2.Size = new System.Drawing.Size(245, 641);
+            this.tabControl2.TabIndex = 4;
+            // 
+            // tabPage4
+            // 
+            this.tabPage4.Controls.Add(this.savebtn);
+            this.tabPage4.Controls.Add(this.label1);
+            this.tabPage4.Controls.Add(this.textBox1);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(237, 615);
+            this.tabPage4.TabIndex = 0;
+            this.tabPage4.Text = "属性";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // tabPage5
+            // 
+            this.tabPage5.Location = new System.Drawing.Point(4, 22);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage5.Size = new System.Drawing.Size(237, 615);
+            this.tabPage5.TabIndex = 1;
+            this.tabPage5.Text = "消息体";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1264, 681);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.tabControl2);
             this.Controls.Add(this.canvas);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
@@ -181,8 +221,10 @@
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.tabPage3.ResumeLayout(false);
+            this.tabControl2.ResumeLayout(false);
+            this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -196,12 +238,15 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Panel canvas;
-        private System.Windows.Forms.GroupBox groupBox1;
         private Nodes.OtherNode otherNode1;
         private System.Windows.Forms.Button savebtn;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TabPage tabPage3;
+        private Nodes.SqlExecuteNode sqlExecuteNode1;
+        private System.Windows.Forms.TabControl tabControl2;
+        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.TabPage tabPage5;
     }
 }
 

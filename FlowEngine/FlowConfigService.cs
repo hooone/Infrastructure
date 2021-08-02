@@ -159,7 +159,13 @@ namespace FlowEngine
         }
         public ICommand GetCommand(string type)
         {
-            return CommonCommand.NewCommonCommand();
+            switch (type)
+            {
+                case "SqlExecute":
+                    return SqlExecuteCommand.NewCommand();
+                default:
+                    return CommonCommand.NewCommand();
+            }
         }
 
         public LinkViewModel CreateLine(string point1, string point2)

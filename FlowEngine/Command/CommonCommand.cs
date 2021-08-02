@@ -8,7 +8,7 @@ namespace FlowEngine.Command
 {
     public class CommonCommand : ICommand
     {
-        public static CommonCommand NewCommonCommand()
+        public static CommonCommand NewCommand()
         {
             CommonCommand rst = new CommonCommand();
             rst.Id = Guid.NewGuid().ToString("N");

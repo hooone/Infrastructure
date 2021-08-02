@@ -24,7 +24,6 @@ namespace FlowEditor
         {
             InitializeComponent();
             service = Launcher.Container.Resolve<FlowConfigService>();
-            this.otherNode1.Type = "OTHER";
             this.canvas.MouseWheel += canvas_Scroll;
             this.canvas.ChangeUICues += canvas_Scroll;
             this.canvas.GotFocus += canvas_Scroll;
@@ -72,9 +71,8 @@ namespace FlowEditor
         // 添加节点到canvas
         private void CreateNode(string id, string type, string text, int x, int y, Dictionary<string, int> linkPoint)
         {
-            Node node = new OtherNode();
+            Node node = CreateNode(type);
             node.Id = id;
-            node.Type = type;
             node.SetText(text);
             node.Location = new Point(x - this.canvas.HorizontalScroll.Value, y - this.canvas.VerticalScroll.Value);
             node.DragStart += Node_DragStart;
@@ -96,7 +94,16 @@ namespace FlowEditor
             }
         }
 
-
+        private Node CreateNode(string type)
+        {
+            switch (type.ToUpper())
+            {
+                case "SQLEXECUTE":
+                    return new SqlExecuteNode();
+                default:
+                    return new OtherNode();
+            }
+        }
         // 工具栏页面切换
         private void TabControl1_SelectedIndexChanged(object sender, System.EventArgs e)
         {
@@ -121,7 +128,6 @@ namespace FlowEditor
                 var dragNode = (Node)Activator.CreateInstance(node.GetType());
                 dragNode.BackColor = node.BackColor;
                 dragNode.Cursor = System.Windows.Forms.Cursors.Hand;
-                dragNode.Type = node.Type;
                 dragNode.Location = new Point(this.tabControl1.Left + page.Left + node.Location.X, this.tabControl1.Top + page.Top + node.Location.Y);
                 dragNode.Size = node.Size;
                 dragNode.DragStart += DragNode_DragStart;
@@ -158,7 +164,6 @@ namespace FlowEditor
             var page = this.tabControl1.TabPages[this.tabControl1.SelectedIndex];
             var dragNode = (Node)Activator.CreateInstance(node.GetType());
             dragNode.BackColor = node.BackColor;
-            dragNode.Type = node.Type;
             dragNode.Cursor = System.Windows.Forms.Cursors.Hand;
             dragNode.Location = new Point(node.Location.X, node.Location.Y);
             dragNode.Size = node.Size;

@@ -15,6 +15,8 @@ namespace FlowEngine.Command
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public Precondition Pre { get; set; }
+        public Postcondition Post { get; set; }
 
         private SqlHelper helper = null;
 
@@ -57,12 +59,28 @@ namespace FlowEngine.Command
 
         public List<Postcondition> GetPostcondition()
         {
-            return null;
+            return new List<Postcondition>() { Post };
         }
 
         public List<Precondition> GetPrecondition()
         {
-            return null;
+            return new List<Precondition>() { Pre };
+        }
+
+        internal static ICommand NewCommand()
+        {
+            SqlExecuteCommand rst = new SqlExecuteCommand();
+            rst.Id = Guid.NewGuid().ToString("N");
+            rst.Name = "执行sql";
+            rst.Pre = new Precondition();
+            rst.Pre.Id = Guid.NewGuid().ToString("N");
+            rst.Pre.Seq = 1;
+            rst.Pre.CommandId = rst.Id;
+            rst.Post = new Postcondition();
+            rst.Post.Id = Guid.NewGuid().ToString("N");
+            rst.Post.Seq = 2;
+            rst.Post.CommandId = rst.Id;
+            return rst;
         }
     }
 }

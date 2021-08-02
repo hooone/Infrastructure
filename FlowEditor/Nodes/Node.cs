@@ -13,7 +13,7 @@ namespace FlowEditor.Nodes
     {
         // 流程节点
         public string Id { get; set; }
-        public string Type { get; set; }
+        public string Type { get; protected set; }
         public abstract void SetText(string text);
         public abstract void HighLight(bool select);
         public abstract void SetDragEnable(bool enable);
