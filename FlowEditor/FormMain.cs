@@ -100,6 +100,8 @@ namespace FlowEditor
             {
                 case "SQLEXECUTE":
                     return new SqlExecuteNode();
+                case "INJECT":
+                    return new InjectNode();
                 default:
                     return new OtherNode();
             }

@@ -43,6 +43,7 @@
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.injectNode1 = new FlowEditor.Nodes.InjectNode();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage3.SuspendLayout();
@@ -64,6 +65,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.injectNode1);
             this.tabPage1.Controls.Add(this.otherNode1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
@@ -202,6 +204,15 @@
             this.tabPage5.Text = "消息体";
             this.tabPage5.UseVisualStyleBackColor = true;
             // 
+            // injectNode1
+            // 
+            this.injectNode1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(166)))), ((int)(((byte)(187)))), ((int)(((byte)(207)))));
+            this.injectNode1.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.injectNode1.Id = null;
+            this.injectNode1.Location = new System.Drawing.Point(40, 77);
+            this.injectNode1.Name = "injectNode1";
+            this.injectNode1.TabIndex = 1;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -247,6 +258,7 @@
         private System.Windows.Forms.TabControl tabControl2;
         private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.TabPage tabPage5;
+        private Nodes.InjectNode injectNode1;
     }
 }
 

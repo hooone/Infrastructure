@@ -159,10 +159,12 @@ namespace FlowEngine
         }
         public ICommand GetCommand(string type)
         {
-            switch (type)
+            switch (type.ToUpper())
             {
-                case "SqlExecute":
+                case "SQLEXECUTE":
                     return SqlExecuteCommand.NewCommand();
+                case "INJECT":
+                    return InjectCommand.NewCommand();
                 default:
                     return CommonCommand.NewCommand();
             }

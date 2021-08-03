@@ -67,6 +67,12 @@
     <Compile Include="LinkPoint.Designer.cs">
       <DependentUpon>LinkPoint.cs</DependentUpon>
     </Compile>
+    <Compile Include="Nodes\InjectNode.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Nodes\InjectNode.Designer.cs">
+      <DependentUpon>InjectNode.cs</DependentUpon>
+    </Compile>
     <Compile Include="Nodes\Node.cs">
       <SubType>UserControl</SubType>
     </Compile>
