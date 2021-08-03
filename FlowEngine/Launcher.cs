@@ -21,6 +21,7 @@ namespace FlowEngine
             builder.RegisterType<DAL.LinkDAL>().SingleInstance();
             builder.RegisterType<DAL.NodeDAL>().SingleInstance();
             builder.RegisterType<DAL.PointDAL>().SingleInstance();
+            builder.RegisterType<DAL.PropertyDAL>().SingleInstance();
             // Service
             builder.RegisterType<FlowConfigService>().SingleInstance();
             Container = builder.Build();

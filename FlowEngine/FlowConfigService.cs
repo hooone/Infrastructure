@@ -14,11 +14,13 @@ namespace FlowEngine
         private readonly NodeDAL nodeDAL = null;
         private readonly LinkDAL linkDAL = null;
         private readonly PointDAL pointDAL = null;
-        public FlowConfigService(NodeDAL nodeDAL, LinkDAL linkDAL, PointDAL pointDAL)
+        private readonly PropertyDAL propertyDAL = null;
+        public FlowConfigService(NodeDAL nodeDAL, LinkDAL linkDAL, PointDAL pointDAL, PropertyDAL propertyDAL)
         {
             this.nodeDAL = nodeDAL;
             this.linkDAL = linkDAL;
             this.pointDAL = pointDAL;
+            this.propertyDAL = propertyDAL;
         }
         public FlowConfig GetFlowConfig()
         {
@@ -146,7 +148,25 @@ namespace FlowEngine
             node.Text = nd.TEXT;
             node.X = nd.X;
             node.Y = nd.Y;
+            // 读取Point表
             node.Points = new Dictionary<string, int>();
+            var points = pointDAL.ReadByNode(new DTO.Point() { NODEID = node.Id });
+            foreach (var item in points)
+            {
+                node.Points.Add(item.ID, item.SEQ);
+            }
+            // 读取Property表
+            node.Properties = new List<PropertyViewModel>();
+            var ps = propertyDAL.ReadByNode(new DTO.PropertyDTO() { NODEID = node.Id });
+            foreach (var item in ps)
+            {
+                PropertyViewModel p = new PropertyViewModel();
+                p.Id = item.ID;
+                p.Name = item.NAME;
+                p.Value = item.VALUE;
+                p.Condition = item.CONDITION;
+                node.Properties.Add(p);
+            }
             return node;
         }
 
@@ -228,6 +248,24 @@ namespace FlowEngine
             {
                 rst.Add(item.ID);
             }
+            return rst;
+        }
+
+        public PropertyViewModel CreateNodeProperty(string nodeid)
+        {
+            DTO.PropertyDTO property = new DTO.PropertyDTO();
+            property.ID = Guid.NewGuid().ToString("N");
+            property.NODEID = nodeid;
+            property.NAME = "property";
+            property.VALUE = "";
+            property.CONDITION = 0;
+            if (propertyDAL.insert(property) == 0)
+                return null;
+            PropertyViewModel rst = new PropertyViewModel();
+            rst.Id = property.ID;
+            rst.Condition = property.CONDITION;
+            rst.Name = property.NAME;
+            rst.Value = property.VALUE;
             return rst;
         }
     }

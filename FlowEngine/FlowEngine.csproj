@@ -71,6 +71,8 @@
     <Compile Include="DAL\LinkDAL.cs" />
     <Compile Include="DAL\NodeDAL.cs" />
     <Compile Include="DAL\PointDAL.cs" />
+    <Compile Include="DAL\PropertyDAL.cs" />
+    <Compile Include="DTO\PropertyDTO.cs" />
     <Compile Include="FlowConfigService.cs" />
     <Compile Include="Launcher.cs" />
     <Compile Include="Model\FlowConfig.cs" />
@@ -79,6 +81,7 @@
     <Compile Include="DTO\PointDTO.cs" />
     <Compile Include="Model\LinkViewModel.cs" />
     <Compile Include="Model\NodeViewModel.cs" />
+    <Compile Include="Model\PropertyViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SQLiteHelper.cs" />
   </ItemGroup>

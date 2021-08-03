@@ -211,6 +211,21 @@ namespace FlowEditor
             if (info == null)
                 return;
             this.textBox1.Text = info.Text;
+            // 标签属性
+            this.panel1.Controls.Clear();
+            foreach (var prop in info.Properties)
+            {
+                Label labelN = new Label();
+                labelN.Location = new Point(10, (this.panel1.Controls.Count / 2) * 30 + 10);
+                labelN.Text = prop.Name;
+                var font = new Font(label1.Font.FontFamily, 14);
+                labelN.Font = font;
+                this.panel1.Controls.Add(labelN);
+                TextBox tbV = new TextBox();
+                tbV.Location = new Point(120, (this.panel1.Controls.Count / 2) * 30 + 10);
+                tbV.Text = prop.Value;
+                this.panel1.Controls.Add(tbV);
+            }
             // 清除线选择
             if (selectLine != null)
             {
@@ -241,6 +256,25 @@ namespace FlowEditor
                 return;
             this.textBox1.Text = info.Text;
             nodes[info.Id].SetText(info.Text);
+        }
+        // 增加属性
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (selectNode == null)
+                return;
+            var prop = service.CreateNodeProperty(selectNode.Id);
+            if (prop == null)
+                return;
+            Label labelN = new Label();
+            labelN.Location = new Point(10, (this.panel1.Controls.Count / 2) * 30 + 10);
+            labelN.Text = prop.Name;
+            var font = new Font(label1.Font.FontFamily, 14);
+            labelN.Font = font;
+            this.panel1.Controls.Add(labelN);
+            TextBox tbV = new TextBox();
+            tbV.Location = new Point(120, (this.panel1.Controls.Count / 2) * 30 + 10);
+            tbV.Text = prop.Value;
+            this.panel1.Controls.Add(tbV);
         }
         // 删除节点
         private void NodeDelete()
@@ -492,6 +526,5 @@ namespace FlowEditor
             HScrollValue = this.canvas.HorizontalScroll.Value;
             VScrollValue = this.canvas.VerticalScroll.Value;
         }
-
     }
 }

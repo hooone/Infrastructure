@@ -14,5 +14,6 @@ namespace FlowEngine.Model
         public int X { get; set; }
         public int Y { get; set; }
         public Dictionary<string, int> Points { get; set; }
+        public List<PropertyViewModel> Properties { get; set; }
     }
 }
