@@ -157,6 +157,12 @@ namespace FlowEngine
             }
             // 读取Property表
             node.Properties = new List<PropertyViewModel>();
+            PropertyViewModel pt = new PropertyViewModel();
+            pt.Id = node.Id;
+            pt.Name = "文本";
+            pt.Value = node.Text;
+            pt.Condition = 0;
+            node.Properties.Add(pt);
             var ps = propertyDAL.ReadByNode(new DTO.PropertyDTO() { NODEID = node.Id });
             foreach (var item in ps)
             {
@@ -165,6 +171,7 @@ namespace FlowEngine
                 p.Name = item.NAME;
                 p.Value = item.VALUE;
                 p.Condition = item.CONDITION;
+                p.Description = item.DESCRIPTION;
                 node.Properties.Add(p);
             }
             return node;
@@ -253,17 +260,30 @@ namespace FlowEngine
 
         public PropertyViewModel CreateNodeProperty(string nodeid)
         {
+            // 生成唯一属性名
+            var all = propertyDAL.ReadAll(null);
+            string name = "property";
+            int idx = 1;
+            while (all.Exists(f => f.NAME.Equals(name + idx, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                idx++;
+            }
+
+            // 写入数据库
             DTO.PropertyDTO property = new DTO.PropertyDTO();
             property.ID = Guid.NewGuid().ToString("N");
             property.NODEID = nodeid;
-            property.NAME = "property";
+            property.NAME = name + idx;
             property.VALUE = "";
             property.CONDITION = 0;
             if (propertyDAL.insert(property) == 0)
                 return null;
+
+            // 装箱
             PropertyViewModel rst = new PropertyViewModel();
             rst.Id = property.ID;
             rst.Condition = property.CONDITION;
+            rst.Description = property.DESCRIPTION;
             rst.Name = property.NAME;
             rst.Value = property.VALUE;
             return rst;

@@ -178,7 +178,7 @@ namespace FlowEditor
 
         #endregion
 
-        #region 修改流程节点
+        #region 流程节点拖动
         // 拖动修改位置
         private void NodeMove_DragEnd(Node node)
         {
@@ -194,87 +194,6 @@ namespace FlowEditor
             {
                 item.Value.ResetLine();
             }
-        }
-        // 选择节点
-        private Nodes.Node selectNode = null;
-        private void Node_Click(object sender, EventArgs e)
-        {
-            if (selectNode != null)
-            {
-                selectNode.HighLight(false);
-                selectNode = null;
-            }
-            var node = (Nodes.Node)sender;
-            node.HighLight(true);
-            selectNode = node;
-            var info = service.GetNodeInfo(node.Id);
-            if (info == null)
-                return;
-            this.textBox1.Text = info.Text;
-            // 标签属性
-            this.panel1.Controls.Clear();
-            foreach (var prop in info.Properties)
-            {
-                Label labelN = new Label();
-                labelN.Location = new Point(10, (this.panel1.Controls.Count / 2) * 30 + 10);
-                labelN.Text = prop.Name;
-                var font = new Font(label1.Font.FontFamily, 14);
-                labelN.Font = font;
-                this.panel1.Controls.Add(labelN);
-                TextBox tbV = new TextBox();
-                tbV.Location = new Point(120, (this.panel1.Controls.Count / 2) * 30 + 10);
-                tbV.Text = prop.Value;
-                this.panel1.Controls.Add(tbV);
-            }
-            // 清除线选择
-            if (selectLine != null)
-            {
-                selectLine.BackColor = Color.FromArgb(144, 144, 144);
-                selectLine = null;
-            }
-            // 清除连接点选择
-            if (selectOutNode != null)
-            {
-                selectOutNode.HighLightPoint(selectOutId, false);
-                selectOutNode = null;
-            }
-            if (selectInNode != null)
-            {
-                selectInNode.HighLightPoint(selectInId, false);
-                selectInNode = null;
-            }
-        }
-
-        // 保存属性修改
-        private void savebtn_Click(object sender, EventArgs e)
-        {
-            if (selectNode == null)
-                return;
-            service.UpdateNodeText(selectNode.Id, this.textBox1.Text);
-            var info = service.GetNodeInfo(selectNode.Id);
-            if (info == null)
-                return;
-            this.textBox1.Text = info.Text;
-            nodes[info.Id].SetText(info.Text);
-        }
-        // 增加属性
-        private void button3_Click(object sender, EventArgs e)
-        {
-            if (selectNode == null)
-                return;
-            var prop = service.CreateNodeProperty(selectNode.Id);
-            if (prop == null)
-                return;
-            Label labelN = new Label();
-            labelN.Location = new Point(10, (this.panel1.Controls.Count / 2) * 30 + 10);
-            labelN.Text = prop.Name;
-            var font = new Font(label1.Font.FontFamily, 14);
-            labelN.Font = font;
-            this.panel1.Controls.Add(labelN);
-            TextBox tbV = new TextBox();
-            tbV.Location = new Point(120, (this.panel1.Controls.Count / 2) * 30 + 10);
-            tbV.Text = prop.Value;
-            this.panel1.Controls.Add(tbV);
         }
         // 删除节点
         private void NodeDelete()
@@ -307,6 +226,102 @@ namespace FlowEditor
         }
         #endregion
 
+        #region 节点属性修改
+
+        // 选择节点
+        private Nodes.Node selectNode = null;
+        private void Node_Click(object sender, EventArgs e)
+        {
+            if (selectNode != null)
+            {
+                selectNode.HighLight(false);
+                selectNode = null;
+            }
+            var node = (Nodes.Node)sender;
+            node.HighLight(true);
+            selectNode = node;
+            var info = service.GetNodeInfo(node.Id);
+            if (info == null)
+                return;
+            // 标签属性
+            this.panel1.Controls.Clear();
+            foreach (var prop in info.Properties)
+            {
+                AddProperty(prop);
+            }
+            // 清除线选择
+            if (selectLine != null)
+            {
+                selectLine.BackColor = Color.FromArgb(144, 144, 144);
+                selectLine = null;
+            }
+            // 清除连接点选择
+            if (selectOutNode != null)
+            {
+                selectOutNode.HighLightPoint(selectOutId, false);
+                selectOutNode = null;
+            }
+            if (selectInNode != null)
+            {
+                selectInNode.HighLightPoint(selectInId, false);
+                selectInNode = null;
+            }
+        }
+        // 增加属性
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (selectNode == null)
+                return;
+            var prop = service.CreateNodeProperty(selectNode.Id);
+            if (prop == null)
+                return;
+            AddProperty(prop);
+        }
+        // 添加属性行
+        private void AddProperty(PropertyViewModel prop)
+        {
+            Label labelN = new Label();
+            labelN.Location = new Point(10, (this.panel1.Controls.Count / 3) * 30 + 10);
+            labelN.Text = prop.Name;
+            labelN.Tag = prop.Id;
+            labelN.Click += ModifyProperty_Click;
+            var font = new Font(labelN.Font.FontFamily, 12);
+            labelN.Font = font;
+            this.panel1.Controls.Add(labelN);
+            this.toolTip1.SetToolTip(labelN, prop.Description);
+            TextBox tbV = new TextBox();
+            tbV.Location = new Point(110, (this.panel1.Controls.Count / 3) * 30 + 10);
+            tbV.Enabled = false;
+            tbV.Text = prop.Value;
+            tbV.Size = new Size(100, 20);
+            tbV.Tag = prop.Id;
+            tbV.Click += ModifyProperty_Click;
+            this.panel1.Controls.Add(tbV);
+            this.toolTip1.SetToolTip(tbV, prop.Value);
+            Label labelM = new Label();
+            labelM.BackColor = Color.Gray;
+            labelM.Location = new Point(218, (this.panel1.Controls.Count / 3) * 30 + 10);
+            labelM.Click += ModifyProperty_Click;
+            labelM.Text = "改";
+            labelM.Cursor = Cursors.Hand;
+            labelM.Size = new Size(20, 20);
+            labelM.Tag = prop.Id;
+            var fonticon = new Font(labelN.Font.FontFamily, 10);
+            labelM.Font = fonticon;
+            this.panel1.Controls.Add(labelM);
+            this.toolTip1.SetToolTip(labelM, "修改");
+        }
+        private void ModifyProperty_Click(object sender, EventArgs e)
+        {
+            var control = (Control)sender;
+            if (string.IsNullOrWhiteSpace(control.Tag.ToString()))
+            {
+                return;
+            }
+            PropertyEdit editForm = new PropertyEdit();
+            editForm.ShowDialog();
+        }
+        #endregion
         #region 添加连接线
         private Nodes.Node selectInNode = null;
         private string selectInId = "";

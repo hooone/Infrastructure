@@ -12,5 +12,6 @@ namespace FlowEngine.Model
         public string Name { get; set; }
         public string Value { get; set; }
         public int Condition { get; set; }
+        public string Description { get; set; }
     }
 }

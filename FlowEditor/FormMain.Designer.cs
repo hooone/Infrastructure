@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.injectNode1 = new FlowEditor.Nodes.InjectNode();
@@ -37,15 +38,13 @@
             this.sqlExecuteNode1 = new FlowEditor.Nodes.SqlExecuteNode();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
-            this.savebtn = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.canvas = new System.Windows.Forms.Panel();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
             this.button3 = new System.Windows.Forms.Button();
             this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage3.SuspendLayout();
@@ -61,7 +60,7 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(212, 630);
+            this.tabControl1.Size = new System.Drawing.Size(182, 630);
             this.tabControl1.TabIndex = 0;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.TabControl1_SelectedIndexChanged);
             // 
@@ -72,7 +71,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(204, 604);
+            this.tabPage1.Size = new System.Drawing.Size(174, 604);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "通用";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -82,7 +81,7 @@
             this.injectNode1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(166)))), ((int)(((byte)(187)))), ((int)(((byte)(207)))));
             this.injectNode1.Cursor = System.Windows.Forms.Cursors.Hand;
             this.injectNode1.Id = null;
-            this.injectNode1.Location = new System.Drawing.Point(40, 77);
+            this.injectNode1.Location = new System.Drawing.Point(35, 78);
             this.injectNode1.Name = "injectNode1";
             this.injectNode1.Size = new System.Drawing.Size(100, 30);
             this.injectNode1.TabIndex = 1;
@@ -92,7 +91,7 @@
             this.otherNode1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(208)))), ((int)(((byte)(162)))));
             this.otherNode1.Cursor = System.Windows.Forms.Cursors.Hand;
             this.otherNode1.Id = null;
-            this.otherNode1.Location = new System.Drawing.Point(40, 20);
+            this.otherNode1.Location = new System.Drawing.Point(35, 17);
             this.otherNode1.Name = "otherNode1";
             this.otherNode1.Size = new System.Drawing.Size(100, 30);
             this.otherNode1.TabIndex = 0;
@@ -102,7 +101,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(204, 604);
+            this.tabPage2.Size = new System.Drawing.Size(174, 604);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "RFID";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -112,7 +111,7 @@
             this.tabPage3.Controls.Add(this.sqlExecuteNode1);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(204, 604);
+            this.tabPage3.Size = new System.Drawing.Size(174, 604);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "存储";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -129,7 +128,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(246, 13);
+            this.button1.Location = new System.Drawing.Point(216, 13);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 1;
@@ -139,46 +138,19 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(341, 13);
+            this.button2.Location = new System.Drawing.Point(311, 13);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 2;
             this.button2.Text = "流程2";
             this.button2.UseVisualStyleBackColor = true;
             // 
-            // savebtn
-            // 
-            this.savebtn.Location = new System.Drawing.Point(143, 580);
-            this.savebtn.Name = "savebtn";
-            this.savebtn.Size = new System.Drawing.Size(75, 23);
-            this.savebtn.TabIndex = 2;
-            this.savebtn.Text = "保存";
-            this.savebtn.UseVisualStyleBackColor = true;
-            this.savebtn.Click += new System.EventHandler(this.savebtn_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("宋体", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(14, 16);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(47, 19);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "文本";
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(127, 15);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 21);
-            this.textBox1.TabIndex = 0;
-            // 
             // canvas
             // 
             this.canvas.AutoScroll = true;
             this.canvas.AutoScrollMinSize = new System.Drawing.Size(2000, 1000);
             this.canvas.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(214)))), ((int)(((byte)(214)))), ((int)(((byte)(214)))));
-            this.canvas.Location = new System.Drawing.Point(230, 50);
+            this.canvas.Location = new System.Drawing.Point(200, 50);
             this.canvas.Name = "canvas";
             this.canvas.Size = new System.Drawing.Size(760, 620);
             this.canvas.TabIndex = 3;
@@ -188,32 +160,30 @@
             // 
             this.tabControl2.Controls.Add(this.tabPage4);
             this.tabControl2.Controls.Add(this.tabPage5);
-            this.tabControl2.Location = new System.Drawing.Point(1007, 13);
+            this.tabControl2.Location = new System.Drawing.Point(968, 13);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(245, 641);
+            this.tabControl2.Size = new System.Drawing.Size(284, 657);
             this.tabControl2.TabIndex = 4;
             // 
             // tabPage4
             // 
             this.tabPage4.Controls.Add(this.panel1);
             this.tabPage4.Controls.Add(this.button3);
-            this.tabPage4.Controls.Add(this.savebtn);
-            this.tabPage4.Controls.Add(this.label1);
-            this.tabPage4.Controls.Add(this.textBox1);
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(237, 615);
+            this.tabPage4.Size = new System.Drawing.Size(276, 631);
             this.tabPage4.TabIndex = 0;
             this.tabPage4.Text = "属性";
             this.tabPage4.UseVisualStyleBackColor = true;
             // 
             // panel1
             // 
-            this.panel1.Location = new System.Drawing.Point(6, 42);
+            this.panel1.AutoScroll = true;
+            this.panel1.Location = new System.Drawing.Point(6, 6);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(225, 516);
+            this.panel1.Size = new System.Drawing.Size(264, 552);
             this.panel1.TabIndex = 4;
             // 
             // button3
@@ -231,10 +201,17 @@
             this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(237, 615);
+            this.tabPage5.Size = new System.Drawing.Size(276, 631);
             this.tabPage5.TabIndex = 1;
             this.tabPage5.Text = "消息体";
             this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // toolTip1
+            // 
+            this.toolTip1.AutoPopDelay = 10000;
+            this.toolTip1.InitialDelay = 100;
+            this.toolTip1.ReshowDelay = 100;
+            this.toolTip1.ShowAlways = true;
             // 
             // FormMain
             // 
@@ -258,7 +235,6 @@
             this.tabPage3.ResumeLayout(false);
             this.tabControl2.ResumeLayout(false);
             this.tabPage4.ResumeLayout(false);
-            this.tabPage4.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -273,9 +249,6 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Panel canvas;
         private Nodes.OtherNode otherNode1;
-        private System.Windows.Forms.Button savebtn;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TabPage tabPage3;
         private Nodes.SqlExecuteNode sqlExecuteNode1;
         private System.Windows.Forms.TabControl tabControl2;
@@ -284,6 +257,7 @@
         private Nodes.InjectNode injectNode1;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Panel panel1;
+        public System.Windows.Forms.ToolTip toolTip1;
     }
 }
 
