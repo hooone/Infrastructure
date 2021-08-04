@@ -269,20 +269,24 @@ namespace FlowEditor
                 return;
             AddProperty(prop);
         }
+        Dictionary<string, TextBox> PropertyBuffer = new Dictionary<string, TextBox>();
         // 显示标签属性
         private void LoadProperties(string nodeId)
         {
             if (string.IsNullOrWhiteSpace(nodeId))
                 return;
+            this.SuspendLayout();
             var info = service.GetNodeInfo(nodeId);
             if (info == null)
                 return;
             // 标签属性
             this.panel1.Controls.Clear();
+            PropertyBuffer.Clear();
             foreach (var prop in info.Properties)
             {
                 AddProperty(prop);
             }
+            this.ResumeLayout();
         }
         // 添加属性行
         private void AddProperty(PropertyViewModel prop)
@@ -304,6 +308,7 @@ namespace FlowEditor
             tbV.Tag = prop.Id;
             tbV.Click += ModifyProperty_Click;
             this.panel1.Controls.Add(tbV);
+            PropertyBuffer.Add(prop.Id, tbV);
             this.toolTip1.SetToolTip(tbV, prop.Value);
             Label labelM = new Label();
             labelM.BackColor = Color.Gray;
@@ -337,7 +342,14 @@ namespace FlowEditor
             {
                 selectNode.SetText(editForm.Value);
             }
-            LoadProperties(editForm.NodeId);
+            if (PropertyBuffer.ContainsKey(editForm.PropertyId))
+            {
+                PropertyBuffer[editForm.PropertyId].Text = editForm.Value;
+            }
+            else
+            {
+                LoadProperties(editForm.NodeId);
+            }
         }
         #endregion
 
