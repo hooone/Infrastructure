@@ -30,5 +30,8 @@ namespace FlowEngine.DTO
         [DbColumn(DataType.VARCHAR2)]
         public string DESCRIPTION { get; set; }
 
+        [DbColumn(DataType.NUMBER)]
+        public int ISCUSTOM { get; set; }
+
     }
 }

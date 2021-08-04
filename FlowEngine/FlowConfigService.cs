@@ -56,6 +56,56 @@ namespace FlowEngine
             return rst;
         }
 
+        public int UpdateProperty(string nodeId, string propertyId, string name, int condition, string value, string description)
+        {
+            if (nodeId == propertyId)
+            {
+                // 更改文本描述
+               return nodeDAL.UpdateText(new DTO.Node() { ID = nodeId, TEXT = value });
+            }
+            else
+            {
+                // 更改属性
+                return propertyDAL.Update(new DTO.PropertyDTO()
+                {
+                    ID = propertyId,
+                    NAME = name,
+                    CONDITION = condition,
+                    VALUE = value,
+                    DESCRIPTION = description,
+                });
+            }
+        }
+
+        public PropertyViewModel GetProperty(string propertyId)
+        {
+            var props = propertyDAL.ReadById(new DTO.PropertyDTO() { ID = propertyId });
+            if (props.Count == 0)
+            {
+                var nodes = nodeDAL.ReadById(new DTO.Node() { ID = propertyId });
+                if (nodes.Count == 0)
+                {
+                    return null;
+                }
+                PropertyViewModel pt = new PropertyViewModel();
+                pt.Id = nodes[0].ID;
+                pt.NodeId = nodes[0].ID;
+                pt.Name = "文本";
+                pt.Value = nodes[0].TEXT;
+                pt.Condition = 0;
+                pt.IsCustom = false;
+                return pt;
+            }
+            PropertyViewModel prop = new PropertyViewModel();
+            prop.Id = props[0].ID;
+            prop.NodeId = props[0].NODEID;
+            prop.Name = props[0].NAME;
+            prop.Value = props[0].VALUE;
+            prop.Condition = props[0].CONDITION;
+            prop.IsCustom = props[0].ISCUSTOM == 1;
+            return prop;
+        }
+
         public int UpdateNodeLocation(string id, int x, int y)
         {
             DTO.Node node = new DTO.Node();
@@ -159,18 +209,22 @@ namespace FlowEngine
             node.Properties = new List<PropertyViewModel>();
             PropertyViewModel pt = new PropertyViewModel();
             pt.Id = node.Id;
+            pt.NodeId = node.Id;
             pt.Name = "文本";
             pt.Value = node.Text;
             pt.Condition = 0;
+            pt.IsCustom = false;
             node.Properties.Add(pt);
             var ps = propertyDAL.ReadByNode(new DTO.PropertyDTO() { NODEID = node.Id });
             foreach (var item in ps)
             {
                 PropertyViewModel p = new PropertyViewModel();
                 p.Id = item.ID;
+                p.NodeId = item.NODEID;
                 p.Name = item.NAME;
                 p.Value = item.VALUE;
                 p.Condition = item.CONDITION;
+                p.IsCustom = item.ISCUSTOM == 1;
                 p.Description = item.DESCRIPTION;
                 node.Properties.Add(p);
             }
@@ -276,13 +330,17 @@ namespace FlowEngine
             property.NAME = name + idx;
             property.VALUE = "";
             property.CONDITION = 0;
+            property.DESCRIPTION = "";
+            property.ISCUSTOM = 1;
             if (propertyDAL.insert(property) == 0)
                 return null;
 
             // 装箱
             PropertyViewModel rst = new PropertyViewModel();
             rst.Id = property.ID;
+            rst.NodeId = property.NODEID;
             rst.Condition = property.CONDITION;
+            rst.IsCustom = property.ISCUSTOM == 1;
             rst.Description = property.DESCRIPTION;
             rst.Name = property.NAME;
             rst.Value = property.VALUE;

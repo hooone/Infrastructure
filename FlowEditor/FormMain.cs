@@ -240,15 +240,7 @@ namespace FlowEditor
             var node = (Nodes.Node)sender;
             node.HighLight(true);
             selectNode = node;
-            var info = service.GetNodeInfo(node.Id);
-            if (info == null)
-                return;
-            // 标签属性
-            this.panel1.Controls.Clear();
-            foreach (var prop in info.Properties)
-            {
-                AddProperty(prop);
-            }
+            LoadProperties(node.Id);
             // 清除线选择
             if (selectLine != null)
             {
@@ -277,11 +269,26 @@ namespace FlowEditor
                 return;
             AddProperty(prop);
         }
+        // 显示标签属性
+        private void LoadProperties(string nodeId)
+        {
+            if (string.IsNullOrWhiteSpace(nodeId))
+                return;
+            var info = service.GetNodeInfo(nodeId);
+            if (info == null)
+                return;
+            // 标签属性
+            this.panel1.Controls.Clear();
+            foreach (var prop in info.Properties)
+            {
+                AddProperty(prop);
+            }
+        }
         // 添加属性行
         private void AddProperty(PropertyViewModel prop)
         {
             Label labelN = new Label();
-            labelN.Location = new Point(10, (this.panel1.Controls.Count / 3) * 30 + 10);
+            labelN.Location = new Point(10, (this.panel1.Controls.Count / 3) * 30 + 10 - this.panel1.VerticalScroll.Value);
             labelN.Text = prop.Name;
             labelN.Tag = prop.Id;
             labelN.Click += ModifyProperty_Click;
@@ -290,7 +297,7 @@ namespace FlowEditor
             this.panel1.Controls.Add(labelN);
             this.toolTip1.SetToolTip(labelN, prop.Description);
             TextBox tbV = new TextBox();
-            tbV.Location = new Point(110, (this.panel1.Controls.Count / 3) * 30 + 10);
+            tbV.Location = new Point(110, (this.panel1.Controls.Count / 3) * 30 + 10 - this.panel1.VerticalScroll.Value);
             tbV.Enabled = false;
             tbV.Text = prop.Value;
             tbV.Size = new Size(100, 20);
@@ -300,7 +307,7 @@ namespace FlowEditor
             this.toolTip1.SetToolTip(tbV, prop.Value);
             Label labelM = new Label();
             labelM.BackColor = Color.Gray;
-            labelM.Location = new Point(218, (this.panel1.Controls.Count / 3) * 30 + 10);
+            labelM.Location = new Point(218, (this.panel1.Controls.Count / 3) * 30 + 10 - this.panel1.VerticalScroll.Value);
             labelM.Click += ModifyProperty_Click;
             labelM.Text = "改";
             labelM.Cursor = Cursors.Hand;
@@ -313,15 +320,28 @@ namespace FlowEditor
         }
         private void ModifyProperty_Click(object sender, EventArgs e)
         {
+            if (selectNode == null)
+                return;
             var control = (Control)sender;
             if (string.IsNullOrWhiteSpace(control.Tag.ToString()))
             {
                 return;
             }
-            PropertyEdit editForm = new PropertyEdit();
-            editForm.ShowDialog();
+            PropertyEdit editForm = new PropertyEdit(this.service, control.Tag.ToString());
+            var diaRst = editForm.ShowDialog();
+            if (diaRst != DialogResult.OK)
+            {
+                return;
+            }
+            if (editForm.NodeId == editForm.PropertyId)
+            {
+                selectNode.SetText(editForm.Value);
+            }
+            LoadProperties(editForm.NodeId);
         }
         #endregion
+
+
         #region 添加连接线
         private Nodes.Node selectInNode = null;
         private string selectInId = "";
@@ -471,6 +491,7 @@ namespace FlowEditor
 
 
         #endregion
+
 
         #region 删除连接线
         private LinkLine selectLine = null;
