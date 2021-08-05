@@ -577,5 +577,35 @@ namespace FlowEditor
             VScrollValue = this.canvas.VerticalScroll.Value;
         }
         #endregion
+
+        /// <summary>
+        /// 单元测试
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (selectNode == null)
+                return;
+            var runtime = Launcher.Container.Resolve<UnitTestRuntimeService>();
+            try
+            {
+
+                runtime.Init(selectNode.Id);
+                var rst = runtime.Run();
+                if (rst)
+                {
+                    MessageBox.Show("执行成功");
+                }
+                else
+                {
+                    MessageBox.Show("执行失败");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + Environment.NewLine + ex.StackTrace);
+            }
+        }
     }
 }

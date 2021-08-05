@@ -24,6 +24,7 @@ namespace FlowEngine
             builder.RegisterType<DAL.PropertyDAL>().SingleInstance();
             // Service
             builder.RegisterType<FlowConfigService>().SingleInstance();
+            builder.RegisterType<UnitTestRuntimeService>().InstancePerDependency();
             Container = builder.Build();
 
         }

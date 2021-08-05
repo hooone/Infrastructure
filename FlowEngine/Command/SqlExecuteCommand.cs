@@ -37,23 +37,27 @@ namespace FlowEngine.Command
             if (helper == null)
                 return false;
             // 执行sql
-            Dictionary<string, object> objs = payload.ObjectList;
             List<object> pms = new List<object>();
-            MatchCollection matchCollection = new Regex(@"(@)\S*(.*?)\b", RegexOptions.IgnoreCase)
-         .Matches(payload.Sql.Substring(payload.Sql.IndexOf("@", StringComparison.Ordinal))
-             .Replace(",", " ,"));
-            foreach (Match match in matchCollection)
+            Dictionary<string, object> objs = payload.ObjectList;
+            if (payload.Sql.IndexOf("@", StringComparison.Ordinal) >= 0)
             {
-                if (objs.ContainsKey(match.Value))
+                MatchCollection matchCollection = new Regex(@"(@)\S*(.*?)\b", RegexOptions.IgnoreCase)
+             .Matches(payload.Sql.Substring(payload.Sql.IndexOf("@", StringComparison.Ordinal))
+                 .Replace(",", " ,"));
+                foreach (Match match in matchCollection)
                 {
-                    pms.Add(objs[match.Value]);
-                }
-                else
-                {
-                    pms.Add(null);
+                    string key = match.Value.Replace("@", "");
+                    if (objs.ContainsKey(key))
+                    {
+                        pms.Add(objs[key]);
+                    }
+                    else
+                    {
+                        pms.Add(null);
+                    }
                 }
             }
-            payload.SqlExecuteResult = helper.ExecuteNonQuery(payload.Sql);
+            payload.SqlExecuteResult = helper.ExecuteNonQuery(payload.Sql, pms.ToArray());
             return true;
         }
 
@@ -64,6 +68,8 @@ namespace FlowEngine.Command
             // 解析payload
             foreach (var prop in Properties)
             {
+                if (prop.Name == "文本")
+                    continue;
                 if (prop.DefaultName.Equals(nameof(ISqlExecutePayload.DbName), StringComparison.CurrentCultureIgnoreCase))
                 {
                     if (context.ContainsKey(prop.Name))
@@ -77,6 +83,10 @@ namespace FlowEngine.Command
                     {
                         payload.Sql = (string)context[prop.Name];
                     }
+                }
+                else if (prop.DefaultName.Equals(nameof(ISqlExecutePayload.SqlExecuteResult), StringComparison.CurrentCultureIgnoreCase))
+                {
+                    continue;
                 }
                 else
                 {
@@ -92,6 +102,8 @@ namespace FlowEngine.Command
         {
             foreach (var prop in Properties)
             {
+                if (prop.Name == "文本")
+                    continue;
                 if (prop.DefaultName.Equals(nameof(ISqlExecutePayload.SqlExecuteResult), StringComparison.CurrentCultureIgnoreCase))
                 {
                     if (context.ContainsKey(prop.Name))
@@ -158,12 +170,12 @@ namespace FlowEngine.Command
             PropertyModel sqlrst = new PropertyModel();
             sqlrst.Name = nameof(ISqlExecutePayload.SqlExecuteResult);
             sqlrst.DefaultName = nameof(ISqlExecutePayload.SqlExecuteResult);
-            sqlrst.Condition = 0;
+            sqlrst.Condition = 2;
             sqlrst.DataType = Model.DataType.STRING;
             sqlrst.Description = "sql执行结果";
             sqlrst.IsCustom = false;
             sqlrst.Value = "";
-            result.Add(sql);
+            result.Add(sqlrst);
             return result;
         }
     }

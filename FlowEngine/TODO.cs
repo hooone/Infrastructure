@@ -5,9 +5,10 @@
 // 把所有GUID生成拉到FlowConfigService层
 // 简化NewCommand
 // 引入AutoMapper
-// payload装箱和拆箱
-// 属性增加只读字段
-// 单元测试
-
+// payload装箱和拆箱 ok
+// 单元测试  ok
+// 单元测试并发锁
 // 触发器
 // 流程测试
+// 日志规范化
+// 提示规范化

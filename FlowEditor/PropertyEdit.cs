@@ -36,10 +36,17 @@ namespace FlowEditor
             this.textBox3.Text = prop.Value;
             this.comboBox1.SelectedIndex = prop.Condition;
             this.comboBox2.SelectedIndex = (int)prop.DataType;
+            this.comboBox2.Enabled = prop.IsCustom;
             this.Value = prop.Value;
             this.PropName = prop.Name;
             this.Description = prop.Description;
             this.NodeId = prop.NodeId;
+            if (prop.Condition == 2)
+            {
+                this.comboBox1.Enabled = false;
+                this.comboBox2.Enabled = false;
+                this.textBox3.Enabled = false;
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
