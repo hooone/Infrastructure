@@ -286,7 +286,7 @@ namespace FlowEditor
             this.ResumeLayout();
         }
         // 添加属性行
-        private void AddProperty(PropertyViewModel prop)
+        private void AddProperty(PropertyModel prop)
         {
             Label labelN = new Label();
             labelN.Location = new Point(10, (this.panel1.Controls.Count / 3) * 30 + 10 - this.panel1.VerticalScroll.Value);

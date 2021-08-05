@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FlowEngine.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,7 +26,7 @@ namespace FlowEngine.Command
         }
         public string Id { get; set; }
         public string Name { get; set; }
-        public Precondition Pre { get; set; } 
+        public Precondition Pre { get; set; }
         public Postcondition Post { get; set; }
 
         public bool Init()
@@ -48,5 +49,9 @@ namespace FlowEngine.Command
             return new List<Precondition>() { Pre };
         }
 
+        public List<PropertyModel> GetProperties()
+        {
+            return new List<PropertyModel>();
+        }
     }
 }

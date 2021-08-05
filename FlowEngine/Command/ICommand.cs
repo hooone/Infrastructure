@@ -14,6 +14,7 @@ namespace FlowEngine.Command
         bool Init();
         List<Precondition> GetPrecondition();
         List<Postcondition> GetPostcondition();
+        List<PropertyModel> GetProperties();
     }
     public class Precondition
     {

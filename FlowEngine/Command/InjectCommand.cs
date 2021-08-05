@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FlowEngine.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,5 +49,9 @@ namespace FlowEngine.Command
             return new List<Precondition>() { Pre };
         }
 
+        public List<PropertyModel> GetProperties()
+        {
+            return new List<PropertyModel>();
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace FlowEditor
                 this.DialogResult = DialogResult.Cancel;
                 this.Close();
             }
-            PropertyViewModel prop = service.GetProperty(this.PropertyId);
+            PropertyModel prop = service.GetProperty(this.PropertyId);
             this.textBox1.Text = prop.Name;
             this.textBox1.Enabled = prop.IsCustom;
             this.textBox2.Text = prop.Description;

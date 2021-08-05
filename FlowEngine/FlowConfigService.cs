@@ -75,7 +75,7 @@ namespace FlowEngine
             }
         }
 
-        public PropertyViewModel GetProperty(string propertyId)
+        public PropertyModel GetProperty(string propertyId)
         {
             var props = propertyDAL.ReadById(new DTO.PropertyDTO() { ID = propertyId });
             if (props.Count == 0)
@@ -85,7 +85,7 @@ namespace FlowEngine
                 {
                     return null;
                 }
-                PropertyViewModel pt = new PropertyViewModel();
+                PropertyModel pt = new PropertyModel();
                 pt.Id = nodes[0].ID;
                 pt.NodeId = nodes[0].ID;
                 pt.Name = "文本";
@@ -95,7 +95,7 @@ namespace FlowEngine
                 pt.IsCustom = false;
                 return pt;
             }
-            PropertyViewModel prop = new PropertyViewModel();
+            PropertyModel prop = new PropertyModel();
             prop.Id = props[0].ID;
             prop.NodeId = props[0].NODEID;
             prop.Name = props[0].NAME;
@@ -156,6 +156,21 @@ namespace FlowEngine
                     return null;
                 }
             }
+            // 插入Property表
+            var props = cmd.GetProperties();
+            foreach (var item in props)
+            {
+                DTO.PropertyDTO po = new DTO.PropertyDTO();
+                po.ID = Guid.NewGuid().ToString("N");
+                po.CONDITION = item.Condition;
+                po.DESCRIPTION = item.Description;
+                po.ISCUSTOM = item.IsCustom ? 1 : 0;
+                po.NAME = item.Name;
+                po.NODEID = cmd.Id;
+                po.TYPE = item.DataType.ToString();
+                po.VALUE = item.Value;
+                propertyDAL.insert(po);
+            }
             // 装箱
             NodeViewModel node = new NodeViewModel();
             node.Id = nd.ID;
@@ -207,8 +222,8 @@ namespace FlowEngine
                 node.Points.Add(item.ID, item.SEQ);
             }
             // 读取Property表
-            node.Properties = new List<PropertyViewModel>();
-            PropertyViewModel pt = new PropertyViewModel();
+            node.Properties = new List<PropertyModel>();
+            PropertyModel pt = new PropertyModel();
             pt.Id = node.Id;
             pt.NodeId = node.Id;
             pt.Name = "文本";
@@ -220,7 +235,7 @@ namespace FlowEngine
             var ps = propertyDAL.ReadByNode(new DTO.PropertyDTO() { NODEID = node.Id });
             foreach (var item in ps)
             {
-                PropertyViewModel p = new PropertyViewModel();
+                PropertyModel p = new PropertyModel();
                 p.Id = item.ID;
                 p.NodeId = item.NODEID;
                 p.Name = item.NAME;
@@ -315,7 +330,7 @@ namespace FlowEngine
             return rst;
         }
 
-        public PropertyViewModel CreateNodeProperty(string nodeid)
+        public PropertyModel CreateNodeProperty(string nodeid)
         {
             // 生成唯一属性名
             var all = propertyDAL.ReadAll(null);
@@ -340,7 +355,7 @@ namespace FlowEngine
                 return null;
 
             // 装箱
-            PropertyViewModel rst = new PropertyViewModel();
+            PropertyModel rst = new PropertyModel();
             rst.Id = property.ID;
             rst.NodeId = property.NODEID;
             rst.Condition = property.CONDITION;
