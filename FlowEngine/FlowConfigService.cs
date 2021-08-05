@@ -133,6 +133,10 @@ namespace FlowEngine
             prop.Id = props[0].ID;
             prop.NodeId = props[0].NODEID;
             prop.Name = props[0].NAME;
+            if (string.IsNullOrEmpty(props[0].DEFAULTNAME))
+                prop.DefaultName = prop.Name;
+            else
+                prop.DefaultName = props[0].DEFAULTNAME;
             prop.Description = props[0].DESCRIPTION;
             prop.Value = props[0].VALUE;
             prop.Condition = props[0].CONDITION;
@@ -153,7 +157,7 @@ namespace FlowEngine
         public NodeViewModel CreateNode(string type, int x, int y)
         {
             // 获取command
-            ICommand cmd = GetCommand(type);
+            ICommand<TestTotalPayload> cmd = GetCommand(type);
             // 插入node表
             DTO.Node nd = new DTO.Node();
             nd.ID = cmd.Id;
@@ -198,6 +202,7 @@ namespace FlowEngine
                 DTO.PropertyDTO po = new DTO.PropertyDTO();
                 po.ID = Guid.NewGuid().ToString("N");
                 po.CONDITION = item.Condition;
+                po.DEFAULTNAME = item.DefaultName;
                 po.DESCRIPTION = item.Description;
                 po.ISCUSTOM = item.IsCustom ? 1 : 0;
                 po.NAME = item.Name;
@@ -285,6 +290,10 @@ namespace FlowEngine
                 p.Id = item.ID;
                 p.NodeId = item.NODEID;
                 p.Name = item.NAME;
+                if (string.IsNullOrEmpty(item.DEFAULTNAME))
+                    p.DefaultName = p.Name;
+                else
+                    p.DefaultName = item.DEFAULTNAME;
                 p.Value = item.VALUE;
                 p.Condition = item.CONDITION;
                 p.DataType = (DataType)Enum.Parse(typeof(DataType), item.DATATYPE);
@@ -295,17 +304,18 @@ namespace FlowEngine
             return node;
         }
 
-        public ICommand GetCommand(string type)
+        public ICommand<TestTotalPayload> GetCommand(string type)
         {
             switch (type.ToUpper())
             {
                 case "SQLEXECUTE":
-                    return SqlExecuteCommand.NewCommand();
-                case "INJECT":
-                    return InjectCommand.NewCommand();
-                default:
-                    return CommonCommand.NewCommand();
+                    return SqlExecuteCommand<TestTotalPayload>.NewCommand();
+                    //case "INJECT":
+                    //    return InjectCommand.NewCommand();
+                    //default:
+                    //    return CommonCommand.NewCommand();
             }
+            return null;
         }
 
         public LinkViewModel CreateLine(string point1, string point2)

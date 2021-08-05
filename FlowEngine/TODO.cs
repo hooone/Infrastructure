@@ -6,6 +6,7 @@
 // 简化NewCommand
 // 引入AutoMapper
 // payload装箱和拆箱
+// 属性增加只读字段
 // 单元测试
 
 // 触发器

@@ -36,5 +36,8 @@ namespace FlowEngine.DTO
         [DbColumn(DataType.VARCHAR2)]
         public string DATATYPE { get; set; }
 
+        [DbColumn(DataType.VARCHAR2)]
+        public string DEFAULTNAME { get; set; }
+
     }
 }

@@ -17,8 +17,8 @@ namespace FlowEngine.DAL
         public int insert(PropertyDTO obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
-            string sql = @"INSERT INTO PROPERTY (ID,NODEID,NAME,VALUE,CONDITION,DESCRIPTION,ISCUSTOM,DATATYPE ) values (@ID,@NODEID,@NAME,@VALUE,@CONDITION,@DESCRIPTION,@ISCUSTOM,@DATATYPE)";
-            return Helper.ExecuteNonQuery(sql, obj.ID, obj.NODEID, obj.NAME, obj.VALUE, obj.CONDITION, obj.DESCRIPTION, obj.ISCUSTOM, obj.DATATYPE);
+            string sql = @"INSERT INTO PROPERTY (ID,NODEID,NAME,VALUE,CONDITION,DESCRIPTION,ISCUSTOM,DATATYPE,DEFAULTNAME ) values (@ID,@NODEID,@NAME,@VALUE,@CONDITION,@DESCRIPTION,@ISCUSTOM,@DATATYPE,@DEFAULTNAME)";
+            return Helper.ExecuteNonQuery(sql, obj.ID, obj.NODEID, obj.NAME, obj.VALUE, obj.CONDITION, obj.DESCRIPTION, obj.ISCUSTOM, obj.DATATYPE, obj.DEFAULTNAME);
         }
 
         [DbRead]
@@ -39,6 +39,7 @@ namespace FlowEngine.DAL
                 t.DESCRIPTION = row[nameof(PropertyDTO.DESCRIPTION)].TryToString();
                 t.ISCUSTOM = row[nameof(PropertyDTO.ISCUSTOM)].TryToInt();
                 t.DATATYPE = row[nameof(PropertyDTO.DATATYPE)].TryToString();
+                t.DEFAULTNAME = row[nameof(PropertyDTO.DEFAULTNAME)].TryToString();
                 rst.Add(t);
             }
             return rst;
@@ -63,6 +64,7 @@ namespace FlowEngine.DAL
                 t.DESCRIPTION = row[nameof(PropertyDTO.DESCRIPTION)].TryToString();
                 t.ISCUSTOM = row[nameof(PropertyDTO.ISCUSTOM)].TryToInt();
                 t.DATATYPE = row[nameof(PropertyDTO.DATATYPE)].TryToString();
+                t.DEFAULTNAME = row[nameof(PropertyDTO.DEFAULTNAME)].TryToString();
                 rst.Add(t);
             }
             return rst;
@@ -97,6 +99,7 @@ namespace FlowEngine.DAL
                 t.DESCRIPTION = row[nameof(PropertyDTO.DESCRIPTION)].TryToString();
                 t.ISCUSTOM = row[nameof(PropertyDTO.ISCUSTOM)].TryToInt();
                 t.DATATYPE = row[nameof(PropertyDTO.DATATYPE)].TryToString();
+                t.DEFAULTNAME = row[nameof(PropertyDTO.DEFAULTNAME)].TryToString();
                 rst.Add(t);
             }
             return rst;

@@ -19,22 +19,21 @@ namespace FlowEngine
             this.flowConfig = _config;
             this.propertyDAL = propertyDAL;
         }
-        ICommand command = null;
+        ICommand<TestTotalPayload> command = null;
         public bool Init(string nodeId)
         {
-            // 初始化payload
-            InitPayload();
+            // 初始化全局context
+            InitContext();
             // 初始化command
             NodeViewModel node = flowConfig.GetNodeInfo(nodeId);
             command = flowConfig.GetCommand(node.Type);
             command.Id = node.Id;
             command.Name = node.Text;
-            // 将payload加载到command
-            command.Init()
+            command.Properties = node.Properties;
             return true;
         }
-        Dictionary<string, object> payload = new Dictionary<string, object>();
-        public bool InitPayload()
+        public Dictionary<string, object> context = new Dictionary<string, object>();
+        public bool InitContext()
         {
             var flows = flowConfig.GetFlowConfig();
             // 初始化payload
@@ -87,15 +86,20 @@ namespace FlowEngine
                                 break;
                         }
                     }
-                    payload.Add(prop.NAME, value);
+                    context.Add(prop.NAME, value);
                 }
             }
             return true;
         }
-        public void Run()
+        public bool Run()
         {
             if (command == null)
-                return;
+                return false;
+            // 将context加载到command
+            var payload = command.UnBoxing(context);
+            var rst = command.Execute(payload);
+            command.Boxing(context, payload);
+            return rst;
         }
     }
 }
