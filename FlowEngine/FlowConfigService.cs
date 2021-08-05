@@ -60,19 +60,53 @@ namespace FlowEngine
                 // 更改文本描述
                 return nodeDAL.UpdateText(new DTO.Node() { ID = nodeId, TEXT = value });
             }
-            else
+            // 数字验证
+            if (type == DataType.NUMBER.ToString())
             {
-                // 更改属性
-                return propertyDAL.Update(new DTO.PropertyDTO()
+                if (!int.TryParse(value, out _))
                 {
-                    ID = propertyId,
-                    NAME = name,
-                    CONDITION = condition,
-                    VALUE = value,
-                    TYPE = type,
-                    DESCRIPTION = description,
-                });
+                    return -2;
+                }
             }
+            else if (type == DataType.FLOAT.ToString())
+            {
+                if (!float.TryParse(value, out _))
+                {
+                    return -2;
+                }
+            }
+            else if (type == DataType.DATE.ToString())
+            {
+                if (!DateTime.TryParse(value, out DateTime dt))
+                {
+                    return -2;
+                }
+                value = dt.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+            // 重名验证
+            var allProps = propertyDAL.ReadAll(null);
+            if (allProps.Exists(f => f.NAME.Equals(name, StringComparison.CurrentCultureIgnoreCase) && f.ID != propertyId))
+            {
+                return -1;
+            }
+            // 指向校验
+            if (condition == 1)
+            {
+                if (!allProps.Exists(f => f.NAME.Equals(value, StringComparison.CurrentCultureIgnoreCase)))
+                {
+                    return -2;
+                }
+            }
+            // 更改属性
+            return propertyDAL.Update(new DTO.PropertyDTO()
+            {
+                ID = propertyId,
+                NAME = name,
+                CONDITION = condition,
+                VALUE = value,
+                DATATYPE = type,
+                DESCRIPTION = description,
+            });
         }
 
         public PropertyModel GetProperty(string propertyId)
@@ -102,7 +136,7 @@ namespace FlowEngine
             prop.Description = props[0].DESCRIPTION;
             prop.Value = props[0].VALUE;
             prop.Condition = props[0].CONDITION;
-            prop.DataType = (DataType)Enum.Parse(typeof(DataType), props[0].TYPE);
+            prop.DataType = (DataType)Enum.Parse(typeof(DataType), props[0].DATATYPE);
             prop.IsCustom = props[0].ISCUSTOM == 1;
             return prop;
         }
@@ -158,6 +192,7 @@ namespace FlowEngine
             }
             // 插入Property表
             var props = cmd.GetProperties();
+            var curProps = propertyDAL.ReadAll(null);
             foreach (var item in props)
             {
                 DTO.PropertyDTO po = new DTO.PropertyDTO();
@@ -167,8 +202,18 @@ namespace FlowEngine
                 po.ISCUSTOM = item.IsCustom ? 1 : 0;
                 po.NAME = item.Name;
                 po.NODEID = cmd.Id;
-                po.TYPE = item.DataType.ToString();
+                po.DATATYPE = item.DataType.ToString();
                 po.VALUE = item.Value;
+
+                // 避免Name重复 
+                string name = po.NAME;
+                int idx = 1;
+                while (curProps.Exists(f => f.NAME == name))
+                {
+                    name = po.NAME + idx.ToString().PadLeft(2, '0');
+                    idx++;
+                }
+                po.NAME = name;
                 propertyDAL.insert(po);
             }
             // 装箱
@@ -199,6 +244,7 @@ namespace FlowEngine
             }
             nodeDAL.Delete(new DTO.Node() { ID = id });
             pointDAL.DeleteByNode(new DTO.Point() { NODEID = id });
+            propertyDAL.DeleteByNode(new DTO.PropertyDTO() { NODEID = id });
         }
 
         public NodeViewModel GetNodeInfo(string id)
@@ -241,7 +287,7 @@ namespace FlowEngine
                 p.Name = item.NAME;
                 p.Value = item.VALUE;
                 p.Condition = item.CONDITION;
-                p.DataType = (DataType)Enum.Parse(typeof(DataType), item.TYPE);
+                p.DataType = (DataType)Enum.Parse(typeof(DataType), item.DATATYPE);
                 p.IsCustom = item.ISCUSTOM == 1;
                 p.Description = item.DESCRIPTION;
                 node.Properties.Add(p);
@@ -249,13 +295,6 @@ namespace FlowEngine
             return node;
         }
 
-        public int UpdateNodeText(string id, string text)
-        {
-            DTO.Node node = new DTO.Node();
-            node.ID = id;
-            node.TEXT = text;
-            return nodeDAL.UpdateText(node);
-        }
         public ICommand GetCommand(string type)
         {
             switch (type.ToUpper())
@@ -348,7 +387,7 @@ namespace FlowEngine
             property.NAME = name + idx;
             property.VALUE = "";
             property.CONDITION = 0;
-            property.TYPE = DataType.STRING.ToString();
+            property.DATATYPE = DataType.STRING.ToString();
             property.DESCRIPTION = "";
             property.ISCUSTOM = 1;
             if (propertyDAL.insert(property) == 0)
@@ -359,7 +398,7 @@ namespace FlowEngine
             rst.Id = property.ID;
             rst.NodeId = property.NODEID;
             rst.Condition = property.CONDITION;
-            rst.DataType = (DataType)Enum.Parse(typeof(DataType), property.TYPE);
+            rst.DataType = (DataType)Enum.Parse(typeof(DataType), property.DATATYPE);
             rst.IsCustom = property.ISCUSTOM == 1;
             rst.Description = property.DESCRIPTION;
             rst.Name = property.NAME;

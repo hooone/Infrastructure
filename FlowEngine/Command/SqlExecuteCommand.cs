@@ -89,7 +89,7 @@ namespace FlowEngine.Command
             List<PropertyModel> result = new List<PropertyModel>();
             PropertyModel db = new PropertyModel();
             db.Name = "DBName";
-            db.Condition = 1;
+            db.Condition = 0;
             db.DataType = Model.DataType.STRING;
             db.Description = "数据库名";
             db.IsCustom = false;
@@ -98,7 +98,7 @@ namespace FlowEngine.Command
 
             PropertyModel sql = new PropertyModel();
             sql.Name = "Sql";
-            sql.Condition = 1;
+            sql.Condition = 0;
             sql.DataType = Model.DataType.STRING;
             sql.Description = "要执行的Sql语句";
             sql.IsCustom = false;

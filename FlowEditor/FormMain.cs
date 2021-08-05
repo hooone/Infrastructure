@@ -300,7 +300,7 @@ namespace FlowEditor
             this.toolTip1.SetToolTip(labelN, prop.Description);
             TextBox tbV = new TextBox();
             tbV.Location = new Point(110, (this.panel1.Controls.Count / 3) * 30 + 10 - this.panel1.VerticalScroll.Value);
-            tbV.Enabled = false;
+            tbV.ReadOnly = true;
             tbV.Text = prop.Value;
             tbV.Size = new Size(100, 20);
             tbV.Tag = prop.Id;

@@ -17,8 +17,8 @@ namespace FlowEngine.DAL
         public int insert(PropertyDTO obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
-            string sql = @"INSERT INTO PROPERTY (ID,NODEID,NAME,VALUE,CONDITION,DESCRIPTION,ISCUSTOM,TYPE ) values (@ID,@NODEID,@NAME,@VALUE,@CONDITION,@DESCRIPTION,@ISCUSTOM,@TYPE)";
-            return Helper.ExecuteNonQuery(sql, obj.ID, obj.NODEID, obj.NAME, obj.VALUE, obj.CONDITION, obj.DESCRIPTION, obj.ISCUSTOM, obj.TYPE);
+            string sql = @"INSERT INTO PROPERTY (ID,NODEID,NAME,VALUE,CONDITION,DESCRIPTION,ISCUSTOM,DATATYPE ) values (@ID,@NODEID,@NAME,@VALUE,@CONDITION,@DESCRIPTION,@ISCUSTOM,@DATATYPE)";
+            return Helper.ExecuteNonQuery(sql, obj.ID, obj.NODEID, obj.NAME, obj.VALUE, obj.CONDITION, obj.DESCRIPTION, obj.ISCUSTOM, obj.DATATYPE);
         }
 
         [DbRead]
@@ -38,7 +38,7 @@ namespace FlowEngine.DAL
                 t.CONDITION = row[nameof(PropertyDTO.CONDITION)].TryToInt();
                 t.DESCRIPTION = row[nameof(PropertyDTO.DESCRIPTION)].TryToString();
                 t.ISCUSTOM = row[nameof(PropertyDTO.ISCUSTOM)].TryToInt();
-                t.TYPE = row[nameof(PropertyDTO.TYPE)].TryToString();
+                t.DATATYPE = row[nameof(PropertyDTO.DATATYPE)].TryToString();
                 rst.Add(t);
             }
             return rst;
@@ -62,7 +62,7 @@ namespace FlowEngine.DAL
                 t.CONDITION = row[nameof(PropertyDTO.CONDITION)].TryToInt();
                 t.DESCRIPTION = row[nameof(PropertyDTO.DESCRIPTION)].TryToString();
                 t.ISCUSTOM = row[nameof(PropertyDTO.ISCUSTOM)].TryToInt();
-                t.TYPE = row[nameof(PropertyDTO.TYPE)].TryToString();
+                t.DATATYPE = row[nameof(PropertyDTO.DATATYPE)].TryToString();
                 rst.Add(t);
             }
             return rst;
@@ -70,12 +70,12 @@ namespace FlowEngine.DAL
 
         [DbUpdate]
         [SqlKey(nameof(PropertyDTO.ID))]
-        [SqlValue(nameof(PropertyDTO.NAME), nameof(PropertyDTO.CONDITION), nameof(PropertyDTO.TYPE), nameof(PropertyDTO.VALUE), nameof(PropertyDTO.DESCRIPTION))]
+        [SqlValue(nameof(PropertyDTO.NAME), nameof(PropertyDTO.CONDITION), nameof(PropertyDTO.DATATYPE), nameof(PropertyDTO.VALUE), nameof(PropertyDTO.DESCRIPTION))]
         public int Update(PropertyDTO obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
-            string sql = @"UPDATE PROPERTY SET NAME=@NAME,CONDITION=@CONDITION,TYPE=@TYPE,VALUE=@VALUE,DESCRIPTION=@DESCRIPTION WHERE ID=@ID";
-            return Helper.ExecuteNonQuery(sql, obj.NAME, obj.CONDITION, obj.TYPE, obj.VALUE, obj.DESCRIPTION, obj.ID);
+            string sql = @"UPDATE PROPERTY SET NAME=@NAME,CONDITION=@CONDITION,DATATYPE=@DATATYPE,VALUE=@VALUE,DESCRIPTION=@DESCRIPTION WHERE ID=@ID";
+            return Helper.ExecuteNonQuery(sql, obj.NAME, obj.CONDITION, obj.DATATYPE, obj.VALUE, obj.DESCRIPTION, obj.ID);
         }
 
         [DbRead]
@@ -96,7 +96,7 @@ namespace FlowEngine.DAL
                 t.CONDITION = row[nameof(PropertyDTO.CONDITION)].TryToInt();
                 t.DESCRIPTION = row[nameof(PropertyDTO.DESCRIPTION)].TryToString();
                 t.ISCUSTOM = row[nameof(PropertyDTO.ISCUSTOM)].TryToInt();
-                t.TYPE = row[nameof(PropertyDTO.TYPE)].TryToString();
+                t.DATATYPE = row[nameof(PropertyDTO.DATATYPE)].TryToString();
                 rst.Add(t);
             }
             return rst;

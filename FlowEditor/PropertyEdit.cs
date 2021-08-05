@@ -45,19 +45,22 @@ namespace FlowEditor
         private void button1_Click(object sender, EventArgs e)
         {
             var rst = service.UpdateProperty(this.NodeId, this.PropertyId, this.textBox1.Text, ((DataType)this.comboBox2.SelectedIndex).ToString(), this.comboBox1.SelectedIndex, this.textBox3.Text, this.textBox2.Text);
-            if (rst > 0)
+            if (rst == -1)
             {
-                this.PropName = this.textBox1.Text;
-                this.Description = this.textBox2.Text;
-                this.Value = this.textBox3.Text;
-                this.DialogResult = DialogResult.OK;
-                this.Close();
+                MessageBox.Show("属性名重复，保存失败。");
+                return;
             }
-            else
+            else if (rst == -2)
             {
-                this.DialogResult = DialogResult.Cancel;
-                this.Close();
+                MessageBox.Show("输入的值无效，保存失败。");
+                return;
             }
+            this.PropName = this.textBox1.Text;
+            this.Description = this.textBox2.Text;
+            this.Value = this.textBox3.Text;
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+
         }
 
         private void button2_Click(object sender, EventArgs e)
