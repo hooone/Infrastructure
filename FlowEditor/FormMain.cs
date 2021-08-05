@@ -4,13 +4,7 @@ using FlowEngine;
 using FlowEngine.Model;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace FlowEditor
@@ -60,6 +54,7 @@ namespace FlowEditor
                 AddLine(item.Id, item.To, item.From);
             }
         }
+
         #region 流程选择
         private void button1_Click(object sender, EventArgs e)
         {
@@ -353,7 +348,6 @@ namespace FlowEditor
         }
         #endregion
 
-
         #region 添加连接线
         private Nodes.Node selectInNode = null;
         private string selectInId = "";
@@ -504,7 +498,6 @@ namespace FlowEditor
 
         #endregion
 
-
         #region 删除连接线
         private LinkLine selectLine = null;
         private void Line_Click(object sender, EventArgs e)
@@ -551,6 +544,8 @@ namespace FlowEditor
             }
         }
         #endregion
+
+        #region 窗体事件Override
         // 删除按键
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -574,5 +569,6 @@ namespace FlowEditor
             HScrollValue = this.canvas.HorizontalScroll.Value;
             VScrollValue = this.canvas.VerticalScroll.Value;
         }
+        #endregion
     }
 }
