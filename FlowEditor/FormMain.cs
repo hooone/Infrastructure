@@ -264,6 +264,7 @@ namespace FlowEditor
                 return;
             AddProperty(prop);
         }
+        Dictionary<string, Label> PropertyNameBuffer = new Dictionary<string, Label>();
         Dictionary<string, TextBox> PropertyBuffer = new Dictionary<string, TextBox>();
         // 显示标签属性
         private void LoadProperties(string nodeId)
@@ -276,6 +277,7 @@ namespace FlowEditor
                 return;
             // 标签属性
             this.panel1.Controls.Clear();
+            PropertyNameBuffer.Clear();
             PropertyBuffer.Clear();
             foreach (var prop in info.Properties)
             {
@@ -294,6 +296,7 @@ namespace FlowEditor
             var font = new Font(labelN.Font.FontFamily, 12);
             labelN.Font = font;
             this.panel1.Controls.Add(labelN);
+            PropertyNameBuffer.Add(prop.Id, labelN);
             this.toolTip1.SetToolTip(labelN, prop.Description);
             TextBox tbV = new TextBox();
             tbV.Location = new Point(110, (this.panel1.Controls.Count / 3) * 30 + 10 - this.panel1.VerticalScroll.Value);
@@ -318,6 +321,7 @@ namespace FlowEditor
             this.panel1.Controls.Add(labelM);
             this.toolTip1.SetToolTip(labelM, "修改");
         }
+        // 修改属性
         private void ModifyProperty_Click(object sender, EventArgs e)
         {
             if (selectNode == null)
@@ -340,6 +344,9 @@ namespace FlowEditor
             if (PropertyBuffer.ContainsKey(editForm.PropertyId))
             {
                 PropertyBuffer[editForm.PropertyId].Text = editForm.Value;
+                PropertyNameBuffer[editForm.PropertyId].Text = editForm.PropName;
+                this.toolTip1.SetToolTip(PropertyBuffer[editForm.PropertyId], editForm.Value);
+                this.toolTip1.SetToolTip(PropertyNameBuffer[editForm.PropertyId], editForm.Description);
             }
             else
             {

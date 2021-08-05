@@ -8,15 +8,16 @@ using System.Threading.Tasks;
 
 namespace FlowEngine
 {
-    public class RuntimeService
+    public class UnitTestRuntimeService
     {
         private readonly FlowConfigService flowConfig;
         private readonly PropertyDAL propertyDAL = null;
-        public RuntimeService(FlowConfigService _config, PropertyDAL propertyDAL)
+        public UnitTestRuntimeService(FlowConfigService _config, PropertyDAL propertyDAL)
         {
             this.flowConfig = _config;
             this.propertyDAL = propertyDAL;
         }
+        ICommand command = null;
         Dictionary<string, object> payload = new Dictionary<string, object>();
         public List<ICommand> Init()
         {
@@ -26,6 +27,7 @@ namespace FlowEngine
             {
                 propertyDAL.ReadByNode(new DTO.PropertyDTO() { NODEID = node.Id });
             }
+            // 初始化赋值
             // 初始化command
             List<ICommand> result = new List<ICommand>();
             foreach (var node in flows.Nodes)
@@ -38,7 +40,7 @@ namespace FlowEngine
             // 初始化流程信号量
             return result;
         }
-        public void Start()
+        public void Run()
         {
         }
     }

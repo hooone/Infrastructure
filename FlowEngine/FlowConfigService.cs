@@ -53,12 +53,12 @@ namespace FlowEngine
             return rst;
         }
 
-        public int UpdateProperty(string nodeId, string propertyId, string name, int condition, string value, string description)
+        public int UpdateProperty(string nodeId, string propertyId, string name, string type, int condition, string value, string description)
         {
             if (nodeId == propertyId)
             {
                 // 更改文本描述
-               return nodeDAL.UpdateText(new DTO.Node() { ID = nodeId, TEXT = value });
+                return nodeDAL.UpdateText(new DTO.Node() { ID = nodeId, TEXT = value });
             }
             else
             {
@@ -69,6 +69,7 @@ namespace FlowEngine
                     NAME = name,
                     CONDITION = condition,
                     VALUE = value,
+                    TYPE = type,
                     DESCRIPTION = description,
                 });
             }
@@ -90,6 +91,7 @@ namespace FlowEngine
                 pt.Name = "文本";
                 pt.Value = nodes[0].TEXT;
                 pt.Condition = 0;
+                pt.DataType = DataType.STRING;
                 pt.IsCustom = false;
                 return pt;
             }
@@ -97,8 +99,10 @@ namespace FlowEngine
             prop.Id = props[0].ID;
             prop.NodeId = props[0].NODEID;
             prop.Name = props[0].NAME;
+            prop.Description = props[0].DESCRIPTION;
             prop.Value = props[0].VALUE;
             prop.Condition = props[0].CONDITION;
+            prop.DataType = (DataType)Enum.Parse(typeof(DataType), props[0].TYPE);
             prop.IsCustom = props[0].ISCUSTOM == 1;
             return prop;
         }
@@ -210,6 +214,7 @@ namespace FlowEngine
             pt.Name = "文本";
             pt.Value = node.Text;
             pt.Condition = 0;
+            pt.DataType = DataType.STRING;
             pt.IsCustom = false;
             node.Properties.Add(pt);
             var ps = propertyDAL.ReadByNode(new DTO.PropertyDTO() { NODEID = node.Id });
@@ -221,6 +226,7 @@ namespace FlowEngine
                 p.Name = item.NAME;
                 p.Value = item.VALUE;
                 p.Condition = item.CONDITION;
+                p.DataType = (DataType)Enum.Parse(typeof(DataType), item.TYPE);
                 p.IsCustom = item.ISCUSTOM == 1;
                 p.Description = item.DESCRIPTION;
                 node.Properties.Add(p);
@@ -327,6 +333,7 @@ namespace FlowEngine
             property.NAME = name + idx;
             property.VALUE = "";
             property.CONDITION = 0;
+            property.TYPE = DataType.STRING.ToString();
             property.DESCRIPTION = "";
             property.ISCUSTOM = 1;
             if (propertyDAL.insert(property) == 0)
@@ -337,6 +344,7 @@ namespace FlowEngine
             rst.Id = property.ID;
             rst.NodeId = property.NODEID;
             rst.Condition = property.CONDITION;
+            rst.DataType = (DataType)Enum.Parse(typeof(DataType), property.TYPE);
             rst.IsCustom = property.ISCUSTOM == 1;
             rst.Description = property.DESCRIPTION;
             rst.Name = property.NAME;

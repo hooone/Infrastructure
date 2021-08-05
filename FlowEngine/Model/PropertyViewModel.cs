@@ -14,6 +14,7 @@ namespace FlowEngine.Model
         public string Value { get; set; }
         public bool IsCustom { get; set; }
         public int Condition { get; set; }
+        public DataType DataType { get; set; }
         public string Description { get; set; }
     }
 }
