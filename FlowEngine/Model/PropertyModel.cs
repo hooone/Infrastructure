@@ -11,6 +11,7 @@ namespace FlowEngine.Model
         public string Id { get; set; }
         public string NodeId { get; set; }
         public string Name { get; set; }
+        public string DefaultName { get; set; }
         public string Value { get; set; }
         public bool IsCustom { get; set; }
         public int Condition { get; set; }
