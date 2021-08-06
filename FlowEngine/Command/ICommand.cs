@@ -13,16 +13,21 @@ namespace FlowEngine.Command
         string Name { get; set; }
         List<PropertyModel> Properties { get; set; }
         /// <summary>
+        /// 执行Command
+        /// </summary>
+        bool Execute(T payload);
+
+        /// <summary>
         /// 从全流程的变量集中拆卸得到当前Command所需的变量
         /// </summary>
         T UnBoxing(Dictionary<string, object> context);
+
         /// <summary>
         /// 将当前Command的变量装箱到全流程的变量集中
         /// </summary>
         void Boxing(Dictionary<string, object> context, T payload);
-        bool Execute(T payload);
-        List<Precondition> GetPrecondition();
-        List<Postcondition> GetPostcondition();
+
+        List<ConditionModel> GetConditions();
         List<PropertyModel> GetProperties();
     }
     public class Precondition

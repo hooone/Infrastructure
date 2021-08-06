@@ -1,5 +1,8 @@
 ﻿using Autofac;
+using AutoMapper;
 using FlowEngine.DAL;
+using FlowEngine.DTO;
+using FlowEngine.Model;
 using Infrastructure.DB;
 using System;
 using System.Collections.Generic;
@@ -15,6 +18,9 @@ namespace FlowEngine
         public static void InitAutoFac()
         {
             var builder = new ContainerBuilder();
+            // Mapper
+            var mapper = InitMapper();
+            builder.RegisterInstance<IMapper>(mapper).SingleInstance();
             // DB
             builder.RegisterType<OracleHelper>().Named<SqlHelper>("ORACLE").As<SqlHelper>().SingleInstance();
             // DAL
@@ -32,8 +38,54 @@ namespace FlowEngine
         public static void InitDatabase()
         {
             // 打开数据库
-            var a = Container.ResolveNamed<SqlHelper>("ORACLE");
-            a.Connect(new COracleParameter().ConnectionString);
+            Container.ResolveNamed<SqlHelper>("ORACLE").Connect(new COracleParameter().ConnectionString);
+        }
+
+        public static IMapper InitMapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                // Node
+                cfg.CreateMap<NodeDTO, NodeViewModel>();
+                cfg.CreateMap<NodeViewModel, NodeDTO>();
+
+                // Point
+                cfg.CreateMap<PointDTO, ConditionModel>();
+                cfg.CreateMap<ConditionModel, PointDTO>();
+
+                // Link
+                cfg.CreateMap<LinkDTO, LinkViewModel>()
+                    .ForMember(dest => dest.From, opt => opt.MapFrom(src => src.LINKFROM))
+                    .ForMember(dest => dest.To, opt => opt.MapFrom(src => src.LINKTO));
+                cfg.CreateMap<LinkViewModel, LinkDTO>()
+                    .ForMember(dest => dest.LINKFROM, opt => opt.MapFrom(src => src.From))
+                    .ForMember(dest => dest.LINKTO, opt => opt.MapFrom(src => src.To));
+
+                // Property
+                cfg.CreateMap<PropertyDTO, PropertyModel>()
+                    .ForMember(dest => dest.IsCustom, opt => opt.MapFrom(src => src.ISCUSTOM == 1))
+                    .ForMember(dest => dest.DefaultName, opt => opt.MapFrom(src => string.IsNullOrEmpty(src.DEFAULTNAME) ? src.NAME : src.DEFAULTNAME))
+                    .ForMember(dest => dest.DataType, opt => opt.MapFrom(src => (Model.DataType)Enum.Parse(typeof(Model.DataType), src.DATATYPE)));
+                cfg.CreateMap<PropertyModel, PropertyDTO>()
+                    .ForMember(dest => dest.ISCUSTOM, opt => opt.MapFrom(src => src.IsCustom ? 1 : 0))
+                    .ForMember(dest => dest.DATATYPE, opt => opt.MapFrom(src => src.DataType.ToString()));
+                cfg.CreateMap<NodeDTO, PropertyModel>()
+                     .ForMember(dest => dest.NodeId, opt => opt.MapFrom(src => src.ID))
+                     .ForMember(dest => dest.Name, opt => opt.MapFrom(src => "文本"))
+                     .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.TEXT))
+                     .ForMember(dest => dest.Operation, opt => opt.MapFrom(src => 0))
+                     .ForMember(dest => dest.DataType, opt => opt.MapFrom(src => Model.DataType.STRING))
+                     .ForMember(dest => dest.IsCustom, opt => opt.MapFrom(src => false));
+                cfg.CreateMap<NodeViewModel, PropertyModel>()
+                     .ForMember(dest => dest.NodeId, opt => opt.MapFrom(src => src.Id))
+                     .ForMember(dest => dest.Name, opt => opt.MapFrom(src => "文本"))
+                     .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.Text))
+                     .ForMember(dest => dest.Operation, opt => opt.MapFrom(src => 0))
+                     .ForMember(dest => dest.DataType, opt => opt.MapFrom(src => Model.DataType.STRING))
+                     .ForMember(dest => dest.IsCustom, opt => opt.MapFrom(src => false));
+            });
+            var mapper = config.CreateMapper();
+            return mapper;
         }
     }
 }

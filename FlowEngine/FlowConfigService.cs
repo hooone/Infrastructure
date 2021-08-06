@@ -1,4 +1,5 @@
-﻿using FlowEngine.Command;
+﻿using AutoMapper;
+using FlowEngine.Command;
 using FlowEngine.DAL;
 using FlowEngine.Model;
 using System;
@@ -12,53 +13,161 @@ namespace FlowEngine
         private readonly LinkDAL linkDAL = null;
         private readonly PointDAL pointDAL = null;
         private readonly PropertyDAL propertyDAL = null;
-        public FlowConfigService(NodeDAL nodeDAL, LinkDAL linkDAL, PointDAL pointDAL, PropertyDAL propertyDAL)
+        private readonly IMapper mapper = null;
+        public FlowConfigService(IMapper mapper, NodeDAL nodeDAL, LinkDAL linkDAL, PointDAL pointDAL, PropertyDAL propertyDAL)
         {
+            this.mapper = mapper;
             this.nodeDAL = nodeDAL;
             this.linkDAL = linkDAL;
             this.pointDAL = pointDAL;
             this.propertyDAL = propertyDAL;
         }
-        public FlowConfig GetFlowConfig()
+
+        #region 增
+        /// <summary>
+        /// 创建流程节点
+        /// </summary>
+        public NodeViewModel CreateNode(string type, int x, int y)
         {
-            FlowConfig rst = new FlowConfig();
-            rst.Nodes = new List<NodeViewModel>();
-            rst.Links = new List<LinkViewModel>();
-            var nodes = nodeDAL.read(null);
-            foreach (var nd in nodes)
+            // 获取command
+            ICommand<TestTotalPayload> cmd = GetCommand(type);
+            cmd.Id = Guid.NewGuid().ToString("N");
+            // 插入node表
+            NodeViewModel node = new NodeViewModel();
+            node.Id = cmd.Id;
+            node.Type = type;
+            node.Text = cmd.Name;
+            node.X = x;
+            node.Y = y;
+            DTO.NodeDTO nd = mapper.Map<DTO.NodeDTO>(node);
+            if (nodeDAL.insert(nd) != 1)
             {
-                NodeViewModel node = new NodeViewModel();
-                node.Id = nd.ID;
-                node.Type = nd.TYPE;
-                node.Text = nd.TEXT;
-                node.X = nd.X;
-                node.Y = nd.Y;
-                node.Points = new Dictionary<string, int>();
-                var points = pointDAL.ReadByNode(new DTO.Point() { NODEID = nd.ID });
-                foreach (var pt in points)
+                return null;
+            }
+
+            // 插入Point表
+            node.Conditions = new List<ConditionModel>();
+            var conds = cmd.GetConditions();
+            foreach (var item in conds)
+            {
+                item.Id = Guid.NewGuid().ToString("N");
+                item.NodeId = cmd.Id;
+                DTO.PointDTO pt = mapper.Map<DTO.PointDTO>(item);
+                if (pointDAL.insert(pt) != 1)
                 {
-                    node.Points.Add(pt.ID, pt.SEQ);
+                    return null;
                 }
-                rst.Nodes.Add(node);
+                node.Conditions.Add(item);
             }
-            var links = linkDAL.read(null);
-            foreach (var lk in links)
+
+            // 插入Property表
+            var props = cmd.GetProperties();
+            var curProps = propertyDAL.ReadAll(null);
+            foreach (var item in props)
             {
-                LinkViewModel link = new LinkViewModel();
-                link.Id = lk.ID;
-                link.From = lk.LINKFROM;
-                link.To = lk.LINKTO;
-                rst.Links.Add(link);
+                item.Id = Guid.NewGuid().ToString("N");
+                // 避免Name重复 
+                string name = item.Name;
+                int idx = 1;
+                while (curProps.Exists(f => f.NAME == name))
+                {
+                    name = item.Name + idx.ToString().PadLeft(2, '0');
+                    idx++;
+                }
+                item.Name = name;
+                DTO.PropertyDTO po = mapper.Map<DTO.PropertyDTO>(item);
+                propertyDAL.insert(po);
             }
-            return rst;
+            return node;
         }
 
+        /// <summary>
+        /// 创建连接线
+        /// </summary>
+        public LinkViewModel CreateLine(string point1, string point2)
+        {
+            LinkViewModel lv = new LinkViewModel();
+            lv.Id = Guid.NewGuid().ToString("N");
+            lv.From = point1;
+            lv.To = point2;
+            // 插入LINK表
+            DTO.LinkDTO link = mapper.Map<DTO.LinkDTO>(lv);
+            if (linkDAL.insert(link) != 1)
+            {
+                return null;
+            }
+            return lv;
+        }
+
+        /// <summary>
+        /// 创建新的自定义属性
+        /// </summary>
+        /// <param name="nodeid"></param>
+        /// <returns></returns>
+        public PropertyModel CreateNodeProperty(string nodeid)
+        {
+            // 生成唯一属性名
+            var all = propertyDAL.ReadAll(null);
+            string name = "property";
+            int idx = 1;
+            while (all.Exists(f => f.NAME.Equals(name + idx, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                idx++;
+            }
+            PropertyModel rst = new PropertyModel();
+            rst.Id = Guid.NewGuid().ToString("N");
+            rst.NodeId = nodeid;
+            rst.Operation = 0;
+            rst.DataType = DataType.STRING;
+            rst.IsCustom = true;
+            rst.Description = "";
+            rst.Name = name + idx;
+            rst.Value = "";
+            // 写入数据库
+            DTO.PropertyDTO property = mapper.Map<DTO.PropertyDTO>(rst);
+            if (propertyDAL.insert(property) == 0)
+                return null;
+
+            // 装箱
+            return rst;
+        }
+        #endregion
+
+        #region 删
+        /// <summary>
+        /// 删除流程节点
+        /// </summary>
+        public void DeleteNode(string id)
+        {
+            var lines = GetLinesByNode(id);
+            foreach (var item in lines)
+            {
+                linkDAL.Delete(new DTO.LinkDTO() { ID = item.Id });
+            }
+            nodeDAL.Delete(new DTO.NodeDTO() { ID = id });
+            pointDAL.DeleteByNode(new DTO.PointDTO() { NODEID = id });
+            propertyDAL.DeleteByNode(new DTO.PropertyDTO() { NODEID = id });
+        }
+
+        /// <summary>
+        /// 删除连接线
+        /// </summary>
+        public void DeleteLine(string id)
+        {
+            linkDAL.Delete(new DTO.LinkDTO() { ID = id });
+        }
+        #endregion
+
+        #region 改
+        /// <summary>
+        ///  更改节点属性
+        /// </summary>
         public int UpdateProperty(string nodeId, string propertyId, string name, string type, int condition, string value, string description)
         {
             if (nodeId == propertyId)
             {
                 // 更改文本描述
-                return nodeDAL.UpdateText(new DTO.Node() { ID = nodeId, TEXT = value });
+                return nodeDAL.UpdateText(new DTO.NodeDTO() { ID = nodeId, TEXT = value });
             }
             // 数字验证
             if (type == DataType.NUMBER.ToString())
@@ -109,207 +218,151 @@ namespace FlowEngine
             });
         }
 
-        public PropertyModel GetProperty(string propertyId)
-        {
-            var props = propertyDAL.ReadById(new DTO.PropertyDTO() { ID = propertyId });
-            if (props.Count == 0)
-            {
-                var nodes = nodeDAL.ReadById(new DTO.Node() { ID = propertyId });
-                if (nodes.Count == 0)
-                {
-                    return null;
-                }
-                PropertyModel pt = new PropertyModel();
-                pt.Id = nodes[0].ID;
-                pt.NodeId = nodes[0].ID;
-                pt.Name = "文本";
-                pt.Value = nodes[0].TEXT;
-                pt.Condition = 0;
-                pt.DataType = DataType.STRING;
-                pt.IsCustom = false;
-                return pt;
-            }
-            PropertyModel prop = new PropertyModel();
-            prop.Id = props[0].ID;
-            prop.NodeId = props[0].NODEID;
-            prop.Name = props[0].NAME;
-            if (string.IsNullOrEmpty(props[0].DEFAULTNAME))
-                prop.DefaultName = prop.Name;
-            else
-                prop.DefaultName = props[0].DEFAULTNAME;
-            prop.Description = props[0].DESCRIPTION;
-            prop.Value = props[0].VALUE;
-            prop.Condition = props[0].CONDITION;
-            prop.DataType = (DataType)Enum.Parse(typeof(DataType), props[0].DATATYPE);
-            prop.IsCustom = props[0].ISCUSTOM == 1;
-            return prop;
-        }
-
+        /// <summary>
+        /// 更改节点的位置
+        /// </summary>
         public int UpdateNodeLocation(string id, int x, int y)
         {
-            DTO.Node node = new DTO.Node();
+            DTO.NodeDTO node = new DTO.NodeDTO();
             node.ID = id;
             node.X = x;
             node.Y = y;
             return nodeDAL.UpdateLocation(node);
         }
+        #endregion
 
-        public NodeViewModel CreateNode(string type, int x, int y)
+        #region 查
+        /// <summary>
+        /// 查询除属性外的完整数据，用于绘制流程图
+        /// </summary>
+        public FlowConfig GetFlowConfig()
         {
-            // 获取command
-            ICommand<TestTotalPayload> cmd = GetCommand(type);
-            // 插入node表
-            DTO.Node nd = new DTO.Node();
-            nd.ID = cmd.Id;
-            nd.TYPE = type;
-            nd.TEXT = cmd.Name;
-            nd.X = x;
-            nd.Y = y;
-            if (nodeDAL.insert(nd) != 1)
+            FlowConfig rst = new FlowConfig();
+            rst.Nodes = new List<NodeViewModel>();
+            rst.Links = new List<LinkViewModel>();
+            var nodes = nodeDAL.read(null);
+            foreach (DTO.NodeDTO nd in nodes)
             {
-                return null;
-            }
-            // 插入Point表
-            var pres = cmd.GetPrecondition();
-            foreach (var item in pres)
-            {
-                DTO.Point pt = new DTO.Point();
-                pt.ID = item.Id;
-                pt.NODEID = item.CommandId;
-                pt.SEQ = item.Seq;
-                if (pointDAL.insert(pt) != 1)
+                NodeViewModel node = mapper.Map<NodeViewModel>(nd);
+                node.Conditions = new List<ConditionModel>();
+                var points = pointDAL.ReadByNode(new DTO.PointDTO() { NODEID = nd.ID });
+                foreach (var pt in points)
                 {
-                    return null;
+                    var cond = mapper.Map<ConditionModel>(pt);
+                    node.Conditions.Add(cond);
                 }
+                rst.Nodes.Add(node);
             }
-            var posts = cmd.GetPostcondition();
-            foreach (var item in posts)
+            var links = linkDAL.read(null);
+            foreach (var lk in links)
             {
-                DTO.Point pt = new DTO.Point();
-                pt.ID = item.Id;
-                pt.NODEID = item.CommandId;
-                pt.SEQ = item.Seq;
-                if (pointDAL.insert(pt) != 1)
-                {
-                    return null;
-                }
+                LinkViewModel link = mapper.Map<LinkViewModel>(lk);
+                rst.Links.Add(link);
             }
-            // 插入Property表
-            var props = cmd.GetProperties();
-            var curProps = propertyDAL.ReadAll(null);
-            foreach (var item in props)
-            {
-                DTO.PropertyDTO po = new DTO.PropertyDTO();
-                po.ID = Guid.NewGuid().ToString("N");
-                po.CONDITION = item.Condition;
-                po.DEFAULTNAME = item.DefaultName;
-                po.DESCRIPTION = item.Description;
-                po.ISCUSTOM = item.IsCustom ? 1 : 0;
-                po.NAME = item.Name;
-                po.NODEID = cmd.Id;
-                po.DATATYPE = item.DataType.ToString();
-                po.VALUE = item.Value;
-
-                // 避免Name重复 
-                string name = po.NAME;
-                int idx = 1;
-                while (curProps.Exists(f => f.NAME == name))
-                {
-                    name = po.NAME + idx.ToString().PadLeft(2, '0');
-                    idx++;
-                }
-                po.NAME = name;
-                propertyDAL.insert(po);
-            }
-            // 装箱
-            NodeViewModel node = new NodeViewModel();
-            node.Id = nd.ID;
-            node.Type = nd.TYPE;
-            node.Text = nd.TEXT;
-            node.X = nd.X;
-            node.Y = nd.Y;
-            node.Points = new Dictionary<string, int>();
-            foreach (var item in pres)
-            {
-                node.Points.Add(item.Id, item.Seq);
-            }
-            foreach (var item in posts)
-            {
-                node.Points.Add(item.Id, item.Seq);
-            }
-            return node;
+            return rst;
         }
 
-        public void DeleteNode(string id)
+        /// <summary>
+        /// 查询指定流程节点的详细信息
+        /// </summary>
+        public NodeViewModel GetNodeInfo(string nodeid)
         {
-            var lines = GetLinesByNode(id);
-            foreach (var item in lines)
-            {
-                linkDAL.Delete(new DTO.Link() { ID = item.Id });
-            }
-            nodeDAL.Delete(new DTO.Node() { ID = id });
-            pointDAL.DeleteByNode(new DTO.Point() { NODEID = id });
-            propertyDAL.DeleteByNode(new DTO.PropertyDTO() { NODEID = id });
-        }
-
-        public NodeViewModel GetNodeInfo(string id)
-        {
-            var nodes = nodeDAL.ReadById(new DTO.Node() { ID = id });
+            var nodes = nodeDAL.ReadById(new DTO.NodeDTO() { ID = nodeid });
             if (nodes.Count != 1)
                 return null;
-            // 装箱
-            var nd = nodes[0];
-            NodeViewModel node = new NodeViewModel();
-            node.Id = nd.ID;
-            node.Type = nd.TYPE;
-            node.Text = nd.TEXT;
-            node.X = nd.X;
-            node.Y = nd.Y;
+            NodeViewModel node = mapper.Map<NodeViewModel>(nodes[0]);
             // 读取Point表
-            node.Points = new Dictionary<string, int>();
-            var points = pointDAL.ReadByNode(new DTO.Point() { NODEID = node.Id });
+            node.Conditions = new List<ConditionModel>();
+            var points = pointDAL.ReadByNode(new DTO.PointDTO() { NODEID = node.Id });
             foreach (var item in points)
             {
-                node.Points.Add(item.ID, item.SEQ);
+                var cond = mapper.Map<ConditionModel>(item);
+                node.Conditions.Add(cond);
             }
             // 读取Property表
             node.Properties = new List<PropertyModel>();
-            PropertyModel pt = new PropertyModel();
-            pt.Id = node.Id;
-            pt.NodeId = node.Id;
-            pt.Name = "文本";
-            pt.Value = node.Text;
-            pt.Condition = 0;
-            pt.DataType = DataType.STRING;
-            pt.IsCustom = false;
+            PropertyModel pt = mapper.Map<PropertyModel>(node);
             node.Properties.Add(pt);
             var ps = propertyDAL.ReadByNode(new DTO.PropertyDTO() { NODEID = node.Id });
             foreach (var item in ps)
             {
-                PropertyModel p = new PropertyModel();
-                p.Id = item.ID;
-                p.NodeId = item.NODEID;
-                p.Name = item.NAME;
-                if (string.IsNullOrEmpty(item.DEFAULTNAME))
-                    p.DefaultName = p.Name;
-                else
-                    p.DefaultName = item.DEFAULTNAME;
-                p.Value = item.VALUE;
-                p.Condition = item.CONDITION;
-                p.DataType = (DataType)Enum.Parse(typeof(DataType), item.DATATYPE);
-                p.IsCustom = item.ISCUSTOM == 1;
-                p.Description = item.DESCRIPTION;
+                PropertyModel p = mapper.Map<PropertyModel>(item);
                 node.Properties.Add(p);
             }
             return node;
         }
+
+        /// <summary>
+        /// 查询一个属性的详细信息，用于在属性修改窗体上显示
+        /// </summary>
+        public PropertyModel GetProperty(string propertyId)
+        {
+            var props = propertyDAL.ReadById(new DTO.PropertyDTO() { ID = propertyId });
+            if (props.Count == 0)
+            {
+                // 将节点的Text字段封装成一个Property
+                var nodes = nodeDAL.ReadById(new DTO.NodeDTO() { ID = propertyId });
+                if (nodes.Count == 0)
+                {
+                    return null;
+                }
+                PropertyModel pt = mapper.Map<PropertyModel>(nodes[0]);
+                return pt;
+            }
+            PropertyModel prop = mapper.Map<PropertyModel>(props[0]);
+            return prop;
+        }
+
+        /// <summary>
+        /// 查询节点相关的连接线，用于流程节点删除的同时删除连接线
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
+        public List<LinkViewModel> GetLinesByNode(string nodeId)
+        {
+            List<LinkViewModel> rst = new List<LinkViewModel>();
+            var points = pointDAL.ReadByNode(new DTO.PointDTO() { NODEID = nodeId });
+            foreach (var item in points)
+            {
+                var fms = linkDAL.ReadByFrom(new DTO.LinkDTO() { LINKFROM = item.ID });
+                foreach (var lk in fms)
+                {
+                    var p = mapper.Map<LinkViewModel>(lk);
+                    rst.Add(p);
+                }
+                var tos = linkDAL.ReadByTo(new DTO.LinkDTO() { LINKTO = item.ID });
+                foreach (var lk in tos)
+                {
+                    var p = mapper.Map<LinkViewModel>(lk);
+                    rst.Add(p);
+                }
+            }
+            return rst;
+        }
+        /// <summary>
+        /// 获得所有信号量连接点，用于流程界面删除时界面清空连接点缓存
+        /// </summary>
+        /// <param name="nodeid"></param>
+        /// <returns></returns>
+        public List<string> GetPointsByNode(string nodeid)
+        {
+            List<string> rst = new List<string>();
+            var pts = pointDAL.ReadByNode(new DTO.PointDTO() { NODEID = nodeid });
+            foreach (var item in pts)
+            {
+                rst.Add(item.ID);
+            }
+            return rst;
+        }
+
+        #endregion
 
         public ICommand<TestTotalPayload> GetCommand(string type)
         {
             switch (type.ToUpper())
             {
                 case "SQLEXECUTE":
-                    return SqlExecuteCommand<TestTotalPayload>.NewCommand();
+                    return new SqlExecuteCommand<TestTotalPayload>();
                     //case "INJECT":
                     //    return InjectCommand.NewCommand();
                     //default:
@@ -318,102 +371,5 @@ namespace FlowEngine
             return null;
         }
 
-        public LinkViewModel CreateLine(string point1, string point2)
-        {
-            DTO.Link link = new DTO.Link();
-            link.ID = Guid.NewGuid().ToString("N");
-            link.LINKFROM = point1;
-            link.LINKTO = point2;
-            if (linkDAL.insert(link) != 1)
-            {
-                return null;
-            }
-            LinkViewModel lv = new LinkViewModel();
-            lv.Id = link.ID;
-            lv.From = link.LINKFROM;
-            lv.To = link.LINKTO;
-            return lv;
-        }
-
-        public void DeleteLine(string id)
-        {
-            linkDAL.Delete(new DTO.Link() { ID = id });
-        }
-
-        public List<LinkViewModel> GetLinesByNode(string nodeId)
-        {
-            List<LinkViewModel> rst = new List<LinkViewModel>();
-            var points = pointDAL.ReadByNode(new DTO.Point() { NODEID = nodeId });
-            foreach (var item in points)
-            {
-                var fms = linkDAL.ReadByFrom(new DTO.Link() { LINKFROM = item.ID });
-                foreach (var lk in fms)
-                {
-                    var p = new LinkViewModel();
-                    p.Id = lk.ID;
-                    p.From = lk.LINKFROM;
-                    p.To = lk.LINKTO;
-                    rst.Add(p);
-                }
-                var tos = linkDAL.ReadByTo(new DTO.Link() { LINKTO = item.ID });
-                foreach (var lk in tos)
-                {
-                    var p = new LinkViewModel();
-                    p.Id = lk.ID;
-                    p.From = lk.LINKFROM;
-                    p.To = lk.LINKTO;
-                    rst.Add(p);
-                }
-            }
-            return rst;
-        }
-
-        public List<string> GetPointsByNode(string nodeid)
-        {
-            List<string> rst = new List<string>();
-            var pts = pointDAL.ReadByNode(new DTO.Point() { NODEID = nodeid });
-            foreach (var item in pts)
-            {
-                rst.Add(item.ID);
-            }
-            return rst;
-        }
-
-        public PropertyModel CreateNodeProperty(string nodeid)
-        {
-            // 生成唯一属性名
-            var all = propertyDAL.ReadAll(null);
-            string name = "property";
-            int idx = 1;
-            while (all.Exists(f => f.NAME.Equals(name + idx, StringComparison.CurrentCultureIgnoreCase)))
-            {
-                idx++;
-            }
-
-            // 写入数据库
-            DTO.PropertyDTO property = new DTO.PropertyDTO();
-            property.ID = Guid.NewGuid().ToString("N");
-            property.NODEID = nodeid;
-            property.NAME = name + idx;
-            property.VALUE = "";
-            property.CONDITION = 0;
-            property.DATATYPE = DataType.STRING.ToString();
-            property.DESCRIPTION = "";
-            property.ISCUSTOM = 1;
-            if (propertyDAL.insert(property) == 0)
-                return null;
-
-            // 装箱
-            PropertyModel rst = new PropertyModel();
-            rst.Id = property.ID;
-            rst.NodeId = property.NODEID;
-            rst.Condition = property.CONDITION;
-            rst.DataType = (DataType)Enum.Parse(typeof(DataType), property.DATATYPE);
-            rst.IsCustom = property.ISCUSTOM == 1;
-            rst.Description = property.DESCRIPTION;
-            rst.Name = property.NAME;
-            rst.Value = property.VALUE;
-            return rst;
-        }
     }
 }

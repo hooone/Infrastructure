@@ -18,7 +18,7 @@ namespace FlowEngine.Command
     public class SqlExecuteCommand<T> : ICommand<T> where T : ISqlExecutePayload, new()
     {
         public string Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = "执行sql";
         public Precondition Pre { get; set; }
         public Postcondition Post { get; set; }
         public List<PropertyModel> Properties { get; set; }
@@ -118,30 +118,13 @@ namespace FlowEngine.Command
             }
         }
 
-        public List<Postcondition> GetPostcondition()
+        public List<ConditionModel> GetConditions()
         {
-            return new List<Postcondition>() { Post };
-        }
-
-        public List<Precondition> GetPrecondition()
-        {
-            return new List<Precondition>() { Pre };
-        }
-
-        internal static ICommand<T> NewCommand()
-        {
-            SqlExecuteCommand<T> rst = new SqlExecuteCommand<T>();
-            rst.Id = Guid.NewGuid().ToString("N");
-            rst.Name = "执行sql";
-            rst.Pre = new Precondition();
-            rst.Pre.Id = Guid.NewGuid().ToString("N");
-            rst.Pre.Seq = 1;
-            rst.Pre.CommandId = rst.Id;
-            rst.Post = new Postcondition();
-            rst.Post.Id = Guid.NewGuid().ToString("N");
-            rst.Post.Seq = 2;
-            rst.Post.CommandId = rst.Id;
-            return rst;
+            var pre = new ConditionModel();
+            pre.Seq = 1;
+            var post = new ConditionModel();
+            post.Seq = 2;
+            return new List<ConditionModel>() { pre, post };
         }
 
         public List<PropertyModel> GetProperties()
@@ -150,7 +133,7 @@ namespace FlowEngine.Command
             PropertyModel db = new PropertyModel();
             db.Name = nameof(ISqlExecutePayload.DbName);
             db.DefaultName = nameof(ISqlExecutePayload.DbName);
-            db.Condition = 0;
+            db.Operation = 0;
             db.DataType = Model.DataType.STRING;
             db.Description = "数据库名";
             db.IsCustom = false;
@@ -160,7 +143,7 @@ namespace FlowEngine.Command
             PropertyModel sql = new PropertyModel();
             sql.Name = nameof(ISqlExecutePayload.Sql);
             sql.DefaultName = nameof(ISqlExecutePayload.Sql);
-            sql.Condition = 0;
+            sql.Operation = 0;
             sql.DataType = Model.DataType.STRING;
             sql.Description = "要执行的Sql语句";
             sql.IsCustom = false;
@@ -170,7 +153,7 @@ namespace FlowEngine.Command
             PropertyModel sqlrst = new PropertyModel();
             sqlrst.Name = nameof(ISqlExecutePayload.SqlExecuteResult);
             sqlrst.DefaultName = nameof(ISqlExecutePayload.SqlExecuteResult);
-            sqlrst.Condition = 2;
+            sqlrst.Operation = 2;
             sqlrst.DataType = Model.DataType.STRING;
             sqlrst.Description = "sql执行结果";
             sqlrst.IsCustom = false;

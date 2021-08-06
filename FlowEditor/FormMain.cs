@@ -46,7 +46,7 @@ namespace FlowEditor
             // 添加流程节点
             foreach (var prop in config.Nodes)
             {
-                CreateNode(prop.Id, prop.Type, prop.Text, prop.X, prop.Y, prop.Points);
+                CreateNode(prop.Id, prop.Type, prop.Text, prop.X, prop.Y, prop.Conditions);
             }
             // 添加线
             foreach (var item in config.Links)
@@ -64,7 +64,7 @@ namespace FlowEditor
 
         #region 添加流程节点
         // 添加节点到canvas
-        private void CreateNode(string id, string type, string text, int x, int y, Dictionary<string, int> linkPoint)
+        private void CreateNode(string id, string type, string text, int x, int y, List<ConditionModel> linkPoint)
         {
             Node node = CreateNode(type);
             node.Id = id;
@@ -80,7 +80,7 @@ namespace FlowEditor
             {
                 foreach (var p in linkPoint)
                 {
-                    node.SetPointId(p.Value, p.Key);
+                    node.SetPointId(p.Seq, p.Id);
                 }
             }
             foreach (var item in node.GetPoints())
@@ -151,7 +151,7 @@ namespace FlowEditor
                     node.Location.Y - this.canvas.Location.Y + this.canvas.VerticalScroll.Value);
                 if (prop == null)
                     return;
-                CreateNode(prop.Id, prop.Type, prop.Text, prop.X, prop.Y, prop.Points);
+                CreateNode(prop.Id, prop.Type, prop.Text, prop.X, prop.Y, prop.Conditions);
             }
         }
 

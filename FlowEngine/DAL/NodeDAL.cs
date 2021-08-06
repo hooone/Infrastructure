@@ -19,7 +19,7 @@ namespace FlowEngine.DAL
         }
 
         [DbInsert]
-        public int insert(Node obj)
+        public int insert(NodeDTO obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
             string sql = @"INSERT INTO NODE (ID,TYPE,TEXT,X,Y ) values (@ID,@TYPE,@TEXT,@X,@Y)";
@@ -27,49 +27,49 @@ namespace FlowEngine.DAL
         }
 
         [DbRead]
-        public List<Node> read(Node obj)
+        public List<NodeDTO> read(NodeDTO obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
             string sql = @"SELECT * FROM NODE";
             DataTable dt = Helper.Query(sql);
-            List<Node> rst = new List<Node>();
+            List<NodeDTO> rst = new List<NodeDTO>();
             foreach (DataRow row in dt.Rows)
             {
-                Node t = new Node();
-                t.ID = row[nameof(Node.ID)].TryToString();
-                t.TYPE = row[nameof(Node.TYPE)].TryToString();
-                t.TEXT = row[nameof(Node.TEXT)].TryToString();
-                t.X = row[nameof(Node.X)].TryToInt();
-                t.Y = row[nameof(Node.Y)].TryToInt();
+                NodeDTO t = new NodeDTO();
+                t.ID = row[nameof(NodeDTO.ID)].TryToString();
+                t.TYPE = row[nameof(NodeDTO.TYPE)].TryToString();
+                t.TEXT = row[nameof(NodeDTO.TEXT)].TryToString();
+                t.X = row[nameof(NodeDTO.X)].TryToInt();
+                t.Y = row[nameof(NodeDTO.Y)].TryToInt();
                 rst.Add(t);
             }
             return rst;
         }
         [DbRead]
-        [SqlKey(nameof(Node.ID))]
-        public List<Node> ReadById(Node obj)
+        [SqlKey(nameof(NodeDTO.ID))]
+        public List<NodeDTO> ReadById(NodeDTO obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
             string sql = @"SELECT * FROM NODE WHERE ID=@ID";
             DataTable dt = Helper.Query(sql, obj.ID);
-            List<Node> rst = new List<Node>();
+            List<NodeDTO> rst = new List<NodeDTO>();
             foreach (DataRow row in dt.Rows)
             {
-                Node t = new Node();
-                t.ID = row[nameof(Node.ID)].TryToString();
-                t.TYPE = row[nameof(Node.TYPE)].TryToString();
-                t.TEXT = row[nameof(Node.TEXT)].TryToString();
-                t.X = row[nameof(Node.X)].TryToInt();
-                t.Y = row[nameof(Node.Y)].TryToInt();
+                NodeDTO t = new NodeDTO();
+                t.ID = row[nameof(NodeDTO.ID)].TryToString();
+                t.TYPE = row[nameof(NodeDTO.TYPE)].TryToString();
+                t.TEXT = row[nameof(NodeDTO.TEXT)].TryToString();
+                t.X = row[nameof(NodeDTO.X)].TryToInt();
+                t.Y = row[nameof(NodeDTO.Y)].TryToInt();
                 rst.Add(t);
             }
             return rst;
         }
 
         [DbUpdate]
-        [SqlKey(nameof(Node.ID))]
-        [SqlValue(nameof(Node.X), nameof(Node.Y))]
-        public int UpdateLocation(Node obj)
+        [SqlKey(nameof(NodeDTO.ID))]
+        [SqlValue(nameof(NodeDTO.X), nameof(NodeDTO.Y))]
+        public int UpdateLocation(NodeDTO obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
             string sql = @"UPDATE NODE SET X=@X,Y=@Y WHERE ID=@ID";
@@ -77,8 +77,8 @@ namespace FlowEngine.DAL
         }
 
         [DbDelete]
-        [SqlKey(nameof(Node.ID))]
-        public int Delete(Node obj)
+        [SqlKey(nameof(NodeDTO.ID))]
+        public int Delete(NodeDTO obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
             string sql = @"DELETE NODE WHERE ID=@ID";
@@ -86,9 +86,9 @@ namespace FlowEngine.DAL
         }
 
         [DbUpdate]
-        [SqlKey(nameof(Node.ID))]
-        [SqlValue(nameof(Node.TEXT))]
-        public int UpdateText(Node obj)
+        [SqlKey(nameof(NodeDTO.ID))]
+        [SqlValue(nameof(NodeDTO.TEXT))]
+        public int UpdateText(NodeDTO obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
             string sql = @"UPDATE NODE SET TEXT=@TEXT WHERE ID=@ID";

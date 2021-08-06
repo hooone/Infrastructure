@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FlowEngine.DTO
 {
     [DbTable("POINT")]
-    public class Point : IDbModel
+    public class PointDTO : IDbModel
     {
         /// 该类型的代码由插件自动生成，请勿修改。
 

@@ -34,14 +34,14 @@ namespace FlowEditor
             this.textBox2.Text = prop.Description;
             this.textBox2.Enabled = prop.IsCustom;
             this.textBox3.Text = prop.Value;
-            this.comboBox1.SelectedIndex = prop.Condition;
+            this.comboBox1.SelectedIndex = prop.Operation;
             this.comboBox2.SelectedIndex = (int)prop.DataType;
             this.comboBox2.Enabled = prop.IsCustom;
             this.Value = prop.Value;
             this.PropName = prop.Name;
             this.Description = prop.Description;
             this.NodeId = prop.NodeId;
-            if (prop.Condition == 2)
+            if (prop.Operation == 2)
             {
                 this.comboBox1.Enabled = false;
                 this.comboBox2.Enabled = false;
