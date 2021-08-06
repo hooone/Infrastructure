@@ -66,6 +66,7 @@ namespace FlowEngine
             foreach (var item in props)
             {
                 item.Id = Guid.NewGuid().ToString("N");
+                item.NodeId = cmd.Id;
                 // 避免Name重复 
                 string name = item.Name;
                 int idx = 1;
@@ -117,7 +118,7 @@ namespace FlowEngine
             PropertyModel rst = new PropertyModel();
             rst.Id = Guid.NewGuid().ToString("N");
             rst.NodeId = nodeid;
-            rst.Operation = 0;
+            rst.Operation = OperationType.InputValue;
             rst.DataType = DataType.STRING;
             rst.IsCustom = true;
             rst.Description = "";
@@ -162,7 +163,7 @@ namespace FlowEngine
         /// <summary>
         ///  更改节点属性
         /// </summary>
-        public int UpdateProperty(string nodeId, string propertyId, string name, string type, int condition, string value, string description)
+        public int UpdateProperty(string nodeId, string propertyId, string name, string type, int operation, string value, string description)
         {
             if (nodeId == propertyId)
             {
@@ -199,7 +200,7 @@ namespace FlowEngine
                 return -1;
             }
             // 指向校验
-            if (condition == 1)
+            if (operation == 1)
             {
                 if (!allProps.Exists(f => f.NAME.Equals(value, StringComparison.CurrentCultureIgnoreCase)))
                 {
@@ -211,7 +212,7 @@ namespace FlowEngine
             {
                 ID = propertyId,
                 NAME = name,
-                CONDITION = condition,
+                OPERATION = ((OperationType)operation).ToString(),
                 VALUE = value,
                 DATATYPE = type,
                 DESCRIPTION = description,

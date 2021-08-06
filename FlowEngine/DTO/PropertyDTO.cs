@@ -24,8 +24,8 @@ namespace FlowEngine.DTO
         [DbColumn(DataType.VARCHAR2)]
         public string VALUE { get; set; }
 
-        [DbColumn(DataType.NUMBER)]
-        public int CONDITION { get; set; }
+        [DbColumn(DataType.VARCHAR2)]
+        public string OPERATION { get; set; }
 
         [DbColumn(DataType.VARCHAR2)]
         public string DESCRIPTION { get; set; }

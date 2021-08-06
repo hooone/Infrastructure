@@ -1,4 +1,5 @@
-﻿using FlowEngine.Command;
+﻿using AutoMapper;
+using FlowEngine.Command;
 using FlowEngine.DAL;
 using FlowEngine.Model;
 using Infrastructure.DB;
@@ -12,10 +13,12 @@ namespace FlowEngine
 {
     public class UnitTestRuntimeService
     {
+        private readonly IMapper mapper;
         private readonly FlowConfigService flowConfig;
         private readonly PropertyDAL propertyDAL = null;
-        public UnitTestRuntimeService(FlowConfigService _config, PropertyDAL propertyDAL)
+        public UnitTestRuntimeService(IMapper mapper, FlowConfigService _config, PropertyDAL propertyDAL)
         {
+            this.mapper = mapper;
             this.flowConfig = _config;
             this.propertyDAL = propertyDAL;
         }
@@ -40,26 +43,26 @@ namespace FlowEngine
             foreach (var node in flows.Nodes)
             {
                 var props = propertyDAL.ReadByNode(new DTO.PropertyDTO() { NODEID = node.Id });
-                foreach (var prop in props)
+                foreach (var propdto in props)
                 {
+                    PropertyModel prop = mapper.Map<PropertyModel>(propdto);
                     object value = null;
-                    Model.DataType typ = (Model.DataType)Enum.Parse(typeof(Model.DataType), prop.DATATYPE);
                     // 直接填值
-                    if (prop.CONDITION == 0)
+                    if (prop.Operation == OperationType.InputValue)
                     {
-                        switch (typ)
+                        switch (prop.DataType)
                         {
                             case Model.DataType.STRING:
-                                value = prop.VALUE.TryToString();
+                                value = prop.Value.TryToString();
                                 break;
                             case Model.DataType.NUMBER:
-                                value = prop.VALUE.TryToInt();
+                                value = prop.Value.TryToInt();
                                 break;
                             case Model.DataType.FLOAT:
-                                value = prop.VALUE.TryToFloat();
+                                value = prop.Value.TryToFloat();
                                 break;
                             case Model.DataType.DATE:
-                                value = prop.VALUE.TryToDateTime();
+                                value = prop.Value.TryToDateTime();
                                 break;
                             default:
                                 break;
@@ -68,7 +71,7 @@ namespace FlowEngine
                     // 采用类型默认值
                     else
                     {
-                        switch (typ)
+                        switch (prop.DataType)
                         {
                             case Model.DataType.STRING:
                                 value = "";
@@ -86,7 +89,7 @@ namespace FlowEngine
                                 break;
                         }
                     }
-                    context.Add(prop.NAME, value);
+                    context.Add(prop.Name, value);
                 }
             }
             return true;

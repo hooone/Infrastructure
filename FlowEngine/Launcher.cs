@@ -65,10 +65,12 @@ namespace FlowEngine
                 cfg.CreateMap<PropertyDTO, PropertyModel>()
                     .ForMember(dest => dest.IsCustom, opt => opt.MapFrom(src => src.ISCUSTOM == 1))
                     .ForMember(dest => dest.DefaultName, opt => opt.MapFrom(src => string.IsNullOrEmpty(src.DEFAULTNAME) ? src.NAME : src.DEFAULTNAME))
-                    .ForMember(dest => dest.DataType, opt => opt.MapFrom(src => (Model.DataType)Enum.Parse(typeof(Model.DataType), src.DATATYPE)));
+                    .ForMember(dest => dest.DataType, opt => opt.MapFrom(src => (Model.DataType)Enum.Parse(typeof(Model.DataType), src.DATATYPE)))
+                    .ForMember(dest => dest.Operation, opt => opt.MapFrom(src => (Model.OperationType)Enum.Parse(typeof(Model.OperationType), src.OPERATION)));
                 cfg.CreateMap<PropertyModel, PropertyDTO>()
                     .ForMember(dest => dest.ISCUSTOM, opt => opt.MapFrom(src => src.IsCustom ? 1 : 0))
-                    .ForMember(dest => dest.DATATYPE, opt => opt.MapFrom(src => src.DataType.ToString()));
+                    .ForMember(dest => dest.DATATYPE, opt => opt.MapFrom(src => src.DataType.ToString()))
+                    .ForMember(dest => dest.OPERATION, opt => opt.MapFrom(src => src.Operation.ToString()));
                 cfg.CreateMap<NodeDTO, PropertyModel>()
                      .ForMember(dest => dest.NodeId, opt => opt.MapFrom(src => src.ID))
                      .ForMember(dest => dest.Name, opt => opt.MapFrom(src => "文本"))

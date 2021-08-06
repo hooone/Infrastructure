@@ -89,6 +89,7 @@
     <Compile Include="DTO\PointDTO.cs" />
     <Compile Include="Model\LinkViewModel.cs" />
     <Compile Include="Model\NodeViewModel.cs" />
+    <Compile Include="Model\OperationType.cs" />
     <Compile Include="Model\PropertyModel.cs" />
     <Compile Include="Model\ConditionModel.cs" />
     <Compile Include="Model\TestTotalPayload.cs" />

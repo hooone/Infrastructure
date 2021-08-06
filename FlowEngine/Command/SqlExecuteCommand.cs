@@ -133,7 +133,7 @@ namespace FlowEngine.Command
             PropertyModel db = new PropertyModel();
             db.Name = nameof(ISqlExecutePayload.DbName);
             db.DefaultName = nameof(ISqlExecutePayload.DbName);
-            db.Operation = 0;
+            db.Operation = OperationType.InputValue;
             db.DataType = Model.DataType.STRING;
             db.Description = "数据库名";
             db.IsCustom = false;
@@ -143,7 +143,7 @@ namespace FlowEngine.Command
             PropertyModel sql = new PropertyModel();
             sql.Name = nameof(ISqlExecutePayload.Sql);
             sql.DefaultName = nameof(ISqlExecutePayload.Sql);
-            sql.Operation = 0;
+            sql.Operation = OperationType.InputValue;
             sql.DataType = Model.DataType.STRING;
             sql.Description = "要执行的Sql语句";
             sql.IsCustom = false;
@@ -153,7 +153,7 @@ namespace FlowEngine.Command
             PropertyModel sqlrst = new PropertyModel();
             sqlrst.Name = nameof(ISqlExecutePayload.SqlExecuteResult);
             sqlrst.DefaultName = nameof(ISqlExecutePayload.SqlExecuteResult);
-            sqlrst.Operation = 2;
+            sqlrst.Operation = OperationType.ResultValue;
             sqlrst.DataType = Model.DataType.STRING;
             sqlrst.Description = "sql执行结果";
             sqlrst.IsCustom = false;
