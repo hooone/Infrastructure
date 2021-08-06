@@ -75,7 +75,15 @@ namespace FlowEngine
                                 break;
                         }
                     }
-                    if (!hasRunning && lastWait == WaitCount && lastReady == ReadyCount && lastRunning == RunningCount && lastComplete == CompleteCount)
+                    lastWait = WaitCount;
+                    lastReady = ReadyCount;
+                    lastRunning = RunningCount;
+                    lastComplete = CompleteCount;
+                    if (!hasRunning &&
+                        lastWait == WaitCount &&
+                        lastReady == ReadyCount &&
+                        lastRunning == RunningCount &&
+                        lastComplete == CompleteCount)
                     {
                         break;
                     }
