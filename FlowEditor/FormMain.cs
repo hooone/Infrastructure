@@ -51,7 +51,7 @@ namespace FlowEditor
             // 添加线
             foreach (var item in config.Links)
             {
-                AddLine(item.Id, item.To, item.From);
+                AddLine(item.Id, item.ToPoint, item.FromPoint);
             }
         }
 
@@ -272,7 +272,7 @@ namespace FlowEditor
             if (string.IsNullOrWhiteSpace(nodeId))
                 return;
             this.SuspendLayout();
-            var info = service.GetNodeInfo(nodeId);
+            var info = service.GetNodeInfo(nodeId, true);
             if (info == null)
                 return;
             // 标签属性
@@ -499,7 +499,7 @@ namespace FlowEditor
             var link = service.CreateLine(point1, point2);
             if (link == null)
                 return;
-            AddLine(link.Id, link.From, link.To);
+            AddLine(link.Id, link.FromPoint, link.ToPoint);
         }
 
 

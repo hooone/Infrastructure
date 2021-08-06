@@ -27,7 +27,7 @@ namespace FlowEngine.DAL
         }
 
         [DbRead]
-        public List<NodeDTO> read(NodeDTO obj)
+        public List<NodeDTO> ReadAll(NodeDTO obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
             string sql = @"SELECT * FROM NODE";

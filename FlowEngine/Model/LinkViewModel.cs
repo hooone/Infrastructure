@@ -9,7 +9,10 @@ namespace FlowEngine.Model
     public class LinkViewModel
     {
         public string Id { get; set; }
-        public string From { get; set; }
-        public string To { get; set; }
+        public string FromPoint { get; set; }
+        public string ToPoint { get; set; }
+        public string FromNode { get; set; }
+        public string ToNode { get; set; }
+        public Precondition DestCondition { get; set; }
     }
 }

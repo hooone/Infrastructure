@@ -16,10 +16,16 @@ namespace FlowEngine.DTO
         public string ID { get; set; }
 
         [DbColumn(DataType.VARCHAR2)]
-        public string LINKFROM { get; set; }
+        public string FROMPOINT { get; set; }
 
         [DbColumn(DataType.VARCHAR2)]
-        public string LINKTO { get; set; }
+        public string TOPOINT { get; set; }
+
+        [DbColumn(DataType.VARCHAR2)]
+        public string FROMNODE { get; set; }
+
+        [DbColumn(DataType.VARCHAR2)]
+        public string TONODE { get; set; }
 
     }
 }

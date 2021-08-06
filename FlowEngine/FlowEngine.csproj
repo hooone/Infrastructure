@@ -70,6 +70,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Command\BaseCommand.cs" />
     <Compile Include="Command\CommonCommand.cs" />
     <Compile Include="Command\ICommand.cs" />
     <Compile Include="Command\InjectCommand.cs" />
@@ -93,8 +94,11 @@
     <Compile Include="Model\PropertyModel.cs" />
     <Compile Include="Model\ConditionModel.cs" />
     <Compile Include="Model\TestTotalPayload.cs" />
+    <Compile Include="Postcondition.cs" />
+    <Compile Include="Precondition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="TODO.md" />
+    <Compile Include="RuntimeService.cs" />
     <Compile Include="UnitTestRuntimeService.cs" />
     <Compile Include="SQLiteHelper.cs" />
   </ItemGroup>

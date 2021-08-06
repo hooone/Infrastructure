@@ -15,16 +15,14 @@ namespace FlowEngine.Command
         int SqlExecuteResult { get; set; }
         Dictionary<string, object> ObjectList { get; set; }
     }
-    public class SqlExecuteCommand<T> : ICommand<T> where T : ISqlExecutePayload, new()
+    public class SqlExecuteCommand<T> : BaseCommand<T> where T : ISqlExecutePayload, new()
     {
-        public string Id { get; set; }
-        public string Name { get; set; } = "执行sql";
-        public Precondition Pre { get; set; }
-        public Postcondition Post { get; set; }
-        public List<PropertyModel> Properties { get; set; }
+        public override string Name { get; set; } = "执行sql";
+
         private SqlHelper helper = null;
 
-        public bool Execute(T payload)
+        private Postcondition Post;
+        public override bool Execute(T payload)
         {
             // 加载helper
             if (helper == null)
@@ -35,7 +33,7 @@ namespace FlowEngine.Command
                     helper = Launcher.Container.Resolve<SqlHelper>();
             }
             if (helper == null)
-                return false;
+                throw new Exception("SQL Helper not exist: " + payload.DbName);
             // 执行sql
             List<object> pms = new List<object>();
             Dictionary<string, object> objs = payload.ObjectList;
@@ -58,18 +56,18 @@ namespace FlowEngine.Command
                 }
             }
             payload.SqlExecuteResult = helper.ExecuteNonQuery(payload.Sql, pms.ToArray());
+            if (Post != null)
+                Post.SetSignal();
             return true;
         }
 
-        public T UnBoxing(Dictionary<string, object> context)
+        public override T UnBoxing(Dictionary<string, object> context)
         {
             T payload = new T();
             payload.ObjectList = new Dictionary<string, object>();
             // 解析payload
             foreach (var prop in Properties)
             {
-                if (prop.Name == "文本")
-                    continue;
                 if (prop.DefaultName.Equals(nameof(ISqlExecutePayload.DbName), StringComparison.CurrentCultureIgnoreCase))
                 {
                     if (context.ContainsKey(prop.Name))
@@ -98,12 +96,10 @@ namespace FlowEngine.Command
             }
             return payload;
         }
-        public void Boxing(Dictionary<string, object> context, T payload)
+        public override void Boxing(Dictionary<string, object> context, T payload)
         {
             foreach (var prop in Properties)
             {
-                if (prop.Name == "文本")
-                    continue;
                 if (prop.DefaultName.Equals(nameof(ISqlExecutePayload.SqlExecuteResult), StringComparison.CurrentCultureIgnoreCase))
                 {
                     if (context.ContainsKey(prop.Name))
@@ -118,7 +114,7 @@ namespace FlowEngine.Command
             }
         }
 
-        public List<ConditionModel> GetConditions()
+        public override List<ConditionModel> GetConditions()
         {
             var pre = new ConditionModel();
             pre.Seq = 1;
@@ -127,7 +123,7 @@ namespace FlowEngine.Command
             return new List<ConditionModel>() { pre, post };
         }
 
-        public List<PropertyModel> GetProperties()
+        public override List<PropertyModel> GetProperties()
         {
             List<PropertyModel> result = new List<PropertyModel>();
             PropertyModel db = new PropertyModel();
@@ -160,6 +156,15 @@ namespace FlowEngine.Command
             sqlrst.Value = "";
             result.Add(sqlrst);
             return result;
+        }
+        public override void RegisterLink(List<LinkViewModel> links)
+        {
+            if (Post == null)
+                Post = new Postcondition();
+            foreach (var item in links)
+            {
+                Post.RegisterDest(item.DestCondition);
+            }
         }
     }
 }

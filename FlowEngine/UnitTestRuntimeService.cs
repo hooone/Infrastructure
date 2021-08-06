@@ -22,13 +22,13 @@ namespace FlowEngine
             this.flowConfig = _config;
             this.propertyDAL = propertyDAL;
         }
-        ICommand<TestTotalPayload> command = null;
+        BaseCommand<TestTotalPayload> command = null;
         public bool Init(string nodeId)
         {
             // 初始化全局context
             InitContext();
             // 初始化command
-            NodeViewModel node = flowConfig.GetNodeInfo(nodeId);
+            NodeViewModel node = flowConfig.GetNodeInfo(nodeId, false);
             command = flowConfig.GetCommand(node.Type);
             command.Id = node.Id;
             command.Name = node.Text;
@@ -98,11 +98,8 @@ namespace FlowEngine
         {
             if (command == null)
                 return false;
-            // 将context加载到command
-            var payload = command.UnBoxing(context);
-            var rst = command.Execute(payload);
-            command.Boxing(context, payload);
-            return rst;
+            command.Run(context);
+            return true;
         }
     }
 }

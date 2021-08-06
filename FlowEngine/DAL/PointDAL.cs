@@ -22,9 +22,30 @@ namespace FlowEngine.DAL
         public int insert(PointDTO obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
-            string sql = @"INSERT INTO POINT (ID,NODEID,SEQ ) values (@ID,@NODEID,@SEQ)";
-            return Helper.ExecuteNonQuery(sql, obj.ID, obj.NODEID, obj.SEQ);
+            string sql = @"INSERT INTO POINT (ID,NODEID,SEQ,ISPRECONDITION ) values (@ID,@NODEID,@SEQ,@ISPRECONDITION)";
+            return Helper.ExecuteNonQuery(sql, obj.ID, obj.NODEID, obj.SEQ, obj.ISPRECONDITION);
         }
+
+        [DbRead]
+        [SqlKey(nameof(PointDTO.ID))]
+        public List<PointDTO> ReadByID(PointDTO obj)
+        {
+            /// 该方法的代码由插件自动生成，请勿修改。
+            string sql = @"SELECT * FROM POINT WHERE ID=@ID";
+            DataTable dt = Helper.Query(sql, obj.ID);
+            List<PointDTO> rst = new List<PointDTO>();
+            foreach (DataRow row in dt.Rows)
+            {
+                PointDTO t = new PointDTO();
+                t.ID = row[nameof(PointDTO.ID)].TryToString();
+                t.NODEID = row[nameof(PointDTO.NODEID)].TryToString();
+                t.SEQ = row[nameof(PointDTO.SEQ)].TryToInt();
+                t.ISPRECONDITION = row[nameof(PointDTO.ISPRECONDITION)].TryToInt();
+                rst.Add(t);
+            }
+            return rst;
+        }
+
 
         [DbRead]
         [SqlKey(nameof(PointDTO.NODEID))]
@@ -40,6 +61,7 @@ namespace FlowEngine.DAL
                 t.ID = row[nameof(PointDTO.ID)].TryToString();
                 t.NODEID = row[nameof(PointDTO.NODEID)].TryToString();
                 t.SEQ = row[nameof(PointDTO.SEQ)].TryToInt();
+                t.ISPRECONDITION = row[nameof(PointDTO.ISPRECONDITION)].TryToInt();
                 rst.Add(t);
             }
             return rst;

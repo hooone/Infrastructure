@@ -30,7 +30,7 @@ namespace FlowEngine
         public NodeViewModel CreateNode(string type, int x, int y)
         {
             // 获取command
-            ICommand<TestTotalPayload> cmd = GetCommand(type);
+            BaseCommand<TestTotalPayload> cmd = GetCommand(type);
             cmd.Id = Guid.NewGuid().ToString("N");
             // 插入node表
             NodeViewModel node = new NodeViewModel();
@@ -87,10 +87,20 @@ namespace FlowEngine
         /// </summary>
         public LinkViewModel CreateLine(string point1, string point2)
         {
+            var ps1 = pointDAL.ReadByID(new DTO.PointDTO { ID = point1 });
+            if (ps1.Count != 1)
+                return null;
+            string node1 = ps1[0].NODEID;
+            var ps2 = pointDAL.ReadByID(new DTO.PointDTO { ID = point2 });
+            if (ps2.Count != 1)
+                return null;
+            string node2 = ps2[0].NODEID;
             LinkViewModel lv = new LinkViewModel();
             lv.Id = Guid.NewGuid().ToString("N");
-            lv.From = point1;
-            lv.To = point2;
+            lv.FromPoint = point1;
+            lv.ToPoint = point2;
+            lv.FromNode = node1;
+            lv.ToNode = node2;
             // 插入LINK表
             DTO.LinkDTO link = mapper.Map<DTO.LinkDTO>(lv);
             if (linkDAL.insert(link) != 1)
@@ -241,7 +251,7 @@ namespace FlowEngine
             FlowConfig rst = new FlowConfig();
             rst.Nodes = new List<NodeViewModel>();
             rst.Links = new List<LinkViewModel>();
-            var nodes = nodeDAL.read(null);
+            var nodes = nodeDAL.ReadAll(null);
             foreach (DTO.NodeDTO nd in nodes)
             {
                 NodeViewModel node = mapper.Map<NodeViewModel>(nd);
@@ -266,7 +276,7 @@ namespace FlowEngine
         /// <summary>
         /// 查询指定流程节点的详细信息
         /// </summary>
-        public NodeViewModel GetNodeInfo(string nodeid)
+        public NodeViewModel GetNodeInfo(string nodeid, bool needText)
         {
             var nodes = nodeDAL.ReadById(new DTO.NodeDTO() { ID = nodeid });
             if (nodes.Count != 1)
@@ -282,8 +292,11 @@ namespace FlowEngine
             }
             // 读取Property表
             node.Properties = new List<PropertyModel>();
-            PropertyModel pt = mapper.Map<PropertyModel>(node);
-            node.Properties.Add(pt);
+            if (needText)
+            {
+                PropertyModel pt = mapper.Map<PropertyModel>(node);
+                node.Properties.Add(pt);
+            }
             var ps = propertyDAL.ReadByNode(new DTO.PropertyDTO() { NODEID = node.Id });
             foreach (var item in ps)
             {
@@ -325,13 +338,13 @@ namespace FlowEngine
             var points = pointDAL.ReadByNode(new DTO.PointDTO() { NODEID = nodeId });
             foreach (var item in points)
             {
-                var fms = linkDAL.ReadByFrom(new DTO.LinkDTO() { LINKFROM = item.ID });
+                var fms = linkDAL.ReadByFrom(new DTO.LinkDTO() { FROMPOINT = item.ID });
                 foreach (var lk in fms)
                 {
                     var p = mapper.Map<LinkViewModel>(lk);
                     rst.Add(p);
                 }
-                var tos = linkDAL.ReadByTo(new DTO.LinkDTO() { LINKTO = item.ID });
+                var tos = linkDAL.ReadByTo(new DTO.LinkDTO() { TOPOINT = item.ID });
                 foreach (var lk in tos)
                 {
                     var p = mapper.Map<LinkViewModel>(lk);
@@ -358,7 +371,7 @@ namespace FlowEngine
 
         #endregion
 
-        public ICommand<TestTotalPayload> GetCommand(string type)
+        public BaseCommand<TestTotalPayload> GetCommand(string type)
         {
             switch (type.ToUpper())
             {

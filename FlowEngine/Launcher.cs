@@ -54,12 +54,8 @@ namespace FlowEngine
                 cfg.CreateMap<ConditionModel, PointDTO>();
 
                 // Link
-                cfg.CreateMap<LinkDTO, LinkViewModel>()
-                    .ForMember(dest => dest.From, opt => opt.MapFrom(src => src.LINKFROM))
-                    .ForMember(dest => dest.To, opt => opt.MapFrom(src => src.LINKTO));
-                cfg.CreateMap<LinkViewModel, LinkDTO>()
-                    .ForMember(dest => dest.LINKFROM, opt => opt.MapFrom(src => src.From))
-                    .ForMember(dest => dest.LINKTO, opt => opt.MapFrom(src => src.To));
+                cfg.CreateMap<LinkDTO, LinkViewModel>();
+                cfg.CreateMap<LinkViewModel, LinkDTO>();
 
                 // Property
                 cfg.CreateMap<PropertyDTO, PropertyModel>()

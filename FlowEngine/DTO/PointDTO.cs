@@ -21,5 +21,8 @@ namespace FlowEngine.DTO
         [DbColumn(DataType.NUMBER)]
         public int SEQ { get; set; }
 
+        [DbColumn(DataType.NUMBER)]
+        public int ISPRECONDITION { get; set; }
+
     }
 }

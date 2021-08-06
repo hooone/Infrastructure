@@ -11,6 +11,7 @@ namespace FlowEngine.Command
     {
         string Id { get; set; }
         string Name { get; set; }
+        CommandState CommandState { get; set; }
         List<PropertyModel> Properties { get; set; }
         /// <summary>
         /// 执行Command
@@ -30,16 +31,12 @@ namespace FlowEngine.Command
         List<ConditionModel> GetConditions();
         List<PropertyModel> GetProperties();
     }
-    public class Precondition
+    public enum CommandState
     {
-        public string Id { get; set; }
-        public int Seq { get; set; }
-        public string CommandId { get; set; }
-    }
-    public class Postcondition
-    {
-        public string Id { get; set; }
-        public int Seq { get; set; }
-        public string CommandId { get; set; }
+        Wait,
+        Ready,
+        Running,
+        Complete,
+        Error,
     }
 }
