@@ -11,7 +11,7 @@ namespace FlowEngine.Command
     {
         public string Id { get; set; }
         public abstract string Name { get; set; }
-        public Precondition PreCondition { get; set; }
+        public Precondition PreCondition { get; set; } = new Precondition();
         public CommandState CommandState { get; set; }
         public List<PropertyModel> Properties { get; set; }
 

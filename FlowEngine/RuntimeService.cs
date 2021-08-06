@@ -32,8 +32,7 @@ namespace FlowEngine
         List<BaseCommand<TestTotalPayload>> Commands = new List<BaseCommand<TestTotalPayload>>();
         public void Work()
         {
-            Working = true;
-            while (Working)
+            //while (Working)
             {
                 // 等待触发器
                 // 重置数据上下文

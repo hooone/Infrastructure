@@ -607,5 +607,18 @@ namespace FlowEditor
                 MessageBox.Show(ex.Message + Environment.NewLine + ex.StackTrace);
             }
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var runtime = Launcher.Container.Resolve<RuntimeService>();
+            try
+            {
+                runtime.Work();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + Environment.NewLine + ex.StackTrace);
+            }
+        }
     }
 }

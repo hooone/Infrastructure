@@ -10,11 +10,12 @@ payload装箱和拆箱 ok
 引入AutoMapper ok
 简化NewCommand ok
 把所有GUID生成拉到FlowConfigService层 ok
+流程测试 ok
 
 TODO
-单元测试并发锁
+逐步跟踪流程运行
 触发器
-流程测试
+单元测试并发锁
 Runtime超时判断
 日志规范化
 提示规范化

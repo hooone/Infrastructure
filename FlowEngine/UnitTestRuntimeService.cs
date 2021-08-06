@@ -98,8 +98,10 @@ namespace FlowEngine
         {
             if (command == null)
                 return false;
-            command.Run(context);
-            return true;
+            var payload = command.UnBoxing(context);
+            var rst = command.Execute(payload);
+            command.Boxing(context, payload);
+            return rst;
         }
     }
 }

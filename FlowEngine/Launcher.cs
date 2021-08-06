@@ -31,6 +31,7 @@ namespace FlowEngine
             // Service
             builder.RegisterType<FlowConfigService>().SingleInstance();
             builder.RegisterType<UnitTestRuntimeService>().InstancePerDependency();
+            builder.RegisterType<RuntimeService>().InstancePerDependency();
             Container = builder.Build();
 
         }
