@@ -85,20 +85,20 @@ namespace FlowEngine
         /// <summary>
         /// 创建连接线
         /// </summary>
-        public LinkViewModel CreateLine(string point1, string point2)
+        public LinkViewModel CreateLine(string pointFrom, string pointTo)
         {
-            var ps1 = pointDAL.ReadByID(new DTO.PointDTO { ID = point1 });
+            var ps1 = pointDAL.ReadByID(new DTO.PointDTO { ID = pointFrom });
             if (ps1.Count != 1)
                 return null;
             string node1 = ps1[0].NODEID;
-            var ps2 = pointDAL.ReadByID(new DTO.PointDTO { ID = point2 });
+            var ps2 = pointDAL.ReadByID(new DTO.PointDTO { ID = pointTo });
             if (ps2.Count != 1)
                 return null;
             string node2 = ps2[0].NODEID;
             LinkViewModel lv = new LinkViewModel();
             lv.Id = Guid.NewGuid().ToString("N");
-            lv.FromPoint = point1;
-            lv.ToPoint = point2;
+            lv.FromPoint = pointFrom;
+            lv.ToPoint = pointTo;
             lv.FromNode = node1;
             lv.ToNode = node2;
             // 插入LINK表

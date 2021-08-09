@@ -403,7 +403,7 @@ namespace FlowEditor
                 selectOutId = Id;
                 selectOutNode = node;
                 // 添加线
-                CreateLine(selectInId, selectOutId);
+                CreateLine(selectOutId, selectInId);
                 // 复位
                 if (selectOutNode != null)
                 {
@@ -423,7 +423,7 @@ namespace FlowEditor
                 selectInId = Id;
                 selectInNode = node;
                 // 添加线
-                CreateLine(selectInId, selectOutId);
+                CreateLine(selectOutId, selectInId);
                 // 复位
                 if (selectOutNode != null)
                 {
@@ -494,9 +494,9 @@ namespace FlowEditor
         }
 
         // 创建连接线
-        private void CreateLine(string point1, string point2)
+        private void CreateLine(string pointFrom, string pointTo)
         {
-            var link = service.CreateLine(point1, point2);
+            var link = service.CreateLine(pointFrom, pointTo);
             if (link == null)
                 return;
             AddLine(link.Id, link.FromPoint, link.ToPoint);

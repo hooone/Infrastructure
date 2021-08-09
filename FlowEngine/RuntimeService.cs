@@ -75,10 +75,6 @@ namespace FlowEngine
                                 break;
                         }
                     }
-                    lastWait = WaitCount;
-                    lastReady = ReadyCount;
-                    lastRunning = RunningCount;
-                    lastComplete = CompleteCount;
                     if (!hasRunning &&
                         lastWait == WaitCount &&
                         lastReady == ReadyCount &&
@@ -87,6 +83,10 @@ namespace FlowEngine
                     {
                         break;
                     }
+                    lastWait = WaitCount;
+                    lastReady = ReadyCount;
+                    lastRunning = RunningCount;
+                    lastComplete = CompleteCount;
                     // 判断超时
                 }
             }
