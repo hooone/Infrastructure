@@ -15,13 +15,12 @@ namespace FlowEngine.Command
         int SqlExecuteResult { get; set; }
         Dictionary<string, object> ObjectList { get; set; }
     }
-    public class SqlExecuteCommand<T> : BaseCommand<T> where T : ISqlExecutePayload, new()
+    public class SqlExecuteCommand<T> : NoBranchBaseCommand<T> where T : ISqlExecutePayload, new()
     {
         public override string Name { get; set; } = "执行sql";
 
         private SqlHelper helper = null;
 
-        private Postcondition Post;
         public override bool Execute(T payload)
         {
             // 加载helper
@@ -56,8 +55,8 @@ namespace FlowEngine.Command
                 }
             }
             payload.SqlExecuteResult = helper.ExecuteNonQuery(payload.Sql, pms.ToArray());
-            if (Post != null)
-                Post.SetSignal();
+            if (base.Post != null)
+                base.Post.SetSignal();
             return true;
         }
 
@@ -114,15 +113,6 @@ namespace FlowEngine.Command
             }
         }
 
-        public override List<ConditionModel> GetConditions()
-        {
-            var pre = new ConditionModel();
-            pre.Seq = 1;
-            var post = new ConditionModel();
-            post.Seq = 2;
-            return new List<ConditionModel>() { pre, post };
-        }
-
         public override List<PropertyModel> GetProperties()
         {
             List<PropertyModel> result = new List<PropertyModel>();
@@ -156,15 +146,6 @@ namespace FlowEngine.Command
             sqlrst.Value = "";
             result.Add(sqlrst);
             return result;
-        }
-        public override void RegisterLink(List<LinkViewModel> links)
-        {
-            if (Post == null)
-                Post = new Postcondition();
-            foreach (var item in links)
-            {
-                Post.RegisterDest(item.DestCondition);
-            }
         }
     }
 }
