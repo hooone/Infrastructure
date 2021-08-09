@@ -31,8 +31,6 @@
             this.components = new System.ComponentModel.Container();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.injectNode1 = new FlowEditor.Nodes.InjectNode();
-            this.otherNode1 = new FlowEditor.Nodes.OtherNode();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.sqlExecuteNode1 = new FlowEditor.Nodes.SqlExecuteNode();
@@ -46,6 +44,7 @@
             this.button3 = new System.Windows.Forms.Button();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.delayNode1 = new FlowEditor.Nodes.DelayNode();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage3.SuspendLayout();
@@ -67,8 +66,7 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.injectNode1);
-            this.tabPage1.Controls.Add(this.otherNode1);
+            this.tabPage1.Controls.Add(this.delayNode1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -76,26 +74,6 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "通用";
             this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // injectNode1
-            // 
-            this.injectNode1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(166)))), ((int)(((byte)(187)))), ((int)(((byte)(207)))));
-            this.injectNode1.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.injectNode1.Id = null;
-            this.injectNode1.Location = new System.Drawing.Point(35, 78);
-            this.injectNode1.Name = "injectNode1";
-            this.injectNode1.Size = new System.Drawing.Size(100, 30);
-            this.injectNode1.TabIndex = 1;
-            // 
-            // otherNode1
-            // 
-            this.otherNode1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(208)))), ((int)(((byte)(162)))));
-            this.otherNode1.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.otherNode1.Id = null;
-            this.otherNode1.Location = new System.Drawing.Point(35, 17);
-            this.otherNode1.Name = "otherNode1";
-            this.otherNode1.Size = new System.Drawing.Size(100, 30);
-            this.otherNode1.TabIndex = 0;
             // 
             // tabPage2
             // 
@@ -122,7 +100,7 @@
             this.sqlExecuteNode1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(216)))), ((int)(((byte)(191)))), ((int)(((byte)(216)))));
             this.sqlExecuteNode1.Cursor = System.Windows.Forms.Cursors.Hand;
             this.sqlExecuteNode1.Id = null;
-            this.sqlExecuteNode1.Location = new System.Drawing.Point(33, 20);
+            this.sqlExecuteNode1.Location = new System.Drawing.Point(20, 20);
             this.sqlExecuteNode1.Name = "sqlExecuteNode1";
             this.sqlExecuteNode1.Size = new System.Drawing.Size(130, 30);
             this.sqlExecuteNode1.TabIndex = 0;
@@ -226,6 +204,16 @@
             this.toolTip1.ReshowDelay = 100;
             this.toolTip1.ShowAlways = true;
             // 
+            // delayNode1
+            // 
+            this.delayNode1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(224)))), ((int)(((byte)(248)))));
+            this.delayNode1.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.delayNode1.Id = null;
+            this.delayNode1.Location = new System.Drawing.Point(20, 20);
+            this.delayNode1.Name = "delayNode1";
+            this.delayNode1.Size = new System.Drawing.Size(130, 30);
+            this.delayNode1.TabIndex = 0;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -261,17 +249,16 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Panel canvas;
-        private Nodes.OtherNode otherNode1;
         private System.Windows.Forms.TabPage tabPage3;
         private Nodes.SqlExecuteNode sqlExecuteNode1;
         private System.Windows.Forms.TabControl tabControl2;
         private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.TabPage tabPage5;
-        private Nodes.InjectNode injectNode1;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Panel panel1;
         public System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button button4;
+        private Nodes.DelayNode delayNode1;
     }
 }
 

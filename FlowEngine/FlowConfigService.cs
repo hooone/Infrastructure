@@ -377,6 +377,8 @@ namespace FlowEngine
             {
                 case "SQLEXECUTE":
                     return new SqlExecuteCommand<TestTotalPayload>();
+                case "DELAY":
+                    return new DelayCommand<TestTotalPayload>();
                     //case "INJECT":
                     //    return InjectCommand.NewCommand();
                     //default:

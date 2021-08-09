@@ -11,13 +11,13 @@ using System.Drawing.Drawing2D;
 
 namespace FlowEditor.Nodes
 {
-    public partial class InjectNode : Node
+    public partial class DelayNode : Node
     {
         private const int _Radius = 6;
         public delegate void NodeEvent(Control control);
-        public InjectNode()
+        public DelayNode()
         {
-            this.Type = "Inject";
+            this.Type = "Delay";
             InitializeComponent();
         }
         #region 属性
@@ -218,9 +218,9 @@ namespace FlowEditor.Nodes
         public override void HighLight(bool select)
         {
             if (!select)
-                this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(166)))), ((int)(((byte)(187)))), ((int)(((byte)(207)))));
+                this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(216)))), ((int)(((byte)(191)))), ((int)(((byte)(216)))));
             else
-                this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(196)))), ((int)(((byte)(212)))), ((int)(((byte)(237)))));
+                this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(246)))), ((int)(((byte)(215)))), ((int)(((byte)(246)))));
         }
 
 
@@ -251,4 +251,5 @@ namespace FlowEditor.Nodes
 
         #endregion
     }
+
 }

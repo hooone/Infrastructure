@@ -95,10 +95,10 @@ namespace FlowEditor
             {
                 case "SQLEXECUTE":
                     return new SqlExecuteNode();
-                case "INJECT":
-                    return new InjectNode();
+                case "DELAY":
+                    return new DelayNode();
                 default:
-                    return new OtherNode();
+                    return null;
             }
         }
         // 工具栏页面切换

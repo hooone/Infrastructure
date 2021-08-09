@@ -68,20 +68,14 @@
     <Compile Include="LinkPoint.Designer.cs">
       <DependentUpon>LinkPoint.cs</DependentUpon>
     </Compile>
-    <Compile Include="Nodes\InjectNode.cs">
+    <Compile Include="Nodes\DelayNode.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Nodes\InjectNode.Designer.cs">
-      <DependentUpon>InjectNode.cs</DependentUpon>
+    <Compile Include="Nodes\DelayNode.Designer.cs">
+      <DependentUpon>DelayNode.cs</DependentUpon>
     </Compile>
     <Compile Include="Nodes\Node.cs">
       <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Nodes\OtherNode.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Nodes\OtherNode.Designer.cs">
-      <DependentUpon>OtherNode.cs</DependentUpon>
     </Compile>
     <Compile Include="Nodes\SqlExecuteNode.cs">
       <SubType>UserControl</SubType>

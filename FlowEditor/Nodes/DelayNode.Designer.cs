@@ -2,7 +2,7 @@
 
 namespace FlowEditor.Nodes
 {
-    partial class InjectNode
+    partial class DelayNode
     {
         /// <summary> 
         /// 必需的设计器变量。
@@ -46,23 +46,23 @@ namespace FlowEditor.Nodes
             // linkOutPoint1
             // 
             this.linkOutPoint1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(217)))), ((int)(((byte)(217)))), ((int)(((byte)(217)))));
-            this.linkOutPoint1.Location = new System.Drawing.Point(92, 11);
+            this.linkOutPoint1.Location = new System.Drawing.Point(122, 11);
             this.linkOutPoint1.Name = "linkOutPoint1";
             this.linkOutPoint1.Size = new System.Drawing.Size(8, 8);
             this.linkOutPoint1.Click += LinkOutPoint1_Click;
             this.linkOutPoint1.TabIndex = 1;
             // 
-            // InjectNode
+            // DelayNode
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(166)))), ((int)(((byte)(187)))), ((int)(((byte)(207)))));
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(224)))), ((int)(((byte)(248)))));
             this.Controls.Add(this.linkOutPoint1);
             this.Controls.Add(this.linkInPoint1);
-            this.Name = "InjectNode";
-            this.Text = "变量";
+            this.Name = "DelayNode";
+            this.Text = "延迟";
             this.Cursor = Cursors.Hand;
-            this.Size = new System.Drawing.Size(100, 30);
+            this.Size = new System.Drawing.Size(130, 30);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Node_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Node_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Node_MouseUp);

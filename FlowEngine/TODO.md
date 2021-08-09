@@ -12,9 +12,11 @@ payload装箱和拆箱 ok
 把所有GUID生成拉到FlowConfigService层 ok
 流程测试 ok
 
+0809
+抽象出NoBranchCommand，将一进一出的流程节点标准化 ok
+延迟cmd开发ok
+
 TODO
-抽象出NoBranchCommand，将一进一出的流程节点标准化
-延迟cmd测试开发
 触发器开发
 触发器的单元测试按钮改为手动触发按钮
 command规范化日志
