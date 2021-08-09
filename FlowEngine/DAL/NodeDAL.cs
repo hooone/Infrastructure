@@ -22,8 +22,8 @@ namespace FlowEngine.DAL
         public int insert(NodeDTO obj)
         {
             /// 该方法的代码由插件自动生成，请勿修改。
-            string sql = @"INSERT INTO NODE (ID,TYPE,TEXT,X,Y ) values (@ID,@TYPE,@TEXT,@X,@Y)";
-            return Helper.ExecuteNonQuery(sql, obj.ID, obj.TYPE, obj.TEXT, obj.X, obj.Y);
+            string sql = @"INSERT INTO NODE (ID,TYPE,TEXT,X,Y,CUSTOMABLE ) values (@ID,@TYPE,@TEXT,@X,@Y,@CUSTOMABLE)";
+            return Helper.ExecuteNonQuery(sql, obj.ID, obj.TYPE, obj.TEXT, obj.X, obj.Y, obj.CUSTOMABLE);
         }
 
         [DbRead]
@@ -41,6 +41,7 @@ namespace FlowEngine.DAL
                 t.TEXT = row[nameof(NodeDTO.TEXT)].TryToString();
                 t.X = row[nameof(NodeDTO.X)].TryToInt();
                 t.Y = row[nameof(NodeDTO.Y)].TryToInt();
+                t.CUSTOMABLE = row[nameof(NodeDTO.CUSTOMABLE)].TryToInt();
                 rst.Add(t);
             }
             return rst;
@@ -61,6 +62,7 @@ namespace FlowEngine.DAL
                 t.TEXT = row[nameof(NodeDTO.TEXT)].TryToString();
                 t.X = row[nameof(NodeDTO.X)].TryToInt();
                 t.Y = row[nameof(NodeDTO.Y)].TryToInt();
+                t.CUSTOMABLE = row[nameof(NodeDTO.CUSTOMABLE)].TryToInt();
                 rst.Add(t);
             }
             return rst;

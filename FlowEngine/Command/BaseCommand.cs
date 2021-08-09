@@ -14,6 +14,7 @@ namespace FlowEngine.Command
         public Precondition PreCondition { get; set; } = new Precondition();
         public CommandState CommandState { get; set; }
         public List<PropertyModel> Properties { get; set; }
+        public abstract bool CustomAble { get; }
 
         T payload = default(T);
         public void Run(Dictionary<string, object> context)

@@ -39,6 +39,7 @@ namespace FlowEngine
             node.Text = cmd.Name;
             node.X = x;
             node.Y = y;
+            node.CustomAble = cmd.CustomAble;
             DTO.NodeDTO nd = mapper.Map<DTO.NodeDTO>(node);
             if (nodeDAL.insert(nd) != 1)
             {
@@ -167,6 +168,16 @@ namespace FlowEngine
         {
             linkDAL.Delete(new DTO.LinkDTO() { ID = id });
         }
+
+        /// <summary>
+        /// 删除自定义属性
+        /// </summary>
+        /// <param name="propertyId"></param>
+        public void DeleteProperty(string propertyId)
+        {
+            propertyDAL.DeleteById(new DTO.PropertyDTO() { ID = propertyId });
+        }
+
         #endregion
 
         #region 改

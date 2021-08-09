@@ -18,6 +18,7 @@ namespace FlowEngine.Command
     public class SqlExecuteCommand<T> : NoBranchBaseCommand<T> where T : ISqlExecutePayload, new()
     {
         public override string Name { get; set; } = "执行sql";
+        public override bool CustomAble { get { return true; } }
 
         private SqlHelper helper = null;
 

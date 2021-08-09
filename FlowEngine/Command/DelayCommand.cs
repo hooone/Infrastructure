@@ -16,6 +16,8 @@ namespace FlowEngine.Command
     {
         public override string Name { get; set; } = "延迟";
 
+        public override bool CustomAble { get { return false; } }
+
         private long start = 0;
         public override bool Execute(T payload)
         {

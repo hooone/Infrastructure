@@ -275,6 +275,11 @@ namespace FlowEditor
             var info = service.GetNodeInfo(nodeId, true);
             if (info == null)
                 return;
+            // 自定义属性按钮
+            if (info.CustomAble)
+                this.button3.Visible = true;
+            else
+                this.button3.Visible = false;
             // 标签属性
             this.panel1.Controls.Clear();
             PropertyNameBuffer.Clear();
@@ -333,7 +338,7 @@ namespace FlowEditor
             }
             PropertyEdit editForm = new PropertyEdit(this.service, control.Tag.ToString());
             var diaRst = editForm.ShowDialog();
-            if (diaRst != DialogResult.OK)
+            if (diaRst != DialogResult.OK && diaRst != DialogResult.Retry)
             {
                 return;
             }
@@ -341,7 +346,7 @@ namespace FlowEditor
             {
                 selectNode.SetText(editForm.Value);
             }
-            if (PropertyBuffer.ContainsKey(editForm.PropertyId))
+            if (PropertyBuffer.ContainsKey(editForm.PropertyId) && diaRst == DialogResult.OK)
             {
                 PropertyBuffer[editForm.PropertyId].Text = editForm.Value;
                 PropertyNameBuffer[editForm.PropertyId].Text = editForm.PropName;

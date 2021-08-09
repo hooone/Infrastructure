@@ -27,5 +27,8 @@ namespace FlowEngine.DTO
         [DbColumn(DataType.NUMBER)]
         public int Y { get; set; }
 
+        [DbColumn(DataType.NUMBER)]
+        public int CUSTOMABLE { get; set; }
+
     }
 }

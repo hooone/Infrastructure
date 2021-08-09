@@ -47,8 +47,10 @@ namespace FlowEngine
             var config = new MapperConfiguration(cfg =>
             {
                 // Node
-                cfg.CreateMap<NodeDTO, NodeViewModel>();
-                cfg.CreateMap<NodeViewModel, NodeDTO>();
+                cfg.CreateMap<NodeDTO, NodeViewModel>()
+                    .ForMember(dest => dest.CustomAble, opt => opt.MapFrom(src => src.CUSTOMABLE == 1));
+                cfg.CreateMap<NodeViewModel, NodeDTO>()
+                    .ForMember(dest => dest.CUSTOMABLE, opt => opt.MapFrom(src => src.CustomAble ? 1 : 0));
 
                 // Point
                 cfg.CreateMap<PointDTO, ConditionModel>();

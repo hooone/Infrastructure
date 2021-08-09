@@ -71,10 +71,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command\BaseCommand.cs" />
-    <Compile Include="Command\CommonCommand.cs" />
     <Compile Include="Command\DelayCommand.cs" />
     <Compile Include="Command\ICommand.cs" />
-    <Compile Include="Command\InjectCommand.cs" />
     <Compile Include="Command\NoBranchBaseCommand.cs" />
     <Compile Include="Command\SqlExecuteCommand.cs" />
     <Compile Include="DAL\COracleParameter.cs" />

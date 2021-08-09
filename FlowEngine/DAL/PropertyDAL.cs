@@ -113,5 +113,14 @@ namespace FlowEngine.DAL
             string sql = @"DELETE PROPERTY WHERE NODEID=@NODEID";
             return Helper.ExecuteNonQuery(sql, obj.NODEID);
         }
+
+        [DbDelete]
+        [SqlKey(nameof(PropertyDTO.ID))]
+        public int DeleteById(PropertyDTO obj)
+        {
+            /// 该方法的代码由插件自动生成，请勿修改。
+            string sql = @"DELETE PROPERTY WHERE ID=@ID";
+            return Helper.ExecuteNonQuery(sql, obj.ID);
+        }
     }
 }

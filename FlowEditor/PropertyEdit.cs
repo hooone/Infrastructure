@@ -47,6 +47,7 @@ namespace FlowEditor
                 this.comboBox2.Enabled = false;
                 this.textBox3.Enabled = false;
             }
+            this.button3.Visible = prop.IsCustom;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -73,6 +74,15 @@ namespace FlowEditor
         private void button2_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
+            this.Close();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("确认删除该属性?", "确认", MessageBoxButtons.YesNo) != DialogResult.Yes)
+                return;
+            service.DeleteProperty(this.PropertyId);
+            this.DialogResult = DialogResult.Retry;
             this.Close();
         }
     }
